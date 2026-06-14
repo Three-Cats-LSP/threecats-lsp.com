@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="T-Viewer">
+<meta name="theme-color" content="#0a1628" id="theme-meta">
+<title>T-Viewer</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<!-- Capacitor runtime — loaded by the WebView; no-op stub when running in browser -->
+<script>
+  if (!window.Capacitor) {
+    window.Capacitor = {
+      isNativePlatform: () => false,
+      Plugins: {}
+    };
+  }
+</script>
+<style>
+  /* ── DARK THEME (default) — matches LSP D-Planner exactly ── */
+  :root {
+    --bg:        #030c18;
+    --surface:   #07121f;
+    --card:      #0a1a2e;
+    --card2:     #0d2038;
+    --rim:       rgba(0,200,255,0.18);
+    --border:    rgba(0,200,255,0.09);
+    --border-hi: rgba(0,200,255,0.28);
+    --accent:    #00d9ff;
+    --accent2:   #00b8a0;
+    --text:      #d8eef8;
+    --muted:     #3e6882;
+    --tip:       #5ba4c2;
+    --dim:       #142535;
+    --green:     #26d07c;
+    --yellow:    #ffb703;
+    --orange:    #ff6d00;
+    --red:       #ff4757;
+    --gold:      #d4af37;
+    --bar:       44px;
+    --fs:        15px;
+    /* syntax — direct hex so JS setProperty() can override them */
+    --syn-h:   #00d9ff;
+    --syn-s:   rgba(0,200,255,0.28);
+    --syn-d:   #ffb703;
+    --syn-w:   #ff6d00;
+    --syn-l:   #00b8a0;
+  }
+
+  /* ── LIGHT THEME — matches LSP D-Planner light mode exactly ── */
+  body.light-theme {
+    --bg:        #ffffff;
+    --surface:   #f8f9fa;
+    --card:      #eff3f8;
+    --card2:     #e8ecf1;
+    --rim:       rgba(0,100,200,0.25);
+    --border:    rgba(0,100,200,0.25);
+    --border-hi: rgba(0,100,200,0.45);
+    --accent:    #0055aa;
+    --accent2:   #005544;
+    --text:      #1a1a1a;
+    --muted:     #555555;
+    --tip:       #4a7fa0;
+    --dim:       #cccccc;
+    --green:     #1a9e55;
+    --yellow:    #FFBF00;
+    --orange:    #ff5500;
+    --red:       #FF3131;
+    --gold:      #996600;
+    /* syntax — direct hex so JS setProperty() can override them */
+    --syn-h:   #004488;
+    --syn-s:   #cccccc;
+    --syn-d:   #000000;
+    --syn-w:   #cc3300;
+    --syn-l:   #005544;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    transition: background .2s, color .2s;
+  }
+
+  /* ── TOP BAR ── */
+  #topbar {
+    position: fixed;
+    top: env(safe-area-inset-top, 0px);
+    left: 0; right: 0;
+    height: var(--bar);
+    background: var(--surface);
+    border-bottom: 1px solid var(--rim);
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    gap: 6px;
+    z-index: 100;
+    transition: background .2s, border-color .2s;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--rim);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background .12s, border-color .2s, color .2s;
+    -webkit-user-select: none; user-select: none;
+  }
+  .btn:active { background: var(--rim); }
+  .btn svg {
+    width: 20px; height: 20px;
+    fill: none; stroke: currentColor;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .btn.hidden { display: none; }
+
+  /* theme toggle — highlight when day mode is active */
+  body.light-theme #btn-theme { border-color: var(--accent); color: var(--accent); }
+
+  /* ── SCROLL AREA ── */
+  #scroll {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + var(--bar));
+    bottom: env(safe-area-inset-bottom, 0px);
+    left: 0; right: 0;
+    overflow-y: auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  #scroll::-webkit-scrollbar { width: 3px; height: 3px; }
+  #scroll::-webkit-scrollbar-thumb { background: var(--rim); border-radius: 2px; }
+
+  /* ── TEXT CONTENT ── */
+  #content {
+    padding: 14px 16px;
+    font-size: var(--fs);
+    line-height: 1.7;
+    word-break: normal;
+    color: var(--text);
+    min-height: 100%;
+    tab-size: 4;
+    transition: color .2s;
+  }
+
+  /* syntax colours — use CSS vars so they flip with theme */
+  .h { color: var(--syn-h); font-weight: bold; }
+  .s { color: var(--syn-s); }
+  .d { color: var(--syn-d); }
+  .w { color: var(--syn-w); }
+  .l { color: var(--syn-l); }
+
+  /* ── LIGHT THEME: hardcoded dark colors — no var() ── */
+  /* light theme UI element colours */
+  body.light-theme .btn { color: #1a1a1a; }
+  body.light-theme #btn-theme { color: #0055aa; border-color: #0055aa; }
+
+  /* ── EMPTY STATE ── */
+  #empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 18px;
+    color: var(--muted);
+    text-align: center;
+    padding: 32px;
+  }
+  #empty svg   { width: 60px; height: 60px; stroke: var(--accent2); fill: none; stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; }
+  #empty h2    { font-size: 16px; color: var(--accent); letter-spacing: .08em; }
+  #empty p     { font-size: 13px; line-height: 1.65; max-width: 260px; }
+  #empty small { font-size: 11px; color: var(--muted); }
+
+  #open-big {
+    background: var(--accent2);
+    border: none;
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    padding: 13px 32px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background .12s;
+  }
+  #open-big:active { background: var(--accent); }
+
+  /* ── BOTTOM BAR ── */
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: var(--accent2);
+    color: #fff;
+    font-size: 13px;
+    padding: 8px 20px;
+    border-radius: 20px;
+    opacity: 0;
+    transition: opacity .22s, transform .22s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 300;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  #filein { display: none; }
+
+  /* ── DRAG-OVER OVERLAY ── */
+  #dropzone {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(3, 12, 24, 0.92);
+    border: 3px dashed var(--accent);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    color: var(--accent);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    pointer-events: none;
+  }
+  #dropzone.active { display: flex; }
+  #dropzone svg { width: 56px; height: 56px; stroke: var(--accent); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+</style>
+</head>
+<body>
+
+<input type="file" id="filein" accept=".txt,.log,.plan,.div,.pdf,text/*,application/pdf">
+
+<!-- DRAG-AND-DROP OVERLAY -->
+<div id="dropzone">
+  <svg viewBox="0 0 64 64"><path d="M12 8h28l12 12v36H12z"/><polyline points="40,8 40,20 52,20"/><line x1="32" y1="22" x2="32" y2="44"/><polyline points="22,34 32,22 42,34"/></svg>
+  DROP FILE HERE
+</div>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <button class="btn" id="btn-open" title="Open file">
+    <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+  </button>
+  <button class="btn hidden" id="btn-copy" title="Copy all">
+    <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+  </button>
+  <button class="btn hidden" id="btn-edit" title="Edit">
+    <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+  </button>
+  <button class="btn hidden" id="btn-save" title="Save file" style="color:var(--accent);">
+    <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+  </button>
+  <button class="btn hidden" id="btn-share" title="Share">
+    <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+  </button>
+  <button class="btn" id="btn-wrap" title="Toggle word wrap">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 7H20" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17H9" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12H17.5C18.8807 12 20 13.1193 20 14.5V14.5C20 15.8807 18.8807 17 17.5 17H12.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 15.5L12.5 17L15 18.5V15.5Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <button class="btn" id="btn-ref" title="About / Reference" style="font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;">?</button>
+  <!-- spacer pushes theme to right edge -->
+  <span id="zoom-label" style="font-size:11px;color:var(--muted);padding:0 4px;flex-shrink:0;">15px</span>
+  <div style="flex:1;"></div>
+  <button class="btn" id="btn-theme" title="Day / Night" style="font-size:16px;">
+    <span id="theme-icon">🌙</span>
+  </button>
+</div>
+
+  <!-- hidden filename tracker -->
+  <span id="filename" style="display:none;"></span>
+<!-- PDF.js -->
+<!-- PDF.js loaded inside main module script below -->
+
+<div id="scroll">
+  <div id="content">
+    <div id="empty">
+      <svg viewBox="0 0 64 64">
+        <path d="M12 8h28l12 12v36H12z"/>
+        <polyline points="40,8 40,20 52,20"/>
+        <line x1="20" y1="32" x2="44" y2="32"/>
+        <line x1="20" y1="40" x2="44" y2="40"/>
+        <line x1="20" y1="48" x2="36" y2="48"/>
+      </svg>
+      <h2>T-VIEWER</h2>
+      <p id="empty-hint">Open a text or PDF file — or share one from LSP D-Planner.</p>
+      <button id="open-big">OPEN FILE</button>
+      <small id="empty-sub">TXT · PDF · UTF-8 · Unicode</small>
+    </div>
+  </div>
+</div>
+
+<!-- PDF viewer (hidden until a PDF is opened) -->
+<div id="pdf-viewer" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + var(--bar));bottom:env(safe-area-inset-bottom,0px);left:0;right:0;overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;background:var(--bg);">
+  <div id="pdf-pages" style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:8px;min-width:min-content;"></div>
+</div>
+
+<!-- PDF page nav bar (hidden until PDF opened) -->
+<div id="pdf-nav" style="display:none;position:fixed;bottom:env(safe-area-inset-bottom,0);left:0;right:0;height:36px;background:var(--surface);border-top:1px solid var(--rim);align-items:center;justify-content:center;gap:12px;z-index:100;">
+  <button class="btn" id="pdf-prev" style="width:30px;height:30px;">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <span id="pdf-page-label" style="font-size:12px;color:var(--muted);min-width:60px;text-align:center;"></span>
+  <button class="btn" id="pdf-next" style="width:30px;height:30px;">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+</div>
+
+<!-- BOTTOM BAR -->
+<div id="toast"></div>
+
+<!-- ── DISCARD WARNING DIALOG ── -->
+<div id="discardDialog" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;padding:32px;">
+  <div style="max-width:320px;width:100%;background:var(--surface);border:1px solid var(--border-hi);border-radius:14px;padding:24px;font-family:'JetBrains Mono',monospace;text-align:center;">
+    <div style="font-size:28px;margin-bottom:12px;">⚠️</div>
+    <div style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.08em;margin-bottom:10px;">DISCARD CHANGES?</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:20px;">You have unsaved edits.<br>Exit edit mode without saving?</div>
+    <div style="display:flex;gap:10px;">
+      <button id="discard-cancel"
+        style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border-hi);background:transparent;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.06em;">
+        KEEP EDITING
+      </button>
+      <button id="discard-confirm"
+        style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--red);background:var(--red);color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.06em;">
+        DISCARD
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── REFERENCE MODAL ── -->
+<div id="refModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:9000;background:rgba(0,0,0,0.75);overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch;box-sizing:border-box;">
+  <div style="max-width:480px;width:100%;margin:0 auto;background:var(--surface);border:1px solid var(--border-hi);border-radius:14px;padding:16px;font-family:'JetBrains Mono',monospace;box-sizing:border-box;">
+
+    <!-- header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+      <div style="font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--accent);">T-VIEWER</div>
+      <button onclick="document.getElementById('refModal').style.display='none'" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 14px;cursor:pointer;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;">✕ Close</button>
+    </div>
+
+    <!-- tab bar -->
+    <div style="display:flex;gap:6px;margin-bottom:20px;">
+      <button id="tab-settings-btn" onclick="switchTab('settings')"
+        style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#000;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">
+        COLORS
+      </button>
+      <button id="tab-about-btn" onclick="switchTab('about')"
+        style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border-hi);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">
+        ABOUT
+      </button>
+    </div>
+
+    <!-- ── ABOUT TAB ── -->
+    <div id="tab-about" style="display:none;">
+
+    <!-- About -->
+    <div style="margin-bottom:20px;">
+      <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:10px;">About T-Viewer</div>
+      <div style="font-size:12px;line-height:1.8;color:var(--text);">
+        T-Viewer is a companion app for <strong style="color:var(--accent);">LSP D-Planner</strong> — a technical dive decompression planner.<br><br>
+        Use T-Viewer to open, read, and share the dive plan text files exported by LSP D-Planner directly on your Android device. Supports syntax highlighting for deco schedules, depth data, warnings, and gas labels.<br><br>
+        <span style="color:var(--muted);">Features:</span>
+        <ul style="margin:8px 0 0 0;padding-left:18px;line-height:2;">
+          <li>Open .txt / .log / .plan / .div files</li>
+          <li>Receive shared files from LSP D-Planner</li>
+          <li>Syntax highlighting for deco logs</li>
+          <li>Dark &amp; light theme (tap 🌙 / ☀️)</li>
+          <li>Pinch-to-zoom (font size shown in top bar)</li>
+          <li>Copy &amp; share text</li>
+          <li>Drag &amp; drop on desktop browser</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Links -->
+    <div style="margin-bottom:20px;padding-top:16px;border-top:1px solid var(--border);">
+      <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:10px;">Apps &amp; Download</div>
+      <div style="display:flex;flex-direction:column;gap:8px;width:100%;box-sizing:border-box;">
+
+        <a href="https://three-cats-lsp.github.io/T-Viewer/download.html" target="_blank" rel="noopener noreferrer"
+           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;"
+           onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+           onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3"/></svg>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">T-Viewer · Download Android APK</span>
+        </a>
+
+        <a href="https://three-cats-lsp.github.io/LSP_D-planner/download.html" target="_blank" rel="noopener noreferrer"
+           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;"
+           onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+           onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3"/></svg>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">LSP D-Planner · Download Android APK</span>
+        </a>
+
+        <a href="https://three-cats-lsp.github.io/LSP_D-planner/" target="_blank" rel="noopener noreferrer"
+           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;"
+           onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+           onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">LSP D-Planner · Open Web App</span>
+        </a>
+
+        <a href="https://github.com/Three-Cats-LSP/T-Viewer" target="_blank" rel="noopener noreferrer"
+           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;"
+           onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+           onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">T-Viewer · Source on GitHub</span>
+        </a>
+
+        <a href="https://github.com/Three-Cats-LSP/LSP_D-planner" target="_blank" rel="noopener noreferrer"
+           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;"
+           onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+           onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">LSP D-Planner · Source on GitHub</span>
+        </a>
+
+        <a href="https://www.instagram.com/threecats_lsp" target="_blank" rel="noopener noreferrer"
+           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;"
+           onmouseover="this.style.borderColor='#d92e7f';this.style.color='#d92e7f'"
+           onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'">
+          <svg width="16" height="16" viewBox="0 0 50 50" fill="none">
+            <defs><linearGradient id="ig2" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#feda75"/><stop offset="5%" style="stop-color:#fa7e1e"/><stop offset="45%" style="stop-color:#d92e7f"/><stop offset="60%" style="stop-color:#9b36b7"/><stop offset="90%" style="stop-color:#515bd4"/></linearGradient></defs>
+            <rect x="5" y="5" width="40" height="40" rx="10" fill="none" stroke="url(#ig2)" stroke-width="2.5"/>
+            <circle cx="25" cy="25" r="8" fill="none" stroke="url(#ig2)" stroke-width="2"/>
+            <circle cx="36" cy="13" r="2" fill="url(#ig2)"/>
+          </svg>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Follow @threecats_lsp on Instagram</span>
+        </a>
+
+        <a href="https://paypal.me/ThreeCatLSP" target="_blank" rel="noopener noreferrer"
+           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:linear-gradient(135deg,rgba(0,112,186,0.12),rgba(0,145,220,0.16));border:1px solid rgba(0,112,186,0.4);border-radius:8px;color:var(--muted);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s,background .2s;"
+           onmouseover="this.style.borderColor='#0070ba';this.style.color='#0070ba';this.style.background='rgba(0,112,186,0.22)'"
+           onmouseout="this.style.borderColor='rgba(0,112,186,0.4)';this.style.color='var(--muted)';this.style.background='linear-gradient(135deg,rgba(0,112,186,0.12),rgba(0,145,220,0.16))'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828L8.293 21H12.5c.524 0 .968-.381 1.05-.9l.437-2.786h1.8c3.476 0 5.893-1.408 6.656-5.49.343-1.818.044-3.145-.22-4.907z" fill="#009cde"/><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z" fill="#003087" opacity="0.8"/></svg>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Support Development · Donate via PayPal</span>
+        </a>
+
+      </div>
+    </div>
+
+    <p style="color:var(--muted);font-size:10px;text-align:center;letter-spacing:1px;opacity:0.6;margin-top:4px;">Three Cats LSP Diving Team</p>
+    </div><!-- /tab-about -->
+
+    <!-- ── SETTINGS TAB ── -->
+    <div id="tab-settings">
+
+      <!-- font selector -->
+      <div style="margin-bottom:18px;">
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:10px;">Font</div>
+        <div id="font-options" style="display:flex;flex-direction:column;gap:7px;"></div>
+      </div>
+
+      <!-- theme sub-tabs -->
+      <div style="display:flex;gap:6px;margin-bottom:16px;">
+        <button id="stab-dark-btn" onclick="switchSettingsTheme('dark')"
+          style="flex:1;padding:7px;border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:#000;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;">
+          🌙 DARK
+        </button>
+        <button id="stab-light-btn" onclick="switchSettingsTheme('light')"
+          style="flex:1;padding:7px;border-radius:7px;border:1px solid var(--border-hi);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;">
+          ☀️ LIGHT
+        </button>
+      </div>
+
+      <!-- dark colours panel -->
+      <div id="spanel-dark">
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:12px;">Dark Theme Colours</div>
+        <div id="pickers-dark" style="display:flex;flex-direction:column;gap:10px;"></div>
+        <button onclick="resetColors('dark')"
+          style="margin-top:14px;width:100%;padding:9px;border-radius:8px;border:1px solid var(--border-hi);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:.06em;">
+          ↺ Reset Dark to Defaults
+        </button>
+      </div>
+
+      <!-- light colours panel -->
+      <div id="spanel-light" style="display:none;">
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:12px;">Light Theme Colours</div>
+        <div id="pickers-light" style="display:flex;flex-direction:column;gap:10px;"></div>
+        <button onclick="resetColors('light')"
+          style="margin-top:14px;width:100%;padding:9px;border-radius:8px;border:1px solid var(--border-hi);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:.06em;">
+          ↺ Reset Light to Defaults
+        </button>
+      </div>
+
+    </div><!-- /tab-settings -->
+
+  </div>
+</div>
+
+<script>
+function cap(plugin) {
+  return window?.Capacitor?.Plugins?.[plugin] ?? null;
+}
+
+// ── DOM refs ──
+const content   = document.getElementById('content');
+const scroll    = document.getElementById('scroll');
+const fname     = document.getElementById('filename');
+const btnOpen   = document.getElementById('btn-open');
+const btnShare  = document.getElementById('btn-share');
+const btnCopy   = document.getElementById('btn-copy');
+const btnEdit   = document.getElementById('btn-edit');
+const btnSave   = document.getElementById('btn-save');
+const btnTheme  = document.getElementById('btn-theme');
+const btnRef    = document.getElementById('btn-ref');
+const btnWrap   = document.getElementById('btn-wrap');
+const themeIcon = document.getElementById('theme-icon');
+const zoomLbl   = document.getElementById('zoom-label');
+const openBig   = document.getElementById('open-big');
+const filein    = document.getElementById('filein');
+const toastEl   = document.getElementById('toast');
+const empty     = document.getElementById('empty');
+const themeMeta = document.getElementById('theme-meta');
+
+let currentText = '';
+
+// ── PDF state ─────────────────────────────────────────────
+let pdfDoc       = null;
+let pdfMode      = false;
+let pdfScale     = 1.5;
+const pdfViewer  = document.getElementById('pdf-viewer');
+const pdfPages   = document.getElementById('pdf-pages');
+const pdfNav     = document.getElementById('pdf-nav');
+const pdfPrev    = document.getElementById('pdf-prev');
+const pdfNext    = document.getElementById('pdf-next');
+const pdfLabel   = document.getElementById('pdf-page-label');
+let toastTimer;
+
+// ── Theme ─────────────────────────────────────────────────
+function applyTheme(light) {
+  document.body.classList.toggle('light-theme', light);
+  themeIcon.textContent = light ? '☀️' : '🌙';
+  themeMeta.content = light ? '#f8f9fa' : '#030c18';
+  try { localStorage.setItem('tv_theme', light ? 'light' : 'dark'); } catch {}
+  setTimeout(applyActiveThemeColors, 0);
+}
+
+let isLightTheme = false;
+try { isLightTheme = localStorage.getItem('tv_theme') === 'light'; } catch {}
+applyTheme(isLightTheme);
+
+btnTheme.addEventListener('click', () => {
+  isLightTheme = !isLightTheme;
+  applyTheme(isLightTheme);
+});
+
+
+// ── Reference modal ───────────────────────────────────────
+btnRef.addEventListener('click', () => {
+  document.getElementById('refModal').style.display = 'flex';
+  document.getElementById('refModal').scrollTop = 0;
+  switchTab('settings');
+});
+document.getElementById('refModal').addEventListener('click', function(e) {
+  if (e.target === this) this.style.display = 'none';
+});
+
+// ── Zoom ──────────────────────────────────────────────────
+let currentZoom = 15;
+function applyZoom(px) {
+  currentZoom = Math.min(32, Math.max(10, Math.round(px)));
+  content.style.fontSize = currentZoom + 'px';
+  zoomLbl.textContent    = currentZoom + 'px';
+  try { localStorage.setItem('tv_zoom', currentZoom); } catch {}
+}
+try { applyZoom(+localStorage.getItem('tv_zoom') || 15); } catch { applyZoom(15); }
+
+// Pinch-to-zoom
+let _pt0 = 0;
+scroll.addEventListener('touchstart', e => {
+  if (e.touches.length === 2)
+    _pt0 = Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
+                      e.touches[0].clientY - e.touches[1].clientY);
+}, { passive: true });
+scroll.addEventListener('touchmove', e => {
+  if (e.touches.length !== 2 || !_pt0) return;
+  e.preventDefault();
+  const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
+                       e.touches[0].clientY - e.touches[1].clientY);
+  applyZoom(currentZoom * d / _pt0);
+  _pt0 = d;
+}, { passive: false });
+scroll.addEventListener('touchend', () => { _pt0 = 0; });
+
+// ── Toast ─────────────────────────────────────────────────
+function toast(msg, ms = 2200) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms);
+}
+
+// ── Syntax highlight ──────────────────────────────
+function highlight(text) {
+  return text.split('\n').map(line => {
+    const t = line.trim();
+    const e = line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if (/^[\s=\-─═*·.]{3,}$/.test(t))                                    return `<span class="s">${e}</span>`;
+    if (/^[A-Z][A-Z ]{3,}$/.test(t))                                        return `<span class="h">${e}</span>`;
+    if (/\b\d+(\.\d+)?\s*(m|ft|bar|ata|psi|min|sec)\b/i.test(line))       return `<span class="d">${e}</span>`;
+    if (/\b(warn|caution|alert|danger|deco|mandatory|stop)\b/i.test(line)) return `<span class="w">${e}</span>`;
+    if (/^[\w\s\/\(\)]{2,25}:\s+\S/.test(t))                              return `<span class="l">${e}</span>`;
+    return e;
+  }).join('\n');
+}
+
+// ── Load text ─────────────────────────────────────────────
+function loadText(text, name) {
+  currentText = text;
+  empty.style.display = 'none';
+  content.innerHTML = highlight(text);
+  fname.textContent = name || 'file';
+  btnShare.classList.remove('hidden');
+  btnCopy.classList.remove('hidden');
+  btnEdit.classList.remove('hidden');
+  btnWrap.classList.remove('hidden');
+  scroll.scrollTop = 0;
+}
+
+// ── Open file ─────────────────────────────────────────────
+// ── PDF mode ──────────────────────────────────────────────
+function enterPdfMode() {
+  pdfMode = true;
+  scroll.style.display     = 'none';
+  pdfViewer.style.display  = 'block';
+  pdfNav.style.display     = 'flex';
+  // hide text-only buttons, show share
+  btnCopy.classList.add('hidden');
+  btnEdit.classList.add('hidden');
+  btnSave.classList.add('hidden');
+  btnWrap.classList.add('hidden');
+  btnShare.classList.remove('hidden');
+}
+
+let pdfCacheUri = null; // URI of PDF in cache dir, set when loaded
+
+function exitPdfMode() {
+  pdfMode     = false;
+  pdfDoc      = null;
+  pdfCacheUri = null;
+  pdfPages.innerHTML = '';
+  pdfViewer.style.display = 'none';
+  pdfNav.style.display    = 'none';
+}
+
+async function loadPdf(data, name) {
+  // data = ArrayBuffer or Uint8Array
+  fname.textContent = name || 'file.pdf';
+  pdfCacheUri = null;
+  enterPdfMode();
+
+  try {
+    const pdfjsLib = window.pdfjsLib;
+    if (!pdfjsLib) { toast('PDF.js not loaded yet — try again'); exitPdfMode(); return; }
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+
+    // write PDF bytes to cache immediately so share works
+    const Filesystem = cap('Filesystem');
+    if (Filesystem) {
+      try {
+        const bytes = data instanceof ArrayBuffer ? new Uint8Array(data) : data;
+        // convert to base64
+        let binary = '';
+        bytes.forEach(b => binary += String.fromCharCode(b));
+        const b64 = btoa(binary);
+        const pdfName = fname.textContent;
+        await Filesystem.writeFile({ path: pdfName, data: b64, directory: 'CACHE' });
+        const uriResult = await Filesystem.getUri({ path: pdfName, directory: 'CACHE' });
+        pdfCacheUri = uriResult.uri;
+      } catch (e) {
+        console.warn('Could not cache PDF for sharing:', e);
+      }
+    }
+
+    const loadingTask = pdfjsLib.getDocument({ data });
+    pdfDoc = await loadingTask.promise;
+
+    pdfLabel.textContent = `1 / ${pdfDoc.numPages}`;
+    pdfPages.innerHTML = '';
+
+    const pageRenders = [];
+    for (let i = 1; i <= pdfDoc.numPages; i++) pageRenders.push(renderPage(i));
+    await Promise.all(pageRenders);
+
+    pdfViewer.scrollTop = 0;
+    pdfLabel.textContent = `1 / ${pdfDoc.numPages}`;
+
+  } catch (err) {
+    toast('Could not open PDF: ' + (err.message || err));
+    exitPdfMode();
+  }
+}
+
+async function renderPage(pageNum) {
+  const page     = await pdfDoc.getPage(pageNum);
+  const viewport = page.getViewport({ scale: pdfScale });
+
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = `position:relative;box-shadow:0 2px 8px rgba(0,0,0,0.4);`;
+  wrapper.dataset.page = pageNum;
+
+  const canvas  = document.createElement('canvas');
+  canvas.width  = viewport.width;
+  canvas.height = viewport.height;
+  canvas.style.display = 'block';
+  canvas.style.width  = viewport.width + 'px';
+  canvas.style.height = viewport.height + 'px';
+
+  wrapper.appendChild(canvas);
+  pdfPages.appendChild(wrapper);
+
+  const ctx = canvas.getContext('2d');
+  await page.render({ canvasContext: ctx, viewport }).promise;
+}
+
+// Update page label on scroll
+pdfViewer.addEventListener('scroll', () => {
+  if (!pdfDoc) return;
+  const wrappers = pdfPages.querySelectorAll('[data-page]');
+  const viewerTop = pdfViewer.getBoundingClientRect().top;
+  let current = 1;
+  wrappers.forEach(w => {
+    if (w.getBoundingClientRect().top - viewerTop < pdfViewer.clientHeight / 2) {
+      current = +w.dataset.page;
+    }
+  });
+  pdfLabel.textContent = `${current} / ${pdfDoc.numPages}`;
+});
+
+// Prev / Next scroll to page
+pdfPrev.addEventListener('click', () => {
+  if (!pdfDoc) return;
+  const wrappers = pdfPages.querySelectorAll('[data-page]');
+  const viewerTop = pdfViewer.getBoundingClientRect().top;
+  let current = 1;
+  wrappers.forEach(w => {
+    if (w.getBoundingClientRect().top - viewerTop < pdfViewer.clientHeight / 2) current = +w.dataset.page;
+  });
+  const target = pdfPages.querySelector(`[data-page="${Math.max(1, current - 1)}"]`);
+  if (target) target.scrollIntoView({ behavior: 'smooth' });
+});
+pdfNext.addEventListener('click', () => {
+  if (!pdfDoc) return;
+  const wrappers = pdfPages.querySelectorAll('[data-page]');
+  const viewerTop = pdfViewer.getBoundingClientRect().top;
+  let current = 1;
+  wrappers.forEach(w => {
+    if (w.getBoundingClientRect().top - viewerTop < pdfViewer.clientHeight / 2) current = +w.dataset.page;
+  });
+  const target = pdfPages.querySelector(`[data-page="${Math.min(pdfDoc.numPages, current + 1)}"]`);
+  if (target) target.scrollIntoView({ behavior: 'smooth' });
+});
+
+// Pinch zoom for PDF — re-render at new scale
+let _pdfPt0 = 0, _pdfBaseScale = 1.5, _pdfPinching = false, _pdfFinalScale = 1.5, _pdfRenderTimer = null;
+
+pdfViewer.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    _pdfPinching = true;
+    _pdfPt0 = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    _pdfBaseScale = pdfScale;
+    _pdfFinalScale = pdfScale;
+    e.preventDefault();
+  }
+}, { passive: false });
+
+pdfViewer.addEventListener('touchmove', e => {
+  if (!_pdfPinching || e.touches.length !== 2) return;
+  e.preventDefault();
+  const d = Math.hypot(
+    e.touches[0].clientX - e.touches[1].clientX,
+    e.touches[0].clientY - e.touches[1].clientY
+  );
+  _pdfFinalScale = Math.min(4, Math.max(0.5, _pdfBaseScale * d / _pdfPt0));
+  pdfPages.style.transform = `scale(${_pdfFinalScale / _pdfBaseScale})`;
+  pdfPages.style.transformOrigin = 'top center';
+}, { passive: false });
+
+pdfViewer.addEventListener('touchend', e => {
+  if (!_pdfPinching) return;
+  if (e.touches.length > 0) return; // wait until ALL fingers are lifted
+  _pdfPinching = false;
+  _pdfPt0 = 0;
+  if (!pdfDoc) return;
+  pdfScale = _pdfFinalScale; // commit final scale
+  clearTimeout(_pdfRenderTimer);
+  _pdfRenderTimer = setTimeout(async () => {
+    pdfPages.innerHTML = '';
+    pdfPages.style.transform = '';
+    const pages = [];
+    for (let i = 1; i <= pdfDoc.numPages; i++) pages.push(renderPage(i));
+    await Promise.all(pages);
+  }, 150);
+}, { passive: true });
+
+function openFile() { filein.click(); }
+
+filein.addEventListener('change', () => {
+  const file = filein.files[0];
+  if (!file) return;
+  if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+    exitPdfMode(); // reset if switching from a previous PDF
+    const reader = new FileReader();
+    reader.onload = e => loadPdf(e.target.result, file.name);
+    reader.onerror = () => toast('Could not read PDF ✗');
+    reader.readAsArrayBuffer(file);
+  } else {
+    exitPdfMode();
+    const reader = new FileReader();
+    reader.onload = e => loadText(e.target.result, file.name);
+    reader.onerror = () => toast('Could not read file ✗');
+    reader.readAsText(file, 'UTF-8');
+  }
+  filein.value = '';
+});
+
+btnOpen.addEventListener('click', openFile);
+openBig.addEventListener('click', openFile);
+
+// ── Handle file intent from another app ───────────────────
+async function handleAppUrl(url) {
+  if (!url) return;
+  const Filesystem = cap('Filesystem');
+  if (!Filesystem) return;
+  try {
+    const name = decodeURIComponent(url.split('/').pop().split('%2F').pop());
+    if (url.toLowerCase().includes('.pdf') || name.toLowerCase().endsWith('.pdf')) {
+      exitPdfMode();
+      const result = await Filesystem.readFile({ path: url });
+      // result.data is base64 for binary files
+      const binary = atob(result.data);
+      const buf = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) buf[i] = binary.charCodeAt(i);
+      loadPdf(buf.buffer, name);
+    } else {
+      exitPdfMode();
+      const result = await Filesystem.readFile({ path: url, encoding: 'utf8' });
+      loadText(result.data, name);
+    }
+  } catch (err) {
+    toast('Cannot open: ' + (err.message || err));
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.Capacitor) {
+    const App = cap('App');
+    if (App) {
+      App.addListener('appUrlOpen', data => handleAppUrl(data.url));
+      App.getLaunchUrl().then(data => {
+        if (data && data.url) handleAppUrl(data.url);
+      }).catch(() => {});
+
+      // Handle Android back gesture / back button
+      App.addListener('backButton', () => {
+        if (document.getElementById('refModal').style.display === 'flex') {
+          document.getElementById('refModal').style.display = 'none';
+        } else if (discardDialog.style.display === 'flex') {
+          discardDialog.style.display = 'none';
+        } else if (pdfMode) {
+          exitPdfMode();
+          scroll.style.display = '';
+          btnShare.classList.add('hidden');
+          btnWrap.classList.add('hidden');
+        } else if (currentText) {
+          currentText = '';
+          content.innerHTML = '';
+          content.appendChild(empty);
+          empty.style.display = '';
+          scroll.style.display = '';
+          fname.textContent = '';
+          btnShare.classList.add('hidden');
+          btnCopy.classList.add('hidden');
+          btnEdit.classList.add('hidden');
+          btnSave.classList.add('hidden');
+        } else {
+          App.exitApp();
+        }
+      });
+    }
+  }
+});
+
+// ── Share ─────────────────────────────────────────────────
+btnShare.addEventListener('click', async () => {
+  const Share      = cap('Share');
+  const Filesystem = cap('Filesystem');
+  const filename   = fname.textContent || 'file';
+
+  if (pdfMode) {
+    // ── Share PDF ──
+    if (!pdfDoc) return;
+    if (Share && Filesystem) {
+      try {
+        const uri = pdfCacheUri;
+        if (!uri) { toast('PDF not ready for sharing'); return; }
+        await Share.share({ title: filename, files: [uri], dialogTitle: 'Share PDF' });
+      } catch (e) {
+        if (e.message !== 'Share canceled') toast('Share failed');
+      }
+    } else {
+      toast('Share not available in browser');
+    }
+    return;
+  }
+
+  // ── Share text file ──
+  if (!currentText) return;
+
+  if (Share && Filesystem) {
+    try {
+      const txtName = filename.endsWith('.txt') ? filename : filename + '.txt';
+      await Filesystem.writeFile({ path: txtName, data: currentText, directory: 'CACHE', encoding: 'utf8' });
+      const uriResult = await Filesystem.getUri({ path: txtName, directory: 'CACHE' });
+      await Share.share({ title: txtName, files: [uriResult.uri], dialogTitle: 'Share dive plan' });
+    } catch (e) {
+      if (e.message !== 'Share canceled') toast('Share failed');
+    }
+  } else if (navigator.share) {
+    try {
+      const file = new File([currentText], filename, { type: 'text/plain' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: file.name });
+      } else {
+        await navigator.share({ title: filename, text: currentText });
+      }
+    } catch (e) {
+      if (e.name !== 'AbortError') copyAll();
+    }
+  } else {
+    copyAll();
+  }
+});
+
+// ── Copy ──────────────────────────────────────────────────
+function copyAll() {
+  if (!currentText) return;
+  navigator.clipboard?.writeText(currentText)
+    .then(() => toast('Copied ✓'))
+    .catch(() => {
+      const ta = Object.assign(document.createElement('textarea'),
+        { value: currentText, style: 'position:fixed;opacity:0' });
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      toast('Copied ✓');
+    });
+}
+btnCopy.addEventListener('click', copyAll);
+
+// ── Wrap toggle ───────────────────────────────────────────
+let isWrapped = true;
+try { isWrapped = localStorage.getItem('tv_wrap') !== 'off'; } catch {}
+
+function applyWrap(wrap) {
+  isWrapped = wrap;
+  content.style.whiteSpace = wrap ? 'pre-wrap' : 'pre';
+  btnWrap.style.color       = wrap ? 'var(--accent)' : '';
+  btnWrap.style.borderColor = wrap ? 'var(--accent)' : '';
+  try { localStorage.setItem('tv_wrap', wrap ? 'on' : 'off'); } catch {}
+}
+applyWrap(isWrapped);
+
+btnWrap.addEventListener('click', () => applyWrap(!isWrapped));
+let isEditing = false;
+let editOriginalText = ''; // snapshot of text when edit mode was entered
+
+function enterEditMode() {
+  isEditing = true;
+  editOriginalText = currentText;
+  content.setAttribute('contenteditable', 'plaintext-only');
+  content.style.outline = 'none';
+  content.style.caretColor = 'var(--accent)';
+  content.innerText = currentText;
+  btnEdit.style.color = 'var(--accent)';
+  btnEdit.style.borderColor = 'var(--accent)';
+  btnSave.classList.remove('hidden');
+  toast('Edit mode — tap 💾 to save');
+}
+
+function exitEditMode(discard) {
+  if (discard) currentText = editOriginalText; // restore original
+  else currentText = content.innerText;        // keep edits
+  content.removeAttribute('contenteditable');
+  content.innerHTML = highlight(currentText);
+  isEditing = false;
+  editOriginalText = '';
+  btnEdit.style.color = '';
+  btnEdit.style.borderColor = '';
+  btnSave.classList.add('hidden');
+}
+
+function hasUnsavedEdits() {
+  return isEditing && content.innerText !== editOriginalText;
+}
+
+// Discard dialog
+const discardDialog  = document.getElementById('discardDialog');
+const discardCancel  = document.getElementById('discard-cancel');
+const discardConfirm = document.getElementById('discard-confirm');
+
+function showDiscardDialog(onDiscard) {
+  discardDialog.style.display = 'flex';
+  const cleanup = () => { discardDialog.style.display = 'none'; };
+  discardConfirm.onclick = () => { cleanup(); onDiscard(); };
+  discardCancel.onclick  = () => { cleanup(); };
+  discardDialog.onclick  = (e) => { if (e.target === discardDialog) cleanup(); };
+}
+
+btnEdit.addEventListener('click', () => {
+  if (!isEditing) {
+    enterEditMode();
+  } else {
+    if (hasUnsavedEdits()) {
+      showDiscardDialog(() => exitEditMode(true));
+    } else {
+      exitEditMode(true);
+    }
+  }
+});
+
+// ── Save file ─────────────────────────────────────────────
+btnSave.addEventListener('click', () => {
+  if (isEditing) exitEditMode(false); // commit edits
+  const Filesystem = cap('Filesystem');
+  if (Filesystem) {
+    Filesystem.writeFile({
+      path: fname.textContent,
+      data: currentText,
+      directory: 'DOCUMENTS',
+      encoding: 'utf8',
+      recursive: true
+    }).then(() => toast('Saved ✓'))
+      .catch(() => saveAsBrowserDownload());
+  } else {
+    saveAsBrowserDownload();
+  }
+});
+
+function saveAsBrowserDownload() {
+  const blob = new Blob([currentText], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), {
+    href: url,
+    download: fname.textContent || 'dive-plan.txt'
+  });
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Downloaded ✓');
+}
+
+// ── Drag and drop (web / desktop) ──────────────────────────
+const dropzone = document.getElementById('dropzone');
+let dragCounter = 0;
+
+document.addEventListener('dragenter', e => {
+  if (!e.dataTransfer.types.includes('Files')) return;
+  dragCounter++;
+  dropzone.classList.add('active');
+});
+document.addEventListener('dragleave', () => {
+  dragCounter--;
+  if (dragCounter <= 0) { dragCounter = 0; dropzone.classList.remove('active'); }
+});
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', e => {
+  e.preventDefault();
+  dragCounter = 0;
+  dropzone.classList.remove('active');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+    exitPdfMode();
+    const reader = new FileReader();
+    reader.onload = ev => loadPdf(ev.target.result, file.name);
+    reader.onerror = () => toast('Could not read PDF ✗');
+    reader.readAsArrayBuffer(file);
+  } else {
+    exitPdfMode();
+    const reader = new FileReader();
+    reader.onload = ev => loadText(ev.target.result, file.name);
+    reader.onerror = () => toast('Could not read file ✗');
+    reader.readAsText(file, 'UTF-8');
+  }
+});
+
+// ── Adjust empty-state hint for platform ─────────────────────
+(function() {
+  const isNative = window.Capacitor?.isNativePlatform?.();
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+  if (!isNative && !isMobile) {
+    document.getElementById('empty-hint').textContent =
+      'Open a text file or drag and drop it here.';
+    document.getElementById('empty-sub').textContent =
+      'UTF-8 · Unicode · plain text · Ctrl+O to open';
+  }
+})();
+
+// ── Font Settings ─────────────────────────────────────────
+
+const FONTS = [
+  { key: 'system',   label: 'System Default',  stack: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
+  { key: 'mono',     label: 'Monospace',        stack: '"Courier New", Courier, monospace' },
+  { key: 'roboto',   label: 'Roboto Mono',      stack: '"Roboto Mono", "Courier New", monospace' },
+  { key: 'source',   label: 'Source Code Pro',  stack: '"Source Code Pro", "Courier New", monospace' },
+  { key: 'jetbrains',label: 'JetBrains Mono',   stack: '"JetBrains Mono", "Courier New", monospace' },
+  { key: 'opensans', label: 'Open Sans',         stack: '"Open Sans", "Segoe UI", Roboto, sans-serif' },
+  { key: 'noto',     label: 'Noto Sans',         stack: '"Noto Sans", "Segoe UI", sans-serif' },
+];
+
+function applyFont(key) {
+  const font = FONTS.find(f => f.key === key) || FONTS[0];
+  document.getElementById('content').style.fontFamily = font.stack;
+  try { localStorage.setItem('tv_font', key); } catch {}
+  // update selected state in picker if it exists
+  document.querySelectorAll('.font-opt-btn').forEach(btn => {
+    const active = btn.dataset.key === key;
+    btn.style.borderColor  = active ? 'var(--accent)'    : 'var(--border-hi)';
+    btn.style.background   = active ? 'var(--accent)'    : 'var(--card)';
+    btn.style.color        = active ? '#000'             : 'var(--text)';
+  });
+}
+
+function buildFontPicker() {
+  const container = document.getElementById('font-options');
+  if (!container || container.children.length > 0) return; // only build once
+  let saved = 'system';
+  try { saved = localStorage.getItem('tv_font') || 'system'; } catch {}
+
+  FONTS.forEach(font => {
+    const btn = document.createElement('button');
+    const active = font.key === saved;
+    btn.className = 'font-opt-btn';
+    btn.dataset.key = font.key;
+    btn.style.cssText = `
+      width:100%; padding:10px 14px;
+      border-radius:8px; cursor:pointer;
+      border:1px solid ${active ? 'var(--accent)' : 'var(--border-hi)'};
+      background:${active ? 'var(--accent)' : 'var(--card)'};
+      color:${active ? '#000' : 'var(--text)'};
+      text-align:left; font-size:13px;
+      font-family:${font.stack};
+      transition:border-color .15s, background .15s, color .15s;
+    `;
+    // show label in the font itself + a sample of dive-plan text
+    btn.innerHTML = `<span style="font-weight:600;">${font.label}</span>
+      <span style="font-size:11px;opacity:0.6;margin-left:8px;">40m · Deco: 3min</span>`;
+    btn.addEventListener('click', () => applyFont(font.key));
+    container.appendChild(btn);
+  });
+}
+
+// Apply saved font on startup
+(function initFont() {
+  try {
+    const saved = localStorage.getItem('tv_font') || 'system';
+    applyFont(saved);
+  } catch {}
+})();
+
+// ── Colour Settings ───────────────────────────────────────
+
+// Default colours per theme — mirrors the CSS
+const COLOR_DEFAULTS = {
+  dark: {
+    '--bg':     '#030c18',
+    '--text':   '#d8eef8',
+    '--syn-h':  '#00d9ff',
+    '--syn-s':  'rgba(0,200,255,0.28)',
+    '--syn-d':  '#ffb703',
+    '--syn-w':  '#ff6d00',
+    '--syn-l':  '#00b8a0',
+  },
+  light: {
+    '--bg':     '#ffffff',
+    '--text':   '#1a1a1a',
+    '--syn-h':  '#004488',
+    '--syn-s':  '#777777',
+    '--syn-d':  '#000000',
+    '--syn-w':  '#cc3300',
+    '--syn-l':  '#005544',
+  }
+};
+
+const COLOR_LABELS = {
+  '--bg':    'Background',
+  '--text':  'Body text',
+  '--syn-h': 'Headers',
+  '--syn-s': 'Separators',
+  '--syn-d': 'Data / Depth',
+  '--syn-w': 'Warnings',
+  '--syn-l': 'Labels',
+};
+
+// Load saved colours from localStorage
+function loadSavedColors() {
+  ['dark','light'].forEach(theme => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('tv_colors_' + theme) || '{}');
+      applyColorSet(theme, saved);
+    } catch {}
+  });
+}
+
+// Apply a colour set for a theme to the DOM
+function applyColorSet(theme, colors) {
+  const root = document.body;
+  const defaults = COLOR_DEFAULTS[theme];
+  Object.keys(defaults).forEach(varName => {
+    const val = colors[varName] || defaults[varName];
+    if (theme === 'dark'  && !isLightTheme) {
+      root.style.setProperty(varName, val);
+      if (varName === '--bg') root.style.setProperty('--surface', val);
+    }
+    if (theme === 'light' &&  isLightTheme) {
+      root.style.setProperty(varName, val);
+      if (varName === '--bg') root.style.setProperty('--surface', val);
+    }
+  });
+}
+
+// Re-apply the active theme's saved colours (called on theme switch)
+function applyActiveThemeColors() {
+  const theme = isLightTheme ? 'light' : 'dark';
+  // clear all inline var overrides first so previous theme doesn't bleed
+  const allVars = [...new Set([...Object.keys(COLOR_DEFAULTS.dark), ...Object.keys(COLOR_DEFAULTS.light)])];
+  allVars.forEach(v => document.body.style.removeProperty(v));
+  try {
+    const saved = JSON.parse(localStorage.getItem('tv_colors_' + theme) || '{}');
+    applyColorSet(theme, saved);
+  } catch {}
+}
+
+// Save one colour change and apply it live
+function setColor(theme, varName, value) {
+  try {
+    const key = 'tv_colors_' + theme;
+    const saved = JSON.parse(localStorage.getItem(key) || '{}');
+    saved[varName] = value;
+    localStorage.setItem(key, JSON.stringify(saved));
+  } catch {}
+  // Apply live only if this theme is active
+  const active = isLightTheme ? 'light' : 'dark';
+  if (theme === active) {
+    document.body.style.setProperty(varName, value);
+    if (varName === '--bg') document.body.style.setProperty('--surface', value);
+  }
+}
+
+// Reset theme colours to defaults
+function resetColors(theme) {
+  try { localStorage.removeItem('tv_colors_' + theme); } catch {}
+  const defaults = COLOR_DEFAULTS[theme];
+  const active = isLightTheme ? 'light' : 'dark';
+  if (theme === active) {
+    Object.entries(defaults).forEach(([k,v]) => document.body.style.setProperty(k, v));
+  }
+  buildPickers(theme); // rebuild to show default values
+}
+
+// Build colour picker rows for a theme
+function buildPickers(theme) {
+  const container = document.getElementById('pickers-' + theme);
+  if (!container) return;
+  container.innerHTML = '';
+
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('tv_colors_' + theme) || '{}'); } catch {}
+
+  const defaults = COLOR_DEFAULTS[theme];
+  Object.entries(defaults).forEach(([varName, defaultVal]) => {
+    const current = saved[varName] || defaultVal;
+    const hexVal  = rgbaToHex(current);
+    const swatchId = 'swatch-' + theme + '-' + varName.replace(/[^a-z0-9]/g,'_');
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;';
+
+    row.innerHTML = `
+      <div id="${swatchId}"
+        style="width:22px;height:22px;border-radius:5px;border:1px solid var(--border-hi);background:${hexVal};flex-shrink:0;"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:11px;color:var(--text);font-weight:600;white-space:nowrap;">${COLOR_LABELS[varName]}</div>
+        <div style="font-size:9px;color:var(--muted);letter-spacing:.06em;">${varName}</div>
+      </div>
+      <input type="text" maxlength="7" value="${hexVal}"
+        style="width:76px;padding:5px 7px;border:1px solid var(--border-hi);border-radius:6px;
+               background:var(--card2);color:var(--text);font-family:'JetBrains Mono',monospace;
+               font-size:12px;letter-spacing:.04em;text-align:center;outline:none;flex-shrink:0;"
+        placeholder="#rrggbb" spellcheck="false" autocomplete="off">
+      <input type="color" value="${hexVal}"
+        style="width:34px;height:34px;border:1px solid var(--border-hi);border-radius:6px;
+               background:transparent;cursor:pointer;padding:2px;flex-shrink:0;">
+    `;
+
+    const swatch  = row.querySelector('#' + swatchId);
+    const picker  = row.querySelector('input[type=color]');
+    const hexInput = row.querySelector('input[type=text]');
+
+    // colour picker → update swatch + text input + apply
+    picker.addEventListener('input', () => {
+      const v = picker.value;
+      swatch.style.background = v;
+      hexInput.value = v;
+      hexInput.style.borderColor = 'var(--border-hi)';
+      setColor(theme, varName, v);
+    });
+
+    // text input → validate → update swatch + picker + apply
+    function applyHexInput() {
+      let v = hexInput.value.trim();
+      if (!v.startsWith('#')) v = '#' + v;
+      if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+        hexInput.value = v.toLowerCase();
+        hexInput.style.borderColor = 'var(--border-hi)';
+        swatch.style.background = v;
+        picker.value = v;
+        setColor(theme, varName, v);
+      } else if (/^#[0-9a-fA-F]{3}$/.test(v)) {
+        // expand shorthand
+        const full = '#' + v[1]+v[1]+v[2]+v[2]+v[3]+v[3];
+        hexInput.value = full;
+        hexInput.style.borderColor = 'var(--border-hi)';
+        swatch.style.background = full;
+        picker.value = full;
+        setColor(theme, varName, full);
+      } else {
+        // invalid — red border, don't apply
+        hexInput.style.borderColor = '#ff4757';
+      }
+    }
+
+    hexInput.addEventListener('input', () => {
+      // live preview as user types if length looks complete
+      const v = hexInput.value.trim().replace(/^#?/, '#');
+      if (/^#[0-9a-fA-F]{6}$/.test(v)) applyHexInput();
+      else hexInput.style.borderColor = hexInput.value.length > 1 ? '#ff8c69' : 'var(--border-hi)';
+    });
+    hexInput.addEventListener('blur',    applyHexInput);
+    hexInput.addEventListener('keydown', e => { if (e.key === 'Enter') { applyHexInput(); hexInput.blur(); } });
+
+    container.appendChild(row);
+  });
+}
+
+// Convert rgba(...) or hex to #rrggbb for <input type=color>
+function rgbaToHex(color) {
+  if (/^#[0-9a-f]{6}$/i.test(color)) return color;
+  if (/^#[0-9a-f]{3}$/i.test(color)) {
+    const [,r,g,b] = color.match(/#(.)(.)(.)/).map((x,i) => i ? parseInt(x+x,16) : x);
+    return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+  }
+  // rgba / rgb — create a temporary canvas to resolve
+  try {
+    const c = document.createElement('canvas');
+    c.width = c.height = 1;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = color;
+    ctx.fillRect(0,0,1,1);
+    const [r,g,b] = ctx.getImageData(0,0,1,1).data;
+    return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+  } catch { return '#888888'; }
+}
+
+// Tab switching — modal tabs (About / Colors)
+function switchTab(tab) {
+  document.getElementById('tab-about').style.display    = tab === 'about'    ? '' : 'none';
+  document.getElementById('tab-settings').style.display = tab === 'settings' ? '' : 'none';
+  const aBtn = document.getElementById('tab-about-btn');
+  const sBtn = document.getElementById('tab-settings-btn');
+  if (tab === 'about') {
+    aBtn.style.background = 'var(--accent)'; aBtn.style.color = '#000'; aBtn.style.borderColor = 'var(--accent)';
+    sBtn.style.background = 'transparent';   sBtn.style.color = 'var(--muted)'; sBtn.style.borderColor = 'var(--border-hi)';
+  } else {
+    sBtn.style.background = 'var(--accent)'; sBtn.style.color = '#000'; sBtn.style.borderColor = 'var(--accent)';
+    aBtn.style.background = 'transparent';   aBtn.style.color = 'var(--muted)'; aBtn.style.borderColor = 'var(--border-hi)';
+    buildPickers('dark');
+    buildPickers('light');
+    buildFontPicker();
+    // open on the currently active theme's sub-tab
+    switchSettingsTheme(isLightTheme ? 'light' : 'dark');
+  }
+}
+
+// Sub-tab switching inside Settings (dark / light)
+function switchSettingsTheme(theme) {
+  document.getElementById('spanel-dark').style.display  = theme === 'dark'  ? '' : 'none';
+  document.getElementById('spanel-light').style.display = theme === 'light' ? '' : 'none';
+  const dBtn = document.getElementById('stab-dark-btn');
+  const lBtn = document.getElementById('stab-light-btn');
+  if (theme === 'dark') {
+    dBtn.style.background = 'var(--accent)'; dBtn.style.color = '#000'; dBtn.style.borderColor = 'var(--accent)';
+    lBtn.style.background = 'transparent';   lBtn.style.color = 'var(--muted)'; lBtn.style.borderColor = 'var(--border-hi)';
+  } else {
+    lBtn.style.background = 'var(--accent)'; lBtn.style.color = '#000'; lBtn.style.borderColor = 'var(--accent)';
+    dBtn.style.background = 'transparent';   dBtn.style.color = 'var(--muted)'; dBtn.style.borderColor = 'var(--border-hi)';
+  }
+}
+
+// Load saved colours on startup
+loadSavedColors();
+
+// Re-apply saved colours whenever theme is toggled
+
+
+// ── Load PDF.js dynamically ───────────────────────────────
+(async () => {
+  try {
+    const pdfjs = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs');
+    window.pdfjsLib = pdfjs;
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+  } catch(e) {
+    console.warn('PDF.js failed to load:', e);
+  }
+})();
+
+// ── Keyboard shortcuts ────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey) {
+    if (e.key === 'o')             { e.preventDefault(); openFile(); }
+    if (e.key === '=' || e.key === '+') { e.preventDefault(); applyZoom(currentZoom + 1); }
+    if (e.key === '-')             { e.preventDefault(); applyZoom(currentZoom - 1); }
+    if (e.key === 'd')             { e.preventDefault(); isLightTheme = !isLightTheme; applyTheme(isLightTheme); }
+  }
+});
+</script>
+
+
+</body>
+</html>
