@@ -3,7 +3,7 @@ name: Sync Apps
 on:
   workflow_dispatch:
   repository_dispatch:
-    types: [sync-d-planner, sync-t-viewer]
+    types: [sync-d-planner, sync-t-viewer, sync-apk-d-planner, sync-apk-t-viewer]
 
 jobs:
   sync:
@@ -14,7 +14,7 @@ jobs:
         with:
           token: ${{ secrets.SYNC_TOKEN }}
 
-      - name: Pull latest D-Planner
+      - name: Pull latest D-Planner index.html
         if: github.event.action == 'sync-d-planner' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p d-planner
@@ -22,9 +22,9 @@ jobs:
                -H "Accept: application/vnd.github.v3.raw" \
                -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner/contents/index.html" \
                -o d-planner/index.html
-          echo "D-Planner synced"
+          echo "D-Planner index.html synced"
 
-      - name: Pull latest T-Viewer
+      - name: Pull latest T-Viewer index.html
         if: github.event.action == 'sync-t-viewer' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p t-viewer
@@ -32,7 +32,27 @@ jobs:
                -H "Accept: application/vnd.github.v3.raw" \
                -L "https://api.github.com/repos/Three-Cats-LSP/T-Viewer/contents/index.html" \
                -o t-viewer/index.html
-          echo "T-Viewer synced"
+          echo "T-Viewer index.html synced"
+
+      - name: Pull latest D-Planner APK
+        if: github.event.action == 'sync-apk-d-planner' || github.event_name == 'workflow_dispatch'
+        run: |
+          mkdir -p d-planner
+          curl -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner/contents/Android%20Apk/LSP_D-planner.apk" \
+               -o d-planner/LSP_D-planner.apk
+          echo "D-Planner APK synced"
+
+      - name: Pull latest T-Viewer APK
+        if: github.event.action == 'sync-apk-t-viewer' || github.event_name == 'workflow_dispatch'
+        run: |
+          mkdir -p t-viewer
+          curl -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               -L "https://api.github.com/repos/Three-Cats-LSP/T-Viewer/contents/Android%20Apk/T-Viewer.apk" \
+               -o t-viewer/T-Viewer.apk
+          echo "T-Viewer APK synced"
 
       - name: Commit and push
         run: |
