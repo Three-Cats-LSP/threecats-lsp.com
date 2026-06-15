@@ -18,14 +18,12 @@ jobs:
         if: github.event.action == 'sync-d-planner' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p d-planner
-          curl -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3.raw" \
-               -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner/contents/index.html" \
-               -o d-planner/index.html
-          curl -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3.raw" \
-               -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner/contents/download.html" \
-               -o d-planner/download.html
+          for f in index.html download.html tests.html tests-extended.html tests-massive.html tests-massive-main.html tests-verify.html; do
+            curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+                 -H "Accept: application/vnd.github.v3.raw" \
+                 "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner/contents/${f}" \
+                 -o "d-planner/${f}"
+          done
           echo "D-Planner synced"
 
       - name: Pull latest T-Viewer files
