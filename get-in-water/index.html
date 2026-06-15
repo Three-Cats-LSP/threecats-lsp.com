@@ -179,6 +179,11 @@ header.hdr {
   font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.5px;
 }
 .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.btn-secondary.btn-icon-only {
+  width: 40px; height: 40px; padding: 0; min-width: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.btn-secondary.btn-icon-only svg { width: 18px; height: 18px; }
 .btn-export {
   padding: 7px 10px; background: var(--surface); color: var(--accent);
   border: 1px solid var(--accent); border-radius: 6px; cursor: pointer;
@@ -499,7 +504,8 @@ const ICON_PATHS = {
   filePdf: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><rect x="8" y="12" width="8" height="7" rx="1"/>',
   moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
   sun: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
-  help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>'
+  help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  menu: '<line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>'
 };
 
 function icon(name, size) {
@@ -792,7 +798,7 @@ function renderTemplateContent() {
       <button class="btn-export" onclick="exportTemplatePDF()" title="Export PDF">${iconPdfBtn()}</button>
     </div>
     <div class="action-row">
-      <button class="btn-secondary" onclick="addCategory()">+ Add card</button>
+      <button class="btn-secondary btn-icon-only" onclick="addCategory()" title="Add card">${icon('plus', 18)}</button>
     </div>`;
   cats.forEach((cat) => {
     const items = state.masterTemplate.items.filter(i => i.categoryId === cat.id);
@@ -915,11 +921,11 @@ function renderTrip() {
       <div class="progress-bar"><div class="progress-fill" style="width:${p.pct}%"></div></div>
     </div>
     <div class="action-row">
-      <button class="btn-secondary" onclick="addTripCategory('${trip.id}')">+ Add card</button>
+      <button class="btn-secondary btn-icon-only" onclick="addTripCategory('${trip.id}')" title="Add card">${icon('plus', 18)}</button>
       <button class="btn-export" onclick="exportTripTXT('full')" title="Download .txt">${icon('fileText', 16)}</button>
       <button class="btn-export" onclick="exportTripPDF('full')" title="Export PDF">${iconPdfBtn()}</button>
       <div class="menu-dropdown">
-        <button class="btn-secondary" onclick="toggleMenu(event)">⋮ More</button>
+        <button class="btn-secondary btn-icon-only" onclick="toggleMenu(event)" title="More">${icon('menu', 18)}</button>
         <div class="menu-panel ${menuOpen ? 'open' : ''}" id="trip-menu">
           <button onclick="promptRenameTrip('${trip.id}')">Rename trip</button>
           <button onclick="exportTripTXT('remaining')">Export remaining (TXT)</button>
