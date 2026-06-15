@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get In Water — Download APK</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #030c18;
+      color: #d8eef8;
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 70% 55% at 15% 60%, rgba(0,100,180,0.22) 0%, transparent 60%);
+    }
+    .card {
+      position: relative; z-index: 1;
+      background: #0a1a2e;
+      border: 1px solid rgba(0,200,255,0.2);
+      border-radius: 20px;
+      padding: 40px 32px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    .logo { font-size: 48px; margin-bottom: 8px; }
+    h1 { font-family: 'JetBrains Mono', monospace; font-size: 20px; color: #00d9ff; margin-bottom: 6px; letter-spacing: 1px; }
+    p { font-size: 14px; color: #5ba4c2; margin-bottom: 28px; line-height: 1.5; }
+    .btn {
+      display: inline-block;
+      background: #00d9ff;
+      color: #030c18;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 14px 32px;
+      border-radius: 30px;
+      text-decoration: none;
+      margin-bottom: 16px;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+      letter-spacing: 0.5px;
+    }
+    .btn:active { opacity: 0.8; }
+    .note { font-size: 12px; color: #3e6882; line-height: 1.6; margin-top: 20px; }
+    .status { font-size: 13px; color: #00d9ff; margin-top: 12px; min-height: 20px; font-family: 'JetBrains Mono', monospace; }
+    .back { display: block; margin-top: 28px; font-size: 12px; color: #3e6882; text-decoration: none; }
+    .back:hover { color: #5ba4c2; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">🤿</div>
+    <h1>Get In Water</h1>
+    <p>Dive trip packing checklist — companion to LSP D-Planner</p>
+
+    <button class="btn" id="dlBtn">⬇ Download APK</button>
+
+    <div class="status" id="status"></div>
+
+    <div class="note">
+      After downloading, open the APK file to install.<br>
+      You may need to allow <em>Install from unknown sources</em> in Settings.
+    </div>
+
+    <a class="back" href="https://threecats-lsp.com/get-in-water/">← Open web version</a>
+  </div>
+
+  <script>
+    const btn = document.getElementById('dlBtn');
+    const status = document.getElementById('status');
+    const APK_URL = 'https://threecats-lsp.com/get-in-water/Get-In-Water.apk';
+
+    btn.addEventListener('click', function() {
+      status.textContent = 'Starting download…';
+      btn.style.opacity = '0.6';
+      btn.style.pointerEvents = 'none';
+
+      fetch(APK_URL)
+        .then(r => {
+          if (!r.ok) throw new Error('Network error ' + r.status);
+          return r.blob();
+        })
+        .then(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'Get-In-Water.apk';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 5000);
+          status.textContent = '✓ Download started — check your notifications';
+          btn.style.opacity = '1';
+          btn.style.pointerEvents = '';
+        })
+        .catch(() => {
+          status.textContent = 'Redirecting… tap Save if prompted';
+          window.location.href = APK_URL;
+          btn.style.opacity = '1';
+          btn.style.pointerEvents = '';
+        });
+    });
+  </script>
+</body>
+</html>

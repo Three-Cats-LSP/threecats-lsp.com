@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Get In Water · Trip Packing</title>
+<link href="manifest.json" rel="manifest"/>
+<meta content="#030c18" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="#f5f7f9" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030c18" id="theme-color-active" name="theme-color"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="Get In Water" name="apple-mobile-web-app-title"/>
+<meta content="Dive trip packing checklist — gear, camera, travel docs. Companion to LSP D-Planner." name="description"/>
+<link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23030c18'/%3E%3Ctext x='32' y='44' font-size='32' text-anchor='middle'%3E%F0%9F%A4%BF%3C/text%3E%3C/svg%3E" rel="icon" type="image/svg+xml"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  if (!window.Capacitor) {
+    window.Capacitor = { isNativePlatform: () => false, Plugins: {} };
+  }
+</script>
+<style>
+:root {
+  --bg: #030c18; --surface: #07121f; --card: #0a1a2e; --card2: #0d2038;
+  --border: rgba(0,200,255,0.09); --border-hi: rgba(0,200,255,0.28);
+  --accent: #00d9ff; --accent2: #00b8a0;
+  --green: #26d07c; --yellow: #ffb703; --orange: #ff6d00; --red: #ff4757;
+  --text: #d8eef8; --muted: #3e6882; --tip: #5ba4c2; --dim: #142535;
+}
+body.light-theme {
+  --bg: #ffffff; --surface: #f8f9fa; --card: #eff3f8; --card2: #e8ecf1;
+  --border: rgba(0,100,200,0.25); --border-hi: rgba(0,100,200,0.45);
+  --accent: #0055aa; --accent2: #005544;
+  --green: #1a9e55; --yellow: #FFBF00; --orange: #ff5500; --red: #FF3131;
+  --text: #1a1a1a; --muted: #555555; --tip: #4a7fa0; --dim: #cccccc;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Outfit', sans-serif; min-height: 100vh; overflow-x: hidden;
+  transition: all 0.4s ease;
+  padding: env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+}
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 60%, rgba(0,100,180,0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 70% at 85% 20%, rgba(0,60,140,0.18) 0%, transparent 60%),
+    linear-gradient(160deg, #030c18 0%, #050e1c 60%, #030c18 100%);
+  transition: all 0.4s ease;
+}
+body.light-theme::before {
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 60%, rgba(100,180,255,0.05) 0%, transparent 60%),
+    linear-gradient(160deg, #ffffff 0%, #ffffff 100%);
+}
+.bubbles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.bubble {
+  position: absolute; border-radius: 50%;
+  background: rgba(0,217,255,0.04); border: 1px solid rgba(0,217,255,0.1);
+  animation: rise linear infinite;
+}
+@keyframes rise {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 1; } 90% { opacity: 0.4; }
+  100% { transform: translateY(-110vh) translateX(20px); opacity: 0; }
+}
+.app { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 16px 14px 32px; }
+header.hdr {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 4px 0 12px; gap: 10px; flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.brand-icon {
+  width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+  background: linear-gradient(135deg, rgba(0,200,255,0.12), rgba(0,100,200,0.08));
+  border: 1px solid var(--accent);
+}
+.brand-text h1 {
+  font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px;
+  color: var(--text); line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.brand-text p {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted); margin-top: 3px;
+}
+.hdr-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 6px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--accent); font-size: 16px; cursor: pointer; transition: all 0.3s;
+}
+.theme-toggle:hover { border-color: var(--accent); background: rgba(0,200,255,0.1); }
+.btn-back {
+  padding: 6px 10px; background: var(--surface); color: var(--accent);
+  border: 1px solid var(--border-hi); border-radius: 6px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px;
+}
+.btn-back:hover { border-color: var(--accent); }
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px; margin-bottom: 12px; position: relative; overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0.2;
+}
+.card-title {
+  font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.card-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border-hi), transparent);
+}
+.card.collapsible .card-title { cursor: pointer; user-select: none; margin-bottom: 0; }
+.card.collapsible .card-title::after { display: none; }
+.card.collapsible .card-title .card-caret { margin-left: auto; transition: transform 0.2s; }
+.card.collapsible.card-open .card-title .card-caret { transform: rotate(180deg); }
+.card.collapsible:not(.card-open) .card-collapsible-body { display: none; }
+.card.collapsible.card-open .card-collapsible-body { display: block; margin-top: 12px; }
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 18px; background: linear-gradient(135deg, rgba(0,200,255,0.2), rgba(0,100,200,0.25));
+  color: var(--accent); border: 1px solid var(--accent); border-radius: 8px;
+  cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  font-weight: 600; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s;
+}
+.btn-primary:hover { background: rgba(0,200,255,0.25); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; background: var(--surface); color: var(--text);
+  border: 1px solid var(--border-hi); border-radius: 8px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.5px;
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.btn-export {
+  padding: 7px 10px; background: var(--surface); color: var(--accent);
+  border: 1px solid var(--accent); border-radius: 6px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 11px;
+  letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px;
+}
+.btn-export:hover { background: rgba(0,200,255,0.1); }
+.btn-danger { color: var(--red); border-color: var(--red); }
+.btn-danger:hover { background: rgba(255,71,87,0.1); }
+.action-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.trip-card {
+  background: var(--card2); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.2s;
+}
+.trip-card:hover { border-color: var(--accent); }
+.trip-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.trip-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
+.progress-bar {
+  height: 6px; background: var(--dim); border-radius: 3px; margin-top: 8px; overflow: hidden;
+}
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 3px; transition: width 0.3s; }
+.progress-sticky {
+  position: sticky; top: 0; z-index: 10; background: var(--bg);
+  padding: 10px 0 12px; margin-bottom: 4px; border-bottom: 1px solid var(--border);
+}
+.check-item {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 4px;
+  border-bottom: 1px solid var(--border); cursor: pointer; user-select: none;
+}
+.check-item:last-child { border-bottom: none; }
+.check-box {
+  width: 22px; height: 22px; flex-shrink: 0; border-radius: 5px;
+  border: 2px solid var(--border-hi); display: flex; align-items: center; justify-content: center;
+  font-size: 14px; transition: all 0.15s; margin-top: 1px;
+}
+.check-item.checked .check-box { background: var(--green); border-color: var(--green); color: #fff; }
+.check-item.checked .item-name { text-decoration: line-through; opacity: 0.55; }
+.item-name { font-size: 14px; flex: 1; }
+.item-note { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--tip); margin-top: 2px; }
+.edit-row {
+  display: flex; align-items: center; gap: 6px; padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.edit-row input {
+  flex: 1; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px 10px; color: var(--text);
+  font-family: 'Outfit', sans-serif; font-size: 13px;
+}
+.edit-row input:focus { outline: none; border-color: var(--accent); }
+.icon-btn {
+  width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border);
+  background: transparent; color: var(--muted); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+.icon-btn.danger:hover { border-color: var(--red); color: var(--red); }
+.empty-state { text-align: center; padding: 32px 16px; color: var(--muted); }
+.empty-state p { font-size: 14px; line-height: 1.5; margin-top: 8px; }
+.link-card {
+  display: flex; align-items: center; gap: 9px; padding: 10px 14px;
+  background: var(--surface); border: 1px solid var(--border-hi); border-radius: 8px;
+  color: var(--muted); text-decoration: none; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; margin-bottom: 8px; transition: border-color 0.2s, color 0.2s;
+}
+.link-card:hover { border-color: var(--accent); color: var(--accent); }
+#toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: rgba(0,200,255,0.92); color: #000; padding: 10px 22px; border-radius: 20px;
+  font-size: 13px; z-index: 99999; pointer-events: none; opacity: 0;
+  transition: transform 0.3s, opacity 0.3s; font-family: 'JetBrains Mono', monospace;
+}
+#toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+#modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  z-index: 200; align-items: center; justify-content: center; padding: 20px;
+}
+#modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--card); border: 1px solid var(--border-hi); border-radius: 14px;
+  padding: 20px; width: 100%; max-width: 360px;
+}
+.modal-box h3 { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; margin-bottom: 14px; }
+.modal-field { margin-bottom: 12px; }
+.modal-field label {
+  display: block; font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
+}
+.modal-field input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 14px;
+}
+.modal-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+.menu-dropdown { position: relative; display: inline-block; }
+.menu-panel {
+  display: none; position: absolute; right: 0; top: 100%; margin-top: 4px;
+  background: var(--card); border: 1px solid var(--border-hi); border-radius: 8px;
+  min-width: 200px; z-index: 50; box-shadow: 0 8px 24px rgba(0,0,0,0.3); overflow: hidden;
+}
+.menu-panel.open { display: block; }
+.menu-panel button {
+  display: block; width: 100%; text-align: left; padding: 10px 14px;
+  background: none; border: none; color: var(--text); cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  border-bottom: 1px solid var(--border);
+}
+.menu-panel button:last-child { border-bottom: none; }
+.menu-panel button:hover { background: rgba(0,200,255,0.08); color: var(--accent); }
+.menu-panel button.danger { color: var(--red); }
+.export-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+@media (max-width: 600px) { .card { padding: 12px 10px; } }
+</style>
+</head>
+<body>
+<div class="bubbles" id="bubbles"></div>
+<div class="app" id="app-root"></div>
+<div id="toast"></div>
+<div id="modal-overlay">
+  <div class="modal-box" id="modal-content"></div>
+</div>
+<script src="capacitor-bridge.js"></script>
+<script>
+const APP_VERSION = '1.0.0';
+const STORAGE_KEY = 'giw_v1';
+
+let state = null;
+let screen = 'home';
+let activeTripId = null;
+let menuOpen = false;
+
+function uid() { return 'id_' + Math.random().toString(36).slice(2, 11) + Date.now().toString(36); }
+
+function defaultTemplate() {
+  const cats = [
+    { id: uid(), name: 'Core Dive Gear', order: 0 },
+    { id: uid(), name: 'Tanks & Gas', order: 1 },
+    { id: uid(), name: 'Camera & Photo', order: 2 },
+    { id: uid(), name: 'Travel & Docs', order: 3 },
+    { id: uid(), name: 'Personal & Safety', order: 4 }
+  ];
+  const byName = n => cats.find(c => c.name === n).id;
+  const items = [];
+  const add = (cat, names) => names.forEach(n => items.push({ id: uid(), categoryId: byName(cat), name: n }));
+  add('Core Dive Gear', ['BCD', 'Regulator', 'Fins', 'Mask', 'Wetsuit / Drysuit', 'Weights & belt', 'Dive computer', 'SMB + spool', 'Torch', 'Knife / cutter', 'Surface marker']);
+  add('Tanks & Gas', ['Cylinder(s)', 'DIN / Yoke adapter', 'O2 analyzer', 'Stage / deco bottles']);
+  add('Camera & Photo', ['Housing', 'Camera body', 'Lens(es)', 'Strobes', 'Sync cords', 'Batteries', 'Chargers', 'Memory cards', 'Desiccant packs', 'Dome port cover']);
+  add('Travel & Docs', ['Passport / ID', 'Dive certification', 'Insurance', 'Logbook', 'Dive insurance card', 'Cash / cards']);
+  add('Personal & Safety', ['Sunscreen', 'Meds', 'First aid kit', 'Towel', 'Dry bag', 'Snacks / water', 'Phone charger']);
+  return { categories: cats, items };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return {
+    masterTemplate: defaultTemplate(),
+    trips: [],
+    settings: { theme: 'dark' }
+  };
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function getCategories() {
+  return [...state.masterTemplate.categories].sort((a, b) => a.order - b.order);
+}
+
+function getCategoryName(id) {
+  const c = state.masterTemplate.categories.find(x => x.id === id);
+  return c ? c.name : 'Other';
+}
+
+function tripProgress(trip) {
+  const total = trip.items.length;
+  const done = trip.items.filter(i => i.checked).length;
+  return { done, total, pct: total ? Math.round((done / total) * 100) : 0 };
+}
+
+function createTripFromTemplate(name, date) {
+  const items = state.masterTemplate.items.map(it => ({
+    id: uid(), categoryId: it.categoryId, name: it.name, note: it.note || '',
+    checked: false, fromTemplate: true
+  }));
+  const trip = { id: uid(), name, date: date || '', createdAt: Date.now(), items };
+  state.trips.unshift(trip);
+  saveState();
+  return trip.id;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toggleCard(el) {
+  const card = el.closest('.card.collapsible');
+  if (card) card.classList.toggle('card-open');
+}
+
+function initBubbles() {
+  const box = document.getElementById('bubbles');
+  for (let i = 0; i < 12; i++) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const sz = 8 + Math.random() * 24;
+    b.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:-${sz}px;animation-duration:${12+Math.random()*18}s;animation-delay:${Math.random()*10}s;`;
+    box.appendChild(b);
+  }
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-theme');
+  document.getElementById('themeIcon').textContent = isLight ? '☀️' : '🌙';
+  state.settings.theme = isLight ? 'light' : 'dark';
+  saveState();
+  const meta = document.getElementById('theme-color-active');
+  if (meta) meta.setAttribute('content', isLight ? '#f5f7f9' : '#030c18');
+}
+
+function applyTheme() {
+  if (state.settings.theme === 'light') {
+    document.body.classList.add('light-theme');
+    document.getElementById('themeIcon').textContent = '☀️';
+    const meta = document.getElementById('theme-color-active');
+    if (meta) meta.setAttribute('content', '#f5f7f9');
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+window.showExportToast = (msg) => showToast(msg || '📥 Saved!');
+
+function navigate(s, tripId) {
+  screen = s;
+  if (tripId !== undefined) activeTripId = tripId;
+  menuOpen = false;
+  render();
+  window.scrollTo(0, 0);
+}
+
+function openModal(html, onMount) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+  if (onMount) onMount();
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function promptNewTrip() {
+  openModal(`
+    <h3>New Trip</h3>
+    <div class="modal-field"><label>Trip name</label><input id="trip-name" placeholder="e.g. Red Sea March" autofocus/></div>
+    <div class="modal-field"><label>Date (optional)</label><input id="trip-date" type="date"/></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="trip-create-btn">Create</button>
+    </div>
+  `, () => {
+    document.getElementById('trip-create-btn').onclick = () => {
+      const name = document.getElementById('trip-name').value.trim();
+      if (!name) { showToast('Enter a trip name'); return; }
+      const date = document.getElementById('trip-date').value;
+      const id = createTripFromTemplate(name, date);
+      closeModal();
+      navigate('trip', id);
+    };
+  });
+}
+
+function renderHeader(title, subtitle, showBack) {
+  return `
+    <header class="hdr">
+      <div class="brand">
+        ${showBack ? `<button class="btn-back" onclick="navigate('home')">← Back</button>` : `
+        <div class="brand-icon">🤿</div>
+        <div class="brand-text"><h1>${esc(title || 'GET IN WATER')}</h1><p>${esc(subtitle || 'Trip Packing Checklist')}</p></div>`}
+      </div>
+      <div class="hdr-actions">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"><span class="theme-icon" id="themeIcon">🌙</span></button>
+        ${screen === 'home' ? `<button class="btn-back" onclick="navigate('about')" title="About">?</button>` : ''}
+      </div>
+    </header>`;
+}
+
+function renderHome() {
+  const trips = [...state.trips].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  let tripsHtml = '';
+  if (!trips.length) {
+    tripsHtml = `<div class="empty-state"><div style="font-size:36px">🧳</div><p>No trips yet.<br>Create one from your master gear template.</p></div>`;
+  } else {
+    tripsHtml = trips.map(t => {
+      const p = tripProgress(t);
+      const dateStr = t.date ? new Date(t.date + 'T12:00:00').toLocaleDateString() : '';
+      return `
+        <div class="trip-card" onclick="navigate('trip','${t.id}')">
+          <h3>${esc(t.name)}</h3>
+          <div class="trip-meta">${dateStr ? dateStr + ' · ' : ''}${p.done}/${p.total} packed</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${p.pct}%"></div></div>
+        </div>`;
+    }).join('');
+  }
+  return `
+    ${renderHeader('GET IN WATER', 'Trip Packing Checklist', false)}
+    <div class="action-row">
+      <button class="btn-primary" onclick="promptNewTrip()">+ New Trip</button>
+      <button class="btn-secondary" onclick="navigate('template')">Master Template</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Your Trips</div>
+      ${tripsHtml}
+    </div>`;
+}
+
+function renderTemplate() {
+  const cats = getCategories();
+  let html = `
+    ${renderHeader('Master Template', 'Edit default gear list', true)}
+    <div class="export-row">
+      <button class="btn-export" onclick="exportTemplateTXT()">📄 TXT</button>
+      <button class="btn-export" onclick="exportTemplatePDF()">📑 PDF</button>
+    </div>
+    <div class="action-row">
+      <button class="btn-secondary" onclick="addCategory()">+ Category</button>
+    </div>`;
+  cats.forEach((cat, ci) => {
+    const items = state.masterTemplate.items.filter(i => i.categoryId === cat.id);
+    html += `
+      <div class="card collapsible card-open" id="cat-${cat.id}">
+        <div class="card-title" onclick="toggleCard(this)">
+          <input value="${esc(cat.name)}" onclick="event.stopPropagation()" onchange="renameCategory('${cat.id}',this.value)" style="background:transparent;border:none;color:var(--accent);font:inherit;flex:1;min-width:0"/>
+          <span class="card-caret">▼</span>
+        </div>
+        <div class="card-collapsible-body">
+          <div style="display:flex;gap:4px;margin-bottom:8px">
+            <button class="icon-btn" onclick="moveCategory('${cat.id}',-1)" title="Move up">↑</button>
+            <button class="icon-btn" onclick="moveCategory('${cat.id}',1)" title="Move down">↓</button>
+            <button class="icon-btn danger" onclick="deleteCategory('${cat.id}')" title="Delete category">✕</button>
+          </div>
+          ${items.map(it => `
+            <div class="edit-row">
+              <input value="${esc(it.name)}" onchange="renameTemplateItem('${it.id}',this.value)"/>
+              <button class="icon-btn danger" onclick="deleteTemplateItem('${it.id}')">✕</button>
+            </div>`).join('')}
+          <button class="btn-secondary" style="margin-top:8px" onclick="addTemplateItem('${cat.id}')">+ Item</button>
+        </div>
+      </div>`;
+  });
+  return html;
+}
+
+function renderTrip() {
+  const trip = state.trips.find(t => t.id === activeTripId);
+  if (!trip) return renderHome();
+  const p = tripProgress(trip);
+  const cats = getCategories();
+  const grouped = {};
+  trip.items.forEach(it => {
+    const cn = getCategoryName(it.categoryId);
+    if (!grouped[cn]) grouped[cn] = [];
+    grouped[cn].push(it);
+  });
+  const extra = trip.items.filter(it => !cats.find(c => c.id === it.categoryId));
+  if (extra.length) grouped['Other'] = (grouped['Other'] || []).concat(extra);
+
+  let catsHtml = Object.keys(grouped).map(cn => {
+    const items = grouped[cn];
+    return `
+      <div class="card collapsible card-open">
+        <div class="card-title" onclick="toggleCard(this)">${esc(cn)} <span class="card-caret">▼</span></div>
+        <div class="card-collapsible-body">
+          ${items.map(it => `
+            <div class="check-item ${it.checked ? 'checked' : ''}" onclick="toggleTripItem('${trip.id}','${it.id}')">
+              <div class="check-box">${it.checked ? '✓' : ''}</div>
+              <div><div class="item-name">${esc(it.name)}</div>${it.note ? `<div class="item-note">${esc(it.note)}</div>` : ''}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    ${renderHeader(trip.name, trip.date || 'Packing checklist', true)}
+    <div class="progress-sticky">
+      <div class="trip-meta">${p.done} / ${p.total} packed (${p.pct}%)</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${p.pct}%"></div></div>
+    </div>
+    <div class="action-row">
+      <button class="btn-export" onclick="exportTripTXT('full')">📄 TXT</button>
+      <button class="btn-export" onclick="exportTripPDF('full')">📑 PDF</button>
+      <div class="menu-dropdown">
+        <button class="btn-secondary" onclick="toggleMenu(event)">⋮ More</button>
+        <div class="menu-panel ${menuOpen ? 'open' : ''}" id="trip-menu">
+          <button onclick="exportTripTXT('remaining')">Export remaining (TXT)</button>
+          <button onclick="exportTripPDF('remaining')">Export remaining (PDF)</button>
+          <button onclick="resetTrip('${trip.id}')">Reset all checks</button>
+          <button class="danger" onclick="deleteTrip('${trip.id}')">Delete trip</button>
+        </div>
+      </div>
+      <button class="btn-secondary" onclick="promptAddTripItem('${trip.id}')">+ Item</button>
+    </div>
+    ${catsHtml}`;
+}
+
+function renderAbout() {
+  return `
+    ${renderHeader('About', 'Get In Water v' + APP_VERSION, true)}
+    <div class="card">
+      <div class="card-title">Companion to LSP D-Planner</div>
+      <p style="font-size:14px;line-height:1.6;color:var(--tip)">
+        Get In Water helps you pack for dive trips. Maintain a master gear template, start a trip checklist, and tick items off as you pack. Export TXT or PDF for printing.
+      </p>
+    </div>
+    <a class="link-card" href="https://threecats-lsp.com" target="_blank" rel="noopener">🏠 Three Cats LSP · Homepage</a>
+    <a class="link-card" href="https://threecats-lsp.com/d-planner/" target="_blank" rel="noopener">🤿 LSP D-Planner · Main App</a>
+    <a class="link-card" href="https://threecats-lsp.com/d-planner/download.html" target="_blank" rel="noopener">⬇ LSP D-Planner · Download APK</a>
+    <a class="link-card" href="https://threecats-lsp.com/t-viewer/" target="_blank" rel="noopener">📄 T-Viewer · Open Web App</a>
+    <a class="link-card" href="https://threecats-lsp.com/get-in-water/download.html" target="_blank" rel="noopener">⬇ Get In Water · Download APK</a>
+    <a class="link-card" href="https://github.com/Three-Cats-LSP/Get-In-Water" target="_blank" rel="noopener">GitHub · Get In Water</a>
+    <a class="link-card" href="https://paypal.me/ThreeCatsLSP" target="_blank" rel="noopener">💙 Support Development · PayPal</a>
+    <p style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:16px;opacity:0.7">v${APP_VERSION} · Three Cats LSP</p>`;
+}
+
+function render() {
+  const root = document.getElementById('app-root');
+  if (screen === 'home') root.innerHTML = renderHome();
+  else if (screen === 'template') root.innerHTML = renderTemplate();
+  else if (screen === 'trip') root.innerHTML = renderTrip();
+  else if (screen === 'about') root.innerHTML = renderAbout();
+  applyTheme();
+}
+
+function toggleMenu(e) {
+  e.stopPropagation();
+  menuOpen = !menuOpen;
+  render();
+}
+
+document.addEventListener('click', () => { if (menuOpen) { menuOpen = false; render(); } });
+
+// ── Template editing ──
+function addCategory() {
+  const order = state.masterTemplate.categories.length;
+  state.masterTemplate.categories.push({ id: uid(), name: 'New Category', order });
+  saveState(); navigate('template');
+}
+function renameCategory(id, name) {
+  const c = state.masterTemplate.categories.find(x => x.id === id);
+  if (c) { c.name = name.trim() || c.name; saveState(); }
+}
+function deleteCategory(id) {
+  if (!confirm('Delete this category and all its items?')) return;
+  state.masterTemplate.categories = state.masterTemplate.categories.filter(c => c.id !== id);
+  state.masterTemplate.items = state.masterTemplate.items.filter(i => i.categoryId !== id);
+  saveState(); navigate('template');
+}
+function moveCategory(id, dir) {
+  const cats = getCategories();
+  const idx = cats.findIndex(c => c.id === id);
+  const swap = idx + dir;
+  if (swap < 0 || swap >= cats.length) return;
+  const tmp = cats[idx].order; cats[idx].order = cats[swap].order; cats[swap].order = tmp;
+  saveState(); navigate('template');
+}
+function addTemplateItem(catId) {
+  const name = prompt('Item name:');
+  if (!name || !name.trim()) return;
+  state.masterTemplate.items.push({ id: uid(), categoryId: catId, name: name.trim() });
+  saveState(); navigate('template');
+}
+function renameTemplateItem(id, name) {
+  const it = state.masterTemplate.items.find(x => x.id === id);
+  if (it) { it.name = name.trim() || it.name; saveState(); }
+}
+function deleteTemplateItem(id) {
+  state.masterTemplate.items = state.masterTemplate.items.filter(i => i.id !== id);
+  saveState(); navigate('template');
+}
+
+// ── Trip actions ──
+function toggleTripItem(tripId, itemId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  const it = trip && trip.items.find(i => i.id === itemId);
+  if (it) { it.checked = !it.checked; saveState(); render(); }
+}
+function resetTrip(tripId) {
+  if (!confirm('Uncheck all items on this trip?')) return;
+  const trip = state.trips.find(t => t.id === tripId);
+  if (trip) { trip.items.forEach(i => i.checked = false); saveState(); navigate('trip', tripId); }
+}
+function deleteTrip(tripId) {
+  if (!confirm('Delete this trip?')) return;
+  state.trips = state.trips.filter(t => t.id !== tripId);
+  saveState(); navigate('home');
+}
+function promptAddTripItem(tripId) {
+  const cats = getCategories();
+  let catId = cats[0] ? cats[0].id : uid();
+  if (cats.length > 1) {
+    const names = cats.map((c, i) => `${i + 1}. ${c.name}`).join('\n');
+    const pick = prompt(`Category number:\n${names}`, '1');
+    const idx = parseInt(pick, 10) - 1;
+    if (idx >= 0 && idx < cats.length) catId = cats[idx].id;
+  }
+  const name = prompt('Item name:');
+  if (!name || !name.trim()) return;
+  const trip = state.trips.find(t => t.id === tripId);
+  if (trip) {
+    trip.items.push({ id: uid(), categoryId: catId, name: name.trim(), note: '', checked: false, fromTemplate: false });
+    saveState(); navigate('trip', tripId);
+  }
+}
+
+// ── Export helpers ──
+function safeFilename(s) {
+  return String(s).replace(/[^a-zA-Z0-9_-]+/g, '_').replace(/^_|_$/g, '') || 'Trip';
+}
+function dateStr() { return new Date().toISOString().split('T')[0]; }
+
+function buildTemplateText() {
+  const lines = [
+    '═══════════════════════════════════════',
+    '  GET IN WATER — Master Gear Template',
+    '  Three Cats LSP · threecats-lsp.com',
+    '═══════════════════════════════════════', ''
+  ];
+  getCategories().forEach(cat => {
+    lines.push(`▸ ${cat.name.toUpperCase()}`);
+    state.masterTemplate.items.filter(i => i.categoryId === cat.id).forEach(it => {
+      lines.push(`  • ${it.name}`);
+    });
+    lines.push('');
+  });
+  lines.push('— Generated by Get In Water v' + APP_VERSION);
+  return lines.join('\n');
+}
+
+function buildTripText(trip, mode) {
+  const p = tripProgress(trip);
+  const lines = [
+    '═══════════════════════════════════════',
+    '  GET IN WATER — Trip Packing List',
+    '  Three Cats LSP · threecats-lsp.com',
+    '═══════════════════════════════════════',
+    `Trip: ${trip.name}`,
+    trip.date ? `Date: ${trip.date}` : '',
+    `Progress: ${p.done}/${p.total} packed`,
+    mode === 'remaining' ? '(Remaining items only)' : '',
+    ''
+  ].filter(Boolean);
+
+  const cats = getCategories();
+  const grouped = {};
+  let items = trip.items;
+  if (mode === 'remaining') items = items.filter(i => !i.checked);
+  items.forEach(it => {
+    const cn = getCategoryName(it.categoryId);
+    if (!grouped[cn]) grouped[cn] = [];
+    grouped[cn].push(it);
+  });
+
+  Object.keys(grouped).forEach(cn => {
+    lines.push(`▸ ${cn.toUpperCase()}`);
+    grouped[cn].forEach(it => {
+      const mark = it.checked ? '[x]' : '[ ]';
+      lines.push(`  ${mark} ${it.name}`);
+    });
+    lines.push('');
+  });
+  lines.push('— Generated by Get In Water v' + APP_VERSION);
+  return lines.join('\n');
+}
+
+function downloadBlob(text, filename, mime) {
+  const blob = new Blob([text], { type: mime });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+  showExportToast();
+}
+
+function exportTemplateTXT() {
+  downloadBlob(buildTemplateText(), `GIW_${dateStr()}_MasterTemplate.txt`, 'text/plain');
+}
+function exportTripTXT(mode) {
+  const trip = state.trips.find(t => t.id === activeTripId);
+  if (!trip) return;
+  const tag = mode === 'remaining' ? 'Remaining' : 'Full';
+  downloadBlob(buildTripText(trip, mode), `GIW_${dateStr()}_${safeFilename(trip.name)}_${tag}.txt`, 'text/plain');
+}
+
+function buildPdfDoc(title, subtitle, sections) {
+  const { jsPDF } = window.jspdf;
+  if (!jsPDF) { alert('PDF library not loaded.'); return null; }
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+  const margin = 18;
+  let y = margin;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.setTextColor(0, 85, 170);
+  doc.text('GET IN WATER', margin, y);
+  y += 7;
+  doc.setFontSize(11);
+  doc.setTextColor(60, 60, 60);
+  doc.text(title, margin, y);
+  y += 5;
+  if (subtitle) { doc.setFontSize(9); doc.text(subtitle, margin, y); y += 6; }
+  doc.setDrawColor(0, 150, 200);
+  doc.line(margin, y, 210 - margin, y);
+  y += 8;
+
+  sections.forEach(sec => {
+    if (y > 270) { doc.addPage(); y = margin; }
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(0, 120, 180);
+    doc.text(sec.title, margin, y);
+    y += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(40, 40, 40);
+    sec.items.forEach(line => {
+      if (y > 275) { doc.addPage(); y = margin; }
+      const wrapped = doc.splitTextToSize(line, 170);
+      doc.text(wrapped, margin + 4, y);
+      y += wrapped.length * 4.5 + 1;
+    });
+    y += 4;
+  });
+
+  y = 285;
+  doc.setFontSize(7);
+  doc.setTextColor(120, 120, 120);
+  doc.text('Three Cats LSP · Get In Water v' + APP_VERSION + ' · threecats-lsp.com/get-in-water/', margin, y);
+  return doc;
+}
+
+function exportTemplatePDF() {
+  const sections = getCategories().map(cat => ({
+    title: cat.name,
+    items: state.masterTemplate.items.filter(i => i.categoryId === cat.id).map(it => `• ${it.name}`)
+  }));
+  const doc = buildPdfDoc('Master Gear Template', '', sections);
+  if (doc) doc.save(`GIW_${dateStr()}_MasterTemplate.pdf`);
+  showExportToast();
+}
+
+function exportTripPDF(mode) {
+  const trip = state.trips.find(t => t.id === activeTripId);
+  if (!trip) return;
+  const p = tripProgress(trip);
+  let items = trip.items;
+  if (mode === 'remaining') items = items.filter(i => !i.checked);
+  const grouped = {};
+  items.forEach(it => {
+    const cn = getCategoryName(it.categoryId);
+    if (!grouped[cn]) grouped[cn] = [];
+    grouped[cn].push(it);
+  });
+  const sections = Object.keys(grouped).map(cn => ({
+    title: cn,
+    items: grouped[cn].map(it => `${it.checked ? '☑' : '☐'} ${it.name}`)
+  }));
+  const sub = `${trip.date ? trip.date + ' · ' : ''}${p.done}/${p.total} packed` + (mode === 'remaining' ? ' · Remaining only' : '');
+  const doc = buildPdfDoc(trip.name, sub, sections);
+  const tag = mode === 'remaining' ? 'Remaining' : 'Full';
+  if (doc) doc.save(`GIW_${dateStr()}_${safeFilename(trip.name)}_${tag}.pdf`);
+  showExportToast();
+}
+
+// ── Init ──
+state = loadState();
+initBubbles();
+render();
+</script>
+</body>
+</html>
