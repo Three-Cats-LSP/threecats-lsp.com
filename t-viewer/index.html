@@ -1,17 +1,17 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="T-Viewer">
-<meta name="theme-color" content="#0a1628" id="theme-meta">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="T-Viewer" name="apple-mobile-web-app-title"/>
+<meta content="#0a1628" id="theme-meta" name="theme-color"/>
 <title>T-Viewer</title>
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-
+<link href="manifest.json" rel="manifest"/>
+<link href="icon-192.png" rel="apple-touch-icon"/>
 <!-- Capacitor runtime — loaded by the WebView; no-op stub when running in browser -->
 <script>
   if (!window.Capacitor) {
@@ -250,267 +250,206 @@
 </style>
 </head>
 <body>
-
-<input type="file" id="filein" accept=".txt,.log,.plan,.div,.pdf,text/*,application/pdf">
-
+<input accept=".txt,.log,.plan,.div,.pdf,text/*,application/pdf" id="filein" type="file"/>
 <!-- DRAG-AND-DROP OVERLAY -->
 <div id="dropzone">
-  <svg viewBox="0 0 64 64"><path d="M12 8h28l12 12v36H12z"/><polyline points="40,8 40,20 52,20"/><line x1="32" y1="22" x2="32" y2="44"/><polyline points="22,34 32,22 42,34"/></svg>
+<svg viewbox="0 0 64 64"><path d="M12 8h28l12 12v36H12z"></path><polyline points="40,8 40,20 52,20"></polyline><line x1="32" x2="32" y1="22" y2="44"></line><polyline points="22,34 32,22 42,34"></polyline></svg>
   DROP FILE HERE
 </div>
-
 <!-- TOP BAR -->
 <div id="topbar">
-  <button class="btn" id="btn-open" title="Open file">
-    <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
-  </button>
-  <button class="btn hidden" id="btn-copy" title="Copy all">
-    <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-  </button>
-  <button class="btn hidden" id="btn-edit" title="Edit">
-    <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-  </button>
-  <button class="btn hidden" id="btn-save" title="Save file" style="color:var(--accent);">
-    <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-  </button>
-  <button class="btn hidden" id="btn-share" title="Share">
-    <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-  </button>
-  <button class="btn" id="btn-wrap" title="Toggle word wrap">
-    <svg viewBox="0 0 24 24" fill="none"><path d="M4 7H20" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17H9" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12H17.5C18.8807 12 20 13.1193 20 14.5V14.5C20 15.8807 18.8807 17 17.5 17H12.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 15.5L12.5 17L15 18.5V15.5Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </button>
-  <button class="btn" id="btn-ref" title="About / Reference" style="font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;">?</button>
-  <!-- spacer pushes theme to right edge -->
-  <span id="zoom-label" style="font-size:11px;color:var(--muted);padding:0 4px;flex-shrink:0;">15px</span>
-  <div style="flex:1;"></div>
-  <button class="btn" id="btn-theme" title="Day / Night" style="font-size:16px;">
-    <span id="theme-icon">🌙</span>
-  </button>
+<button class="btn" id="btn-open" title="Open file">
+<svg viewbox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"></path></svg>
+</button>
+<button class="btn hidden" id="btn-copy" title="Copy all">
+<svg viewbox="0 0 24 24"><rect height="13" rx="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+</button>
+<button class="btn hidden" id="btn-edit" title="Edit">
+<svg viewbox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+</button>
+<button class="btn hidden" id="btn-save" style="color:var(--accent);" title="Save file">
+<svg viewbox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+</button>
+<button class="btn hidden" id="btn-share" title="Share">
+<svg viewbox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line></svg>
+</button>
+<button class="btn" id="btn-wrap" title="Toggle word wrap">
+<svg fill="none" viewbox="0 0 24 24"><path d="M4 7H20" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4 17H9" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4 12H17.5C18.8807 12 20 13.1193 20 14.5V14.5C20 15.8807 18.8807 17 17.5 17H12.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15 15.5L12.5 17L15 18.5V15.5Z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<button class="btn" id="btn-ref" style="font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;" title="About / Reference">?</button>
+<!-- spacer pushes theme to right edge -->
+<span id="zoom-label" style="font-size:11px;color:var(--muted);padding:0 4px;flex-shrink:0;">15px</span>
+<div style="flex:1;"></div>
+<button class="btn" id="btn-theme" style="font-size:16px;" title="Day / Night">
+<span id="theme-icon">🌙</span>
+</button>
 </div>
-
-  <!-- hidden filename tracker -->
-  <span id="filename" style="display:none;"></span>
+<!-- hidden filename tracker -->
+<span id="filename" style="display:none;"></span>
 <!-- PDF.js -->
 <!-- PDF.js loaded inside main module script below -->
-
 <div id="scroll">
-  <div id="content">
-    <div id="empty">
-      <svg viewBox="0 0 64 64">
-        <path d="M12 8h28l12 12v36H12z"/>
-        <polyline points="40,8 40,20 52,20"/>
-        <line x1="20" y1="32" x2="44" y2="32"/>
-        <line x1="20" y1="40" x2="44" y2="40"/>
-        <line x1="20" y1="48" x2="36" y2="48"/>
-      </svg>
-      <h2>T-VIEWER</h2>
-      <p id="empty-hint">Open a text or PDF file — or share one from LSP D-Planner.</p>
-      <button id="open-big">OPEN FILE</button>
-      <small id="empty-sub">TXT · PDF · UTF-8 · Unicode</small>
-    </div>
-  </div>
+<div id="content">
+<div id="empty">
+<svg viewbox="0 0 64 64">
+<path d="M12 8h28l12 12v36H12z"></path>
+<polyline points="40,8 40,20 52,20"></polyline>
+<line x1="20" x2="44" y1="32" y2="32"></line>
+<line x1="20" x2="44" y1="40" y2="40"></line>
+<line x1="20" x2="36" y1="48" y2="48"></line>
+</svg>
+<h2>T-VIEWER</h2>
+<p id="empty-hint">Open a text or PDF file — or share one from LSP D-Planner.</p>
+<button id="open-big">OPEN FILE</button>
+<small id="empty-sub">TXT · PDF · UTF-8 · Unicode</small>
 </div>
-
+</div>
+</div>
 <!-- PDF viewer (hidden until a PDF is opened) -->
 <div id="pdf-viewer" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + var(--bar));bottom:env(safe-area-inset-bottom,0px);left:0;right:0;overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;background:var(--bg);">
-  <div id="pdf-pages" style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:8px;min-width:min-content;"></div>
+<div id="pdf-pages" style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:8px;min-width:min-content;"></div>
 </div>
-
 <!-- PDF page nav bar (hidden until PDF opened) -->
 <div id="pdf-nav" style="display:none;position:fixed;bottom:env(safe-area-inset-bottom,0);left:0;right:0;height:36px;background:var(--surface);border-top:1px solid var(--rim);align-items:center;justify-content:center;gap:12px;z-index:100;">
-  <button class="btn" id="pdf-prev" style="width:30px;height:30px;">
-    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-  </button>
-  <span id="pdf-page-label" style="font-size:12px;color:var(--muted);min-width:60px;text-align:center;"></span>
-  <button class="btn" id="pdf-next" style="width:30px;height:30px;">
-    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-  </button>
+<button class="btn" id="pdf-prev" style="width:30px;height:30px;">
+<svg viewbox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+</button>
+<span id="pdf-page-label" style="font-size:12px;color:var(--muted);min-width:60px;text-align:center;"></span>
+<button class="btn" id="pdf-next" style="width:30px;height:30px;">
+<svg viewbox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+</button>
 </div>
-
 <!-- BOTTOM BAR -->
 <div id="toast"></div>
-
 <!-- ── DISCARD WARNING DIALOG ── -->
 <div id="discardDialog" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;padding:32px;">
-  <div style="max-width:320px;width:100%;background:var(--surface);border:1px solid var(--border-hi);border-radius:14px;padding:24px;font-family:'JetBrains Mono',monospace;text-align:center;">
-    <div style="font-size:28px;margin-bottom:12px;">⚠️</div>
-    <div style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.08em;margin-bottom:10px;">DISCARD CHANGES?</div>
-    <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:20px;">You have unsaved edits.<br>Exit edit mode without saving?</div>
-    <div style="display:flex;gap:10px;">
-      <button id="discard-cancel"
-        style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border-hi);background:transparent;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.06em;">
+<div style="max-width:320px;width:100%;background:var(--surface);border:1px solid var(--border-hi);border-radius:14px;padding:24px;font-family:'JetBrains Mono',monospace;text-align:center;">
+<div style="font-size:28px;margin-bottom:12px;">⚠️</div>
+<div style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.08em;margin-bottom:10px;">DISCARD CHANGES?</div>
+<div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:20px;">You have unsaved edits.<br/>Exit edit mode without saving?</div>
+<div style="display:flex;gap:10px;">
+<button id="discard-cancel" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border-hi);background:transparent;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.06em;">
         KEEP EDITING
       </button>
-      <button id="discard-confirm"
-        style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--red);background:var(--red);color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.06em;">
+<button id="discard-confirm" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--red);background:var(--red);color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.06em;">
         DISCARD
       </button>
-    </div>
-  </div>
 </div>
-
+</div>
+</div>
 <!-- ── REFERENCE MODAL ── -->
 <div id="refModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:9000;background:rgba(0,0,0,0.75);overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch;box-sizing:border-box;">
-  <div style="max-width:480px;width:100%;margin:0 auto;background:var(--surface);border:1px solid var(--border-hi);border-radius:14px;padding:16px;font-family:'JetBrains Mono',monospace;box-sizing:border-box;">
-
-    <!-- header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);">
-      <div style="font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--accent);">T-VIEWER</div>
-      <button onclick="document.getElementById('refModal').style.display='none'" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 14px;cursor:pointer;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;">✕ Close</button>
-    </div>
-
-    <!-- tab bar -->
-    <div style="display:flex;gap:6px;margin-bottom:20px;">
-      <button id="tab-settings-btn" onclick="switchTab('settings')"
-        style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#000;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">
+<div style="max-width:480px;width:100%;margin:0 auto;background:var(--surface);border:1px solid var(--border-hi);border-radius:14px;padding:16px;font-family:'JetBrains Mono',monospace;box-sizing:border-box;">
+<!-- header -->
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+<div style="font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--accent);">T-VIEWER</div>
+<button onclick="document.getElementById('refModal').style.display='none'" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 14px;cursor:pointer;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;">✕ Close</button>
+</div>
+<!-- tab bar -->
+<div style="display:flex;gap:6px;margin-bottom:20px;">
+<button id="tab-settings-btn" onclick="switchTab('settings')" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#000;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">
         COLORS
       </button>
-      <button id="tab-about-btn" onclick="switchTab('about')"
-        style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border-hi);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">
+<button id="tab-about-btn" onclick="switchTab('about')" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border-hi);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;cursor:pointer;">
         ABOUT
       </button>
-    </div>
-
-    <!-- ── ABOUT TAB ── -->
-    <div id="tab-about" style="display:none;">
-
-    <!-- About -->
-    <div style="margin-bottom:20px;">
-      <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:10px;">About T-Viewer</div>
-      <div style="font-size:12px;line-height:1.8;color:var(--text);">
-        T-Viewer is a companion app for <strong style="color:var(--accent);">LSP D-Planner</strong> — a technical dive decompression planner.<br><br>
-        Use T-Viewer to open, read, and share the dive plan text files exported by LSP D-Planner directly on your Android device. Supports syntax highlighting for deco schedules, depth data, warnings, and gas labels.<br><br>
-        <span style="color:var(--muted);">Features:</span>
-        <ul style="margin:8px 0 0 0;padding-left:18px;line-height:2;">
-          <li>Open .txt / .log / .plan / .div files</li>
-          <li>Receive shared files from LSP D-Planner</li>
-          <li>Syntax highlighting for deco logs</li>
-          <li>Dark &amp; light theme (tap 🌙 / ☀️)</li>
-          <li>Pinch-to-zoom (font size shown in top bar)</li>
-          <li>Copy &amp; share text</li>
-          <li>Drag &amp; drop on desktop browser</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Links -->
-    <div style="margin-bottom:20px;padding-top:16px;border-top:1px solid var(--border);">
-      <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:10px;">Apps &amp; Download</div>
-      <div style="display:flex;flex-direction:column;gap:8px;width:100%;box-sizing:border-box;">
-
-        <a href="https://three-cats-lsp.github.io/T-Viewer/download.html" target="_blank" rel="noopener noreferrer"
-           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;"
-           onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
-           onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3"/></svg>
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">T-Viewer · Download Android APK</span>
-        </a>
-
-        <a href="https://three-cats-lsp.github.io/LSP_D-planner/download.html" target="_blank" rel="noopener noreferrer"
-           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;"
-           onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
-           onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3"/></svg>
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">LSP D-Planner · Download Android APK</span>
-        </a>
-
-        <a href="https://three-cats-lsp.github.io/LSP_D-planner/" target="_blank" rel="noopener noreferrer"
-           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;"
-           onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
-           onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">LSP D-Planner · Open Web App</span>
-        </a>
-
-        <a href="https://github.com/Three-Cats-LSP/T-Viewer" target="_blank" rel="noopener noreferrer"
-           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;"
-           onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
-           onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">T-Viewer · Source on GitHub</span>
-        </a>
-
-        <a href="https://github.com/Three-Cats-LSP/LSP_D-planner" target="_blank" rel="noopener noreferrer"
-           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;"
-           onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
-           onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">LSP D-Planner · Source on GitHub</span>
-        </a>
-
-        <a href="https://www.instagram.com/threecats_lsp" target="_blank" rel="noopener noreferrer"
-           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;"
-           onmouseover="this.style.borderColor='#d92e7f';this.style.color='#d92e7f'"
-           onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'">
-          <svg width="16" height="16" viewBox="0 0 50 50" fill="none">
-            <defs><linearGradient id="ig2" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#feda75"/><stop offset="5%" style="stop-color:#fa7e1e"/><stop offset="45%" style="stop-color:#d92e7f"/><stop offset="60%" style="stop-color:#9b36b7"/><stop offset="90%" style="stop-color:#515bd4"/></linearGradient></defs>
-            <rect x="5" y="5" width="40" height="40" rx="10" fill="none" stroke="url(#ig2)" stroke-width="2.5"/>
-            <circle cx="25" cy="25" r="8" fill="none" stroke="url(#ig2)" stroke-width="2"/>
-            <circle cx="36" cy="13" r="2" fill="url(#ig2)"/>
-          </svg>
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Follow @threecats_lsp on Instagram</span>
-        </a>
-
-        <a href="https://paypal.me/ThreeCatLSP" target="_blank" rel="noopener noreferrer"
-           style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:linear-gradient(135deg,rgba(0,112,186,0.12),rgba(0,145,220,0.16));border:1px solid rgba(0,112,186,0.4);border-radius:8px;color:var(--muted);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s,background .2s;"
-           onmouseover="this.style.borderColor='#0070ba';this.style.color='#0070ba';this.style.background='rgba(0,112,186,0.22)'"
-           onmouseout="this.style.borderColor='rgba(0,112,186,0.4)';this.style.color='var(--muted)';this.style.background='linear-gradient(135deg,rgba(0,112,186,0.12),rgba(0,145,220,0.16))'">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828L8.293 21H12.5c.524 0 .968-.381 1.05-.9l.437-2.786h1.8c3.476 0 5.893-1.408 6.656-5.49.343-1.818.044-3.145-.22-4.907z" fill="#009cde"/><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z" fill="#003087" opacity="0.8"/></svg>
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Support Development · Donate via PayPal</span>
-        </a>
-
-      </div>
-    </div>
-
-    <p style="color:var(--muted);font-size:10px;text-align:center;letter-spacing:1px;opacity:0.6;margin-top:4px;">Three Cats LSP Diving Team</p>
-    </div><!-- /tab-about -->
-
-    <!-- ── SETTINGS TAB ── -->
-    <div id="tab-settings">
-
-      <!-- font selector -->
-      <div style="margin-bottom:18px;">
-        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:10px;">Font</div>
-        <div id="font-options" style="display:flex;flex-direction:column;gap:7px;"></div>
-      </div>
-
-      <!-- theme sub-tabs -->
-      <div style="display:flex;gap:6px;margin-bottom:16px;">
-        <button id="stab-dark-btn" onclick="switchSettingsTheme('dark')"
-          style="flex:1;padding:7px;border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:#000;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;">
+</div>
+<!-- ── ABOUT TAB ── -->
+<div id="tab-about" style="display:none;">
+<!-- About -->
+<div style="margin-bottom:20px;">
+<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:10px;">About T-Viewer</div>
+<div style="font-size:12px;line-height:1.8;color:var(--text);">
+        T-Viewer is a companion app for <strong style="color:var(--accent);">LSP D-Planner</strong> — a technical dive decompression planner.<br/><br/>
+        Use T-Viewer to open, read, and share the dive plan text files exported by LSP D-Planner directly on your Android device. Supports syntax highlighting for deco schedules, depth data, warnings, and gas labels.<br/><br/>
+<span style="color:var(--muted);">Features:</span>
+<ul style="margin:8px 0 0 0;padding-left:18px;line-height:2;">
+<li>Open .txt / .log / .plan / .div files</li>
+<li>Receive shared files from LSP D-Planner</li>
+<li>Syntax highlighting for deco logs</li>
+<li>Dark &amp; light theme (tap 🌙 / ☀️)</li>
+<li>Pinch-to-zoom (font size shown in top bar)</li>
+<li>Copy &amp; share text</li>
+<li>Drag &amp; drop on desktop browser</li>
+</ul>
+</div>
+</div>
+<!-- Links -->
+<div style="margin-bottom:20px;padding-top:16px;border-top:1px solid var(--border);">
+<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:10px;">Apps &amp; Download</div>
+<div style="display:flex;flex-direction:column;gap:8px;width:100%;box-sizing:border-box;">
+<a href="https://three-cats-lsp.github.io/T-Viewer/download.html" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;" target="_blank">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M12 2v10m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3"></path></svg>
+<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">T-Viewer · Download Android APK</span>
+</a>
+<a href="https://three-cats-lsp.github.io/LSP_D-planner/download.html" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;" target="_blank">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M12 2v10m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3"></path></svg>
+<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">LSP D-Planner · Download Android APK</span>
+</a>
+<a href="https://three-cats-lsp.github.io/LSP_D-planner/" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;" target="_blank">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><circle cx="12" cy="12" r="10"></circle><line x1="2" x2="22" y1="12" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">LSP D-Planner · Open Web App</span>
+</a>
+<a href="https://github.com/Three-Cats-LSP/T-Viewer" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;" target="_blank">
+<svg fill="currentColor" height="16" viewbox="0 0 24 24" width="16"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"></path></svg>
+<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">T-Viewer · Source on GitHub</span>
+</a>
+<a href="https://github.com/Three-Cats-LSP/LSP_D-planner" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;" target="_blank">
+<svg fill="currentColor" height="16" viewbox="0 0 24 24" width="16"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"></path></svg>
+<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">LSP D-Planner · Source on GitHub</span>
+</a>
+<a href="https://www.thingiverse.com/Roman_Markovtsev/designs" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;" target="_blank"><svg fill="currentColor" height="16" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">My Designs · Thingiverse</span></a><a href="https://www.instagram.com/threecats_lsp" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='#d92e7f';this.style.color='#d92e7f'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;" target="_blank">
+<svg fill="none" height="16" viewbox="0 0 50 50" width="16">
+<defs><lineargradient id="ig2" x1="0%" x2="100%" y1="100%" y2="0%"><stop offset="0%" style="stop-color:#feda75"></stop><stop offset="5%" style="stop-color:#fa7e1e"></stop><stop offset="45%" style="stop-color:#d92e7f"></stop><stop offset="60%" style="stop-color:#9b36b7"></stop><stop offset="90%" style="stop-color:#515bd4"></stop></lineargradient></defs>
+<rect fill="none" height="40" rx="10" stroke="url(#ig2)" stroke-width="2.5" width="40" x="5" y="5"></rect>
+<circle cx="25" cy="25" fill="none" r="8" stroke="url(#ig2)" stroke-width="2"></circle>
+<circle cx="36" cy="13" fill="url(#ig2)" r="2"></circle>
+</svg>
+<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Follow @threecats_lsp on Instagram</span>
+</a>
+<a href="https://paypal.me/ThreeCatLSP" onmouseout="this.style.borderColor='rgba(0,112,186,0.4)';this.style.color='var(--muted)';this.style.background='linear-gradient(135deg,rgba(0,112,186,0.12),rgba(0,145,220,0.16))'" onmouseover="this.style.borderColor='#0070ba';this.style.color='#0070ba';this.style.background='rgba(0,112,186,0.22)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:linear-gradient(135deg,rgba(0,112,186,0.12),rgba(0,145,220,0.16));border:1px solid rgba(0,112,186,0.4);border-radius:8px;color:var(--muted);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s,background .2s;" target="_blank">
+<svg fill="none" height="16" viewbox="0 0 24 24" width="16"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828L8.293 21H12.5c.524 0 .968-.381 1.05-.9l.437-2.786h1.8c3.476 0 5.893-1.408 6.656-5.49.343-1.818.044-3.145-.22-4.907z" fill="#009cde"></path><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z" fill="#003087" opacity="0.8"></path></svg>
+<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Support Development · Donate via PayPal</span>
+</a>
+</div>
+</div>
+<p style="color:var(--muted);font-size:10px;text-align:center;letter-spacing:1px;opacity:0.6;margin-top:4px;">Three Cats LSP Diving Team</p>
+</div><!-- /tab-about -->
+<!-- ── SETTINGS TAB ── -->
+<div id="tab-settings">
+<!-- font selector -->
+<div style="margin-bottom:18px;">
+<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:10px;">Font</div>
+<div id="font-options" style="display:flex;flex-direction:column;gap:7px;"></div>
+</div>
+<!-- theme sub-tabs -->
+<div style="display:flex;gap:6px;margin-bottom:16px;">
+<button id="stab-dark-btn" onclick="switchSettingsTheme('dark')" style="flex:1;padding:7px;border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:#000;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;">
           🌙 DARK
         </button>
-        <button id="stab-light-btn" onclick="switchSettingsTheme('light')"
-          style="flex:1;padding:7px;border-radius:7px;border:1px solid var(--border-hi);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;">
+<button id="stab-light-btn" onclick="switchSettingsTheme('light')" style="flex:1;padding:7px;border-radius:7px;border:1px solid var(--border-hi);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;">
           ☀️ LIGHT
         </button>
-      </div>
-
-      <!-- dark colours panel -->
-      <div id="spanel-dark">
-        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:12px;">Dark Theme Colours</div>
-        <div id="pickers-dark" style="display:flex;flex-direction:column;gap:10px;"></div>
-        <button onclick="resetColors('dark')"
-          style="margin-top:14px;width:100%;padding:9px;border-radius:8px;border:1px solid var(--border-hi);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:.06em;">
+</div>
+<!-- dark colours panel -->
+<div id="spanel-dark">
+<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:12px;">Dark Theme Colours</div>
+<div id="pickers-dark" style="display:flex;flex-direction:column;gap:10px;"></div>
+<button onclick="resetColors('dark')" style="margin-top:14px;width:100%;padding:9px;border-radius:8px;border:1px solid var(--border-hi);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:.06em;">
           ↺ Reset Dark to Defaults
         </button>
-      </div>
-
-      <!-- light colours panel -->
-      <div id="spanel-light" style="display:none;">
-        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:12px;">Light Theme Colours</div>
-        <div id="pickers-light" style="display:flex;flex-direction:column;gap:10px;"></div>
-        <button onclick="resetColors('light')"
-          style="margin-top:14px;width:100%;padding:9px;border-radius:8px;border:1px solid var(--border-hi);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:.06em;">
+</div>
+<!-- light colours panel -->
+<div id="spanel-light" style="display:none;">
+<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tip);margin-bottom:12px;">Light Theme Colours</div>
+<div id="pickers-light" style="display:flex;flex-direction:column;gap:10px;"></div>
+<button onclick="resetColors('light')" style="margin-top:14px;width:100%;padding:9px;border-radius:8px;border:1px solid var(--border-hi);background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:.06em;">
           ↺ Reset Light to Defaults
         </button>
-      </div>
-
-    </div><!-- /tab-settings -->
-
-  </div>
 </div>
-
+</div><!-- /tab-settings -->
+</div>
+</div>
 <script>
 function cap(plugin) {
   return window?.Capacitor?.Plugins?.[plugin] ?? null;
@@ -1456,7 +1395,5 @@ document.addEventListener('keydown', e => {
   }
 });
 </script>
-
-
 </body>
 </html>
