@@ -12,8 +12,9 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Get In Water" name="apple-mobile-web-app-title"/>
 <meta content="Dive trip packing checklist — gear, camera, travel docs. Companion to LSP D-Planner." name="description"/>
-<link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23030c18'/%3E%3Ctext x='32' y='44' font-size='32' text-anchor='middle'%3E%F0%9F%A4%BF%3C/text%3E%3C/svg%3E" rel="icon" type="image/svg+xml"/>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="icon-192.png" rel="icon" type="image/png"/>
+<link href="icon-192.png" rel="apple-touch-icon"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Noto+Sans:wght@400;500;600;700&amp;family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   if (!window.Capacitor) {
@@ -27,6 +28,8 @@
   --accent: #00d9ff; --accent2: #00b8a0;
   --green: #26d07c; --yellow: #ffb703; --orange: #ff6d00; --red: #ff4757;
   --text: #d8eef8; --muted: #3e6882; --tip: #5ba4c2; --dim: #142535;
+  --font-ui: 'Outfit', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-user: 'Noto Sans', 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 body.light-theme {
   --bg: #ffffff; --surface: #f8f9fa; --card: #eff3f8; --card2: #e8ecf1;
@@ -39,7 +42,7 @@ body.light-theme {
 html { scroll-behavior: smooth; }
 body {
   background: var(--bg); color: var(--text);
-  font-family: 'Outfit', sans-serif; min-height: 100vh; overflow-x: hidden;
+  font-family: var(--font-ui); min-height: 100vh; overflow-x: hidden;
   transition: all 0.4s ease;
   padding: env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
 }
@@ -75,10 +78,10 @@ header.hdr {
 .brand { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
 .brand-icon {
   width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; font-size: 22px;
-  background: linear-gradient(135deg, rgba(0,200,255,0.12), rgba(0,100,200,0.08));
-  border: 1px solid var(--accent);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  background: #030c18; border: 1px solid var(--accent);
 }
+.brand-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .brand-text h1 {
   font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px;
   color: var(--text); line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -101,6 +104,10 @@ header.hdr {
   font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px;
 }
 .btn-back:hover { border-color: var(--accent); }
+.btn-back.btn-close {
+  width: 32px; height: 32px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+}
 .card {
   background: var(--card); border: 1px solid var(--border); border-radius: 14px;
   padding: 16px; margin-bottom: 12px; position: relative; overflow: hidden;
@@ -118,9 +125,29 @@ header.hdr {
   content: ''; flex: 1; height: 1px;
   background: linear-gradient(90deg, var(--border-hi), transparent);
 }
-.card.collapsible .card-title { cursor: pointer; user-select: none; margin-bottom: 0; }
+.card.collapsible .card-title { cursor: pointer; user-select: none; margin-bottom: 0; display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+.card-title .card-add-btn { flex-shrink: 0; }
+.check-item .check-main { display: flex; align-items: flex-start; gap: 10px; flex: 1; min-width: 0; cursor: pointer; }
 .card.collapsible .card-title::after { display: none; }
-.card.collapsible .card-title .card-caret { margin-left: auto; transition: transform 0.2s; }
+.card.collapsible .card-title .card-caret { flex-shrink: 0; transition: transform 0.2s; font-size: 10px; color: var(--muted); }
+.card-title input {
+  background: transparent; border: none; color: var(--accent);
+  font-family: var(--font-user); flex: 1; min-width: 0;
+  letter-spacing: normal; text-transform: none;
+  font-weight: 600; font-size: 13px;
+}
+.card-title input:focus { outline: 1px solid var(--border-hi); border-radius: 4px; background: var(--surface); }
+.user-text, .item-name, .edit-row input, .modal-field input, .trip-card h3 {
+  font-family: var(--font-user);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.card-title-actions { display: flex; gap: 3px; flex-shrink: 0; align-items: center; }
+.icon-btn-sm {
+  width: 26px; height: 26px; border-radius: 5px; font-size: 12px;
+}
+.modal-field-row { display: flex; gap: 8px; }
+.modal-field-row .modal-field { flex: 1; }
 .card.collapsible.card-open .card-title .card-caret { transform: rotate(180deg); }
 .card.collapsible:not(.card-open) .card-collapsible-body { display: none; }
 .card.collapsible.card-open .card-collapsible-body { display: block; margin-top: 12px; }
@@ -132,6 +159,10 @@ header.hdr {
   font-weight: 600; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s;
 }
 .btn-primary:hover { background: rgba(0,200,255,0.25); }
+.btn-primary.btn-icon-only {
+  width: 40px; height: 40px; padding: 0; min-width: 0;
+}
+.btn-primary.btn-icon-only svg { width: 18px; height: 18px; }
 .btn-secondary {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 8px 14px; background: var(--surface); color: var(--text);
@@ -142,19 +173,32 @@ header.hdr {
 .btn-export {
   padding: 7px 10px; background: var(--surface); color: var(--accent);
   border: 1px solid var(--accent); border-radius: 6px; cursor: pointer;
-  font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 11px;
-  letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px;
+  font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 12px;
+  letter-spacing: 1px; display: inline-flex; align-items: center; justify-content: center;
+  gap: 0; line-height: 1; transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent; outline: none;
 }
+.btn-export:focus { outline: none; }
+.btn-export:active { background: var(--accent); color: var(--bg); opacity: 1; }
 .btn-export:hover { background: rgba(0,200,255,0.1); }
+.btn-export-pdf-label {
+  display: inline-block; width: 16px; height: 16px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
+  letter-spacing: 0; line-height: 16px; text-align: center;
+}
 .btn-danger { color: var(--red); border-color: var(--red); }
 .btn-danger:hover { background: rgba(255,71,87,0.1); }
 .action-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .trip-card {
   background: var(--card2); border: 1px solid var(--border); border-radius: 12px;
-  padding: 14px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.2s;
+  padding: 14px; margin-bottom: 10px; transition: border-color 0.2s;
 }
 .trip-card:hover { border-color: var(--accent); }
+.trip-card-head { display: flex; align-items: flex-start; gap: 8px; }
+.trip-card-main { flex: 1; min-width: 0; cursor: pointer; }
+.trip-card-actions { display: flex; gap: 3px; flex-shrink: 0; }
 .trip-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.trip-card .progress-bar { cursor: pointer; }
 .trip-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
 .progress-bar {
   height: 6px; background: var(--dim); border-radius: 3px; margin-top: 8px; overflow: hidden;
@@ -192,7 +236,18 @@ header.hdr {
   width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border);
   background: transparent; color: var(--muted); cursor: pointer; font-size: 14px;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  padding: 0;
 }
+.icon-btn svg, .btn-export svg, .card-caret svg, .check-box svg, .theme-toggle svg, .btn-back svg {
+  display: block; flex-shrink: 0;
+}
+.icon-btn svg { width: 14px; height: 14px; }
+.icon-btn-sm svg { width: 13px; height: 13px; }
+.check-box svg { width: 14px; height: 14px; stroke-width: 2.5; }
+.btn-export svg { width: 16px; height: 16px; }
+.card-caret svg { width: 11px; height: 11px; color: var(--muted); }
+.theme-toggle svg { width: 16px; height: 16px; }
+.btn-back svg { width: 12px; height: 12px; }
 .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
 .icon-btn.danger:hover { border-color: var(--red); color: var(--red); }
 .empty-state { text-align: center; padding: 32px 16px; color: var(--muted); }
@@ -248,7 +303,22 @@ header.hdr {
 .menu-panel button:hover { background: rgba(0,200,255,0.08); color: var(--accent); }
 .menu-panel button.danger { color: var(--red); }
 .export-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-@media (max-width: 600px) { .card { padding: 12px 10px; } }
+.about-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.about-tab-btn {
+  flex: 1; padding: 8px; border-radius: 8px;
+  border: 1px solid var(--border-hi); background: transparent; color: var(--muted);
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.08em; cursor: pointer; text-transform: uppercase;
+}
+.about-tab-btn.active { border-color: var(--accent); background: var(--accent); color: #030c18; }
+body.light-theme .about-tab-btn.active { color: #fff; }
+@media (max-width: 600px) {
+  .card { padding: 12px 10px; }
+  .icon-btn-sm { width: 24px; height: 24px; font-size: 11px; }
+  .card-title input { font-size: 12px; }
+  .card.collapsible .card-title { gap: 4px; }
+  .card-title-actions { gap: 2px; }
+}
 </style>
 </head>
 <body>
@@ -260,13 +330,14 @@ header.hdr {
 </div>
 <script src="capacitor-bridge.js"></script>
 <script>
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.2.0';
 const STORAGE_KEY = 'giw_v1';
 
 let state = null;
 let screen = 'home';
 let activeTripId = null;
 let menuOpen = false;
+let aboutTab = 'template';
 
 function uid() { return 'id_' + Math.random().toString(36).slice(2, 11) + Date.now().toString(36); }
 
@@ -292,13 +363,74 @@ function defaultTemplate() {
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const data = JSON.parse(raw);
+      migrateState(data);
+      return data;
+    }
   } catch (e) {}
   return {
     masterTemplate: defaultTemplate(),
     trips: [],
     settings: { theme: 'dark' }
   };
+}
+
+function ensureTripShape(trip) {
+  if (!trip) return;
+  if (trip.date && !trip.dateStart) {
+    trip.dateStart = trip.date;
+    delete trip.date;
+  }
+  if (!trip.dateEnd) trip.dateEnd = trip.dateStart || '';
+  if (!trip.categories && state && state.masterTemplate) {
+    trip.categories = state.masterTemplate.categories.map(c => ({
+      id: c.id, name: c.name, order: c.order
+    }));
+  }
+}
+
+function migrateState(data) {
+  if (!data.trips) data.trips = [];
+  const tpl = data.masterTemplate || defaultTemplate();
+  data.trips.forEach(trip => {
+    if (trip.date && !trip.dateStart) {
+      trip.dateStart = trip.date;
+      delete trip.date;
+    }
+    if (!trip.dateEnd) trip.dateEnd = trip.dateStart || '';
+    if (!trip.categories && tpl.categories) {
+      trip.categories = tpl.categories.map(c => ({
+        id: c.id, name: c.name, order: c.order
+      }));
+    }
+  });
+}
+
+function getTripCategories(trip) {
+  ensureTripShape(trip);
+  return [...(trip.categories || [])].sort((a, b) => a.order - b.order);
+}
+
+function formatTripDateRange(trip) {
+  const start = trip.dateStart || trip.date || '';
+  const end = trip.dateEnd || start;
+  if (!start) return '';
+  try {
+    const ds = new Date(start + 'T12:00:00');
+    if (!end || end === start) {
+      return ds.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+    const de = new Date(end + 'T12:00:00');
+    const sameYear = ds.getFullYear() === de.getFullYear();
+    const startFmt = ds.toLocaleDateString('en-GB', {
+      day: '2-digit', month: 'short', year: sameYear ? undefined : 'numeric'
+    });
+    const endFmt = de.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    return startFmt + ' \u2013 ' + endFmt;
+  } catch (e) {
+    return start;
+  }
 }
 
 function saveState() {
@@ -320,12 +452,24 @@ function tripProgress(trip) {
   return { done, total, pct: total ? Math.round((done / total) * 100) : 0 };
 }
 
-function createTripFromTemplate(name, date) {
+function createTripFromTemplate(name, dateStart, dateEnd) {
   const items = state.masterTemplate.items.map(it => ({
     id: uid(), categoryId: it.categoryId, name: it.name, note: it.note || '',
     checked: false, fromTemplate: true
   }));
-  const trip = { id: uid(), name, date: date || '', createdAt: Date.now(), items };
+  const start = dateStart || '';
+  const end = dateEnd || start;
+  const trip = {
+    id: uid(),
+    name,
+    dateStart: start,
+    dateEnd: end,
+    createdAt: Date.now(),
+    categories: state.masterTemplate.categories.map(c => ({
+      id: c.id, name: c.name, order: c.order
+    })),
+    items
+  };
   state.trips.unshift(trip);
   saveState();
   return trip.id;
@@ -333,6 +477,31 @@ function createTripFromTemplate(name, date) {
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const ICON_PATHS = {
+  copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  close: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  chevUp: '<polyline points="18 15 12 9 6 15"/>',
+  chevDown: '<polyline points="6 9 12 15 18 9"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>',
+  fileText: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>',
+  filePdf: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><rect x="8" y="12" width="8" height="7" rx="1"/>',
+  moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  sun: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
+  help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>'
+};
+
+function icon(name, size) {
+  const path = ICON_PATHS[name];
+  if (!path) return '';
+  const s = size || 16;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+}
+
+function iconPdfBtn() {
+  return '<span class="btn-export-pdf-label">PDF</span>';
 }
 
 function toggleCard(el) {
@@ -366,6 +535,8 @@ function applyTheme() {
     document.getElementById('themeIcon').textContent = '☀️';
     const meta = document.getElementById('theme-color-active');
     if (meta) meta.setAttribute('content', '#f5f7f9');
+  } else {
+    document.getElementById('themeIcon').textContent = '🌙';
   }
 }
 
@@ -385,6 +556,11 @@ function navigate(s, tripId) {
   window.scrollTo(0, 0);
 }
 
+function switchAboutTab(tab) {
+  aboutTab = tab;
+  render();
+}
+
 function openModal(html, onMount) {
   document.getElementById('modal-content').innerHTML = html;
   document.getElementById('modal-overlay').classList.add('open');
@@ -395,34 +571,166 @@ function closeModal() {
   document.getElementById('modal-overlay').classList.remove('open');
 }
 
+function nextTripCopyName(baseName) {
+  const root = baseName.replace(/\s*\(\d+\)\s*$/, '').trim();
+  const escaped = root.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('^' + escaped + '(?: \\((\\d+)\\))?$');
+  let max = 1;
+  state.trips.forEach(t => {
+    const m = t.name.match(re);
+    if (m) max = Math.max(max, m[1] ? parseInt(m[1], 10) : 1);
+  });
+  return max === 1 ? root + ' (2)' : root + ' (' + (max + 1) + ')';
+}
+
+function cloneTripFromSource(sourceTrip, name, dateStart, dateEnd) {
+  ensureTripShape(sourceTrip);
+  const catIdMap = {};
+  const categories = sourceTrip.categories.map(c => {
+    const newId = uid();
+    catIdMap[c.id] = newId;
+    return { id: newId, name: c.name, order: c.order };
+  });
+  const items = sourceTrip.items.map(it => ({
+    id: uid(),
+    categoryId: catIdMap[it.categoryId] || it.categoryId,
+    name: it.name,
+    note: it.note || '',
+    checked: false,
+    fromTemplate: !!it.fromTemplate
+  }));
+  const start = dateStart || '';
+  const end = dateEnd || start;
+  const trip = {
+    id: uid(),
+    name,
+    dateStart: start,
+    dateEnd: end,
+    createdAt: Date.now(),
+    categories,
+    items
+  };
+  state.trips.unshift(trip);
+  saveState();
+  return trip.id;
+}
+
+function mountTripDateModal(startId, endId, oneDayId) {
+  const startEl = document.getElementById(startId);
+  const endEl = document.getElementById(endId);
+  document.getElementById(oneDayId).onclick = () => {
+    if (startEl.value) {
+      endEl.value = startEl.value;
+      showToast('One day trip');
+    } else {
+      showToast('Pick a start date first');
+    }
+  };
+  startEl.addEventListener('change', () => {
+    if (!endEl.value || endEl.value < startEl.value) endEl.value = startEl.value;
+  });
+}
+
 function promptNewTrip() {
   openModal(`
     <h3>New Trip</h3>
-    <div class="modal-field"><label>Trip name</label><input id="trip-name" placeholder="e.g. Red Sea March" autofocus/></div>
-    <div class="modal-field"><label>Date (optional)</label><input id="trip-date" type="date"/></div>
+    <div class="modal-field"><label>Trip name</label><input id="trip-name" placeholder="e.g. Osezaki" autofocus/></div>
+    <div class="modal-field-row">
+      <div class="modal-field"><label>Start date</label><input id="trip-date-start" type="date"/></div>
+      <div class="modal-field"><label>Finish date</label><input id="trip-date-end" type="date"/></div>
+    </div>
+    <button class="btn-secondary" id="trip-one-day-btn" style="width:100%;margin-bottom:4px">One day trip</button>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancel</button>
       <button class="btn-primary" id="trip-create-btn">Create</button>
     </div>
   `, () => {
+    mountTripDateModal('trip-date-start', 'trip-date-end', 'trip-one-day-btn');
     document.getElementById('trip-create-btn').onclick = () => {
       const name = document.getElementById('trip-name').value.trim();
       if (!name) { showToast('Enter a trip name'); return; }
-      const date = document.getElementById('trip-date').value;
-      const id = createTripFromTemplate(name, date);
+      const dateStart = document.getElementById('trip-date-start').value;
+      const dateEnd = document.getElementById('trip-date-end').value || dateStart;
+      if (dateStart && dateEnd && dateEnd < dateStart) {
+        showToast('Finish date must be on or after start');
+        return;
+      }
+      const id = createTripFromTemplate(name, dateStart, dateEnd);
       closeModal();
       navigate('trip', id);
     };
   });
 }
 
+function promptDuplicateTrip(tripId) {
+  const source = state.trips.find(t => t.id === tripId);
+  if (!source) return;
+  const defaultName = nextTripCopyName(source.name);
+  openModal(`
+    <h3>Duplicate Trip</h3>
+    <p style="font-size:13px;color:var(--muted);margin:-6px 0 12px;line-height:1.45">Copies your cards and gear list. Checks start cleared.</p>
+    <div class="modal-field"><label>Trip name</label><input id="trip-dup-name" value="${esc(defaultName)}" autofocus/></div>
+    <div class="modal-field-row">
+      <div class="modal-field"><label>Start date</label><input id="trip-dup-start" type="date"/></div>
+      <div class="modal-field"><label>Finish date</label><input id="trip-dup-end" type="date"/></div>
+    </div>
+    <button class="btn-secondary" id="trip-dup-one-day-btn" style="width:100%;margin-bottom:4px">One day trip</button>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="trip-dup-create-btn">Create copy</button>
+    </div>
+  `, () => {
+    mountTripDateModal('trip-dup-start', 'trip-dup-end', 'trip-dup-one-day-btn');
+    document.getElementById('trip-dup-create-btn').onclick = () => {
+      const name = document.getElementById('trip-dup-name').value.trim();
+      if (!name) { showToast('Enter a trip name'); return; }
+      const dateStart = document.getElementById('trip-dup-start').value;
+      const dateEnd = document.getElementById('trip-dup-end').value || dateStart;
+      if (dateStart && dateEnd && dateEnd < dateStart) {
+        showToast('Finish date must be on or after start');
+        return;
+      }
+      const id = cloneTripFromSource(source, name, dateStart, dateEnd);
+      closeModal();
+      showToast('Trip duplicated');
+      navigate('trip', id);
+    };
+  });
+}
+
+function promptRenameTrip(tripId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  openModal(`
+    <h3>Rename Trip</h3>
+    <div class="modal-field"><label>Trip name</label><input id="trip-rename" value="${esc(trip.name)}" autofocus/></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="trip-rename-btn">Save</button>
+    </div>
+  `, () => {
+    document.getElementById('trip-rename-btn').onclick = () => {
+      const name = document.getElementById('trip-rename').value.trim();
+      if (!name) { showToast('Enter a trip name'); return; }
+      trip.name = name;
+      saveState();
+      closeModal();
+      navigate('trip', tripId);
+    };
+  });
+}
+
 function renderHeader(title, subtitle, showBack) {
+  const backOrClose = showBack
+    ? (screen === 'about'
+      ? `<button class="btn-back btn-close" onclick="navigate('home')" title="Close">${icon('close', 14)}</button>`
+      : `<button class="btn-back" onclick="navigate('home')">← Back</button>`)
+    : `<div class="brand-icon"><img src="icon-192.png" width="44" height="44" alt=""/></div>
+        <div class="brand-text"><h1>${esc(title || 'GET IN WATER')}</h1><p>${esc(subtitle || 'Trip Packing Checklist')}</p></div>`;
   return `
     <header class="hdr">
       <div class="brand">
-        ${showBack ? `<button class="btn-back" onclick="navigate('home')">← Back</button>` : `
-        <div class="brand-icon">🤿</div>
-        <div class="brand-text"><h1>${esc(title || 'GET IN WATER')}</h1><p>${esc(subtitle || 'Trip Packing Checklist')}</p></div>`}
+        ${backOrClose}
       </div>
       <div class="hdr-actions">
         <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"><span class="theme-icon" id="themeIcon">🌙</span></button>
@@ -439,20 +747,27 @@ function renderHome() {
   } else {
     tripsHtml = trips.map(t => {
       const p = tripProgress(t);
-      const dateStr = t.date ? new Date(t.date + 'T12:00:00').toLocaleDateString() : '';
+      const dateStr = formatTripDateRange(t);
       return `
-        <div class="trip-card" onclick="navigate('trip','${t.id}')">
-          <h3>${esc(t.name)}</h3>
-          <div class="trip-meta">${dateStr ? dateStr + ' · ' : ''}${p.done}/${p.total} packed</div>
-          <div class="progress-bar"><div class="progress-fill" style="width:${p.pct}%"></div></div>
+        <div class="trip-card">
+          <div class="trip-card-head">
+            <div class="trip-card-main" onclick="navigate('trip','${t.id}')">
+              <h3>${esc(t.name)}</h3>
+              <div class="trip-meta">${dateStr ? esc(dateStr) + ' · ' : ''}${p.done}/${p.total} packed</div>
+            </div>
+            <div class="trip-card-actions">
+              <button class="icon-btn icon-btn-sm" onclick="promptDuplicateTrip('${t.id}')" title="Duplicate trip">${icon('copy', 14)}</button>
+              <button class="icon-btn icon-btn-sm danger" onclick="deleteTrip('${t.id}')" title="Remove trip">${icon('close', 14)}</button>
+            </div>
+          </div>
+          <div class="progress-bar" onclick="navigate('trip','${t.id}')"><div class="progress-fill" style="width:${p.pct}%"></div></div>
         </div>`;
     }).join('');
   }
   return `
     ${renderHeader('GET IN WATER', 'Trip Packing Checklist', false)}
     <div class="action-row">
-      <button class="btn-primary" onclick="promptNewTrip()">+ New Trip</button>
-      <button class="btn-secondary" onclick="navigate('template')">Master Template</button>
+      <button class="btn-primary btn-icon-only" onclick="promptNewTrip()" title="New trip">${icon('plus', 18)}</button>
     </div>
     <div class="card">
       <div class="card-title">Your Trips</div>
@@ -460,102 +775,54 @@ function renderHome() {
     </div>`;
 }
 
-function renderTemplate() {
+function renderTemplateContent() {
   const cats = getCategories();
   let html = `
-    ${renderHeader('Master Template', 'Edit default gear list', true)}
     <div class="export-row">
-      <button class="btn-export" onclick="exportTemplateTXT()">📄 TXT</button>
-      <button class="btn-export" onclick="exportTemplatePDF()">📑 PDF</button>
+      <button class="btn-export" onclick="exportTemplateTXT()" title="Download .txt">${icon('fileText', 16)}</button>
+      <button class="btn-export" onclick="exportTemplatePDF()" title="Export PDF">${iconPdfBtn()}</button>
     </div>
     <div class="action-row">
-      <button class="btn-secondary" onclick="addCategory()">+ Category</button>
+      <button class="btn-secondary" onclick="addCategory()">+ Add card</button>
     </div>`;
-  cats.forEach((cat, ci) => {
+  cats.forEach((cat) => {
     const items = state.masterTemplate.items.filter(i => i.categoryId === cat.id);
     html += `
       <div class="card collapsible card-open" id="cat-${cat.id}">
         <div class="card-title" onclick="toggleCard(this)">
-          <input value="${esc(cat.name)}" onclick="event.stopPropagation()" onchange="renameCategory('${cat.id}',this.value)" style="background:transparent;border:none;color:var(--accent);font:inherit;flex:1;min-width:0"/>
-          <span class="card-caret">▼</span>
+          <input value="${esc(cat.name)}" onclick="event.stopPropagation()" onchange="renameCategory('${cat.id}',this.value)" title="Rename card"/>
+          <div class="card-title-actions" onclick="event.stopPropagation()">
+            <button class="icon-btn icon-btn-sm" onclick="moveCategory('${cat.id}',-1)" title="Move up">${icon('chevUp', 13)}</button>
+            <button class="icon-btn icon-btn-sm" onclick="moveCategory('${cat.id}',1)" title="Move down">${icon('chevDown', 13)}</button>
+            <button class="icon-btn icon-btn-sm danger" onclick="deleteCategory('${cat.id}')" title="Remove card">${icon('close', 13)}</button>
+          </div>
+          <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addTemplateItem('${cat.id}')" title="Add item">${icon('plus', 13)}</button>
+          <span class="card-caret">${icon('chevDown', 11)}</span>
         </div>
         <div class="card-collapsible-body">
-          <div style="display:flex;gap:4px;margin-bottom:8px">
-            <button class="icon-btn" onclick="moveCategory('${cat.id}',-1)" title="Move up">↑</button>
-            <button class="icon-btn" onclick="moveCategory('${cat.id}',1)" title="Move down">↓</button>
-            <button class="icon-btn danger" onclick="deleteCategory('${cat.id}')" title="Delete category">✕</button>
-          </div>
           ${items.map(it => `
             <div class="edit-row">
               <input value="${esc(it.name)}" onchange="renameTemplateItem('${it.id}',this.value)"/>
-              <button class="icon-btn danger" onclick="deleteTemplateItem('${it.id}')">✕</button>
+              <button class="icon-btn danger" onclick="deleteTemplateItem('${it.id}')" title="Delete item">${icon('close', 14)}</button>
             </div>`).join('')}
-          <button class="btn-secondary" style="margin-top:8px" onclick="addTemplateItem('${cat.id}')">+ Item</button>
         </div>
       </div>`;
   });
   return html;
 }
 
-function renderTrip() {
-  const trip = state.trips.find(t => t.id === activeTripId);
-  if (!trip) return renderHome();
-  const p = tripProgress(trip);
-  const cats = getCategories();
-  const grouped = {};
-  trip.items.forEach(it => {
-    const cn = getCategoryName(it.categoryId);
-    if (!grouped[cn]) grouped[cn] = [];
-    grouped[cn].push(it);
-  });
-  const extra = trip.items.filter(it => !cats.find(c => c.id === it.categoryId));
-  if (extra.length) grouped['Other'] = (grouped['Other'] || []).concat(extra);
-
-  let catsHtml = Object.keys(grouped).map(cn => {
-    const items = grouped[cn];
-    return `
-      <div class="card collapsible card-open">
-        <div class="card-title" onclick="toggleCard(this)">${esc(cn)} <span class="card-caret">▼</span></div>
-        <div class="card-collapsible-body">
-          ${items.map(it => `
-            <div class="check-item ${it.checked ? 'checked' : ''}" onclick="toggleTripItem('${trip.id}','${it.id}')">
-              <div class="check-box">${it.checked ? '✓' : ''}</div>
-              <div><div class="item-name">${esc(it.name)}</div>${it.note ? `<div class="item-note">${esc(it.note)}</div>` : ''}</div>
-            </div>`).join('')}
-        </div>
-      </div>`;
-  }).join('');
-
-  return `
-    ${renderHeader(trip.name, trip.date || 'Packing checklist', true)}
-    <div class="progress-sticky">
-      <div class="trip-meta">${p.done} / ${p.total} packed (${p.pct}%)</div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${p.pct}%"></div></div>
-    </div>
-    <div class="action-row">
-      <button class="btn-export" onclick="exportTripTXT('full')">📄 TXT</button>
-      <button class="btn-export" onclick="exportTripPDF('full')">📑 PDF</button>
-      <div class="menu-dropdown">
-        <button class="btn-secondary" onclick="toggleMenu(event)">⋮ More</button>
-        <div class="menu-panel ${menuOpen ? 'open' : ''}" id="trip-menu">
-          <button onclick="exportTripTXT('remaining')">Export remaining (TXT)</button>
-          <button onclick="exportTripPDF('remaining')">Export remaining (PDF)</button>
-          <button onclick="resetTrip('${trip.id}')">Reset all checks</button>
-          <button class="danger" onclick="deleteTrip('${trip.id}')">Delete trip</button>
-        </div>
-      </div>
-      <button class="btn-secondary" onclick="promptAddTripItem('${trip.id}')">+ Item</button>
-    </div>
-    ${catsHtml}`;
-}
-
 function renderAbout() {
   return `
-    ${renderHeader('About', 'Get In Water v' + APP_VERSION, true)}
+    ${renderHeader('GET IN WATER', 'Settings & About', true)}
+    <div class="about-tabs">
+      <button class="about-tab-btn ${aboutTab === 'template' ? 'active' : ''}" onclick="switchAboutTab('template')">Gear template</button>
+      <button class="about-tab-btn ${aboutTab === 'about' ? 'active' : ''}" onclick="switchAboutTab('about')">About</button>
+    </div>
+    ${aboutTab === 'template' ? renderTemplateContent() : `
     <div class="card">
       <div class="card-title">Companion to LSP D-Planner</div>
       <p style="font-size:14px;line-height:1.6;color:var(--tip)">
-        Get In Water helps you pack for dive trips. Maintain a master gear template, start a trip checklist, and tick items off as you pack. Export TXT or PDF for printing.
+        Get In Water helps you pack for dive trips. Edit your master gear template under <strong>Gear template</strong>, start a trip checklist, and tick items off as you pack. Export TXT or PDF for printing.
       </p>
     </div>
     <a class="link-card" href="https://threecats-lsp.com" target="_blank" rel="noopener">🏠 Three Cats LSP · Homepage</a>
@@ -565,13 +832,90 @@ function renderAbout() {
     <a class="link-card" href="https://threecats-lsp.com/get-in-water/download.html" target="_blank" rel="noopener">⬇ Get In Water · Download APK</a>
     <a class="link-card" href="https://github.com/Three-Cats-LSP/Get-In-Water" target="_blank" rel="noopener">GitHub · Get In Water</a>
     <a class="link-card" href="https://paypal.me/ThreeCatsLSP" target="_blank" rel="noopener">💙 Support Development · PayPal</a>
-    <p style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:16px;opacity:0.7">v${APP_VERSION} · Three Cats LSP</p>`;
+    <p style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:16px;opacity:0.7">v${APP_VERSION} · Three Cats LSP</p>`}`;
+}
+
+function renderTrip() {
+  const trip = state.trips.find(t => t.id === activeTripId);
+  if (!trip) return renderHome();
+  ensureTripShape(trip);
+  const p = tripProgress(trip);
+  const cats = getTripCategories(trip);
+  const knownIds = new Set(cats.map(c => c.id));
+
+  let catsHtml = cats.map(cat => {
+    const items = trip.items.filter(i => i.categoryId === cat.id);
+    return `
+      <div class="card collapsible card-open">
+        <div class="card-title" onclick="toggleCard(this)">
+          <input value="${esc(cat.name)}" onclick="event.stopPropagation()" onchange="renameTripCategory('${trip.id}','${cat.id}',this.value)" title="Rename card"/>
+          <div class="card-title-actions" onclick="event.stopPropagation()">
+            <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${trip.id}','${cat.id}',-1)" title="Move up">${icon('chevUp', 13)}</button>
+            <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${trip.id}','${cat.id}',1)" title="Move down">${icon('chevDown', 13)}</button>
+            <button class="icon-btn icon-btn-sm" onclick="duplicateTripCategory('${trip.id}','${cat.id}')" title="Duplicate card">${icon('copy', 13)}</button>
+            <button class="icon-btn icon-btn-sm danger" onclick="removeTripCategory('${trip.id}','${cat.id}')" title="Remove card">${icon('close', 13)}</button>
+          </div>
+          <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addTripItem('${trip.id}','${cat.id}')" title="Add item">${icon('plus', 13)}</button>
+          <span class="card-caret">${icon('chevDown', 11)}</span>
+        </div>
+        <div class="card-collapsible-body">
+          ${items.length ? items.map(it => `
+            <div class="check-item ${it.checked ? 'checked' : ''}">
+              <div class="check-main" onclick="toggleTripItem('${trip.id}','${it.id}')">
+                <div class="check-box">${it.checked ? icon('check', 14) : ''}</div>
+                <div><div class="item-name">${esc(it.name)}</div>${it.note ? `<div class="item-note">${esc(it.note)}</div>` : ''}</div>
+              </div>
+              <button class="icon-btn danger" onclick="deleteTripItem('${trip.id}','${it.id}')" title="Remove item">${icon('close', 14)}</button>
+            </div>`).join('') : `<div class="empty-state" style="padding:12px 4px"><p style="margin:0;font-size:12px">No items yet — tap + to add</p></div>`}
+        </div>
+      </div>`;
+  }).join('');
+
+  const otherItems = trip.items.filter(it => !knownIds.has(it.categoryId));
+  if (otherItems.length) {
+    catsHtml += `
+      <div class="card collapsible card-open">
+        <div class="card-title" onclick="toggleCard(this)">Other <span class="card-caret">${icon('chevDown', 11)}</span></div>
+        <div class="card-collapsible-body">
+          ${otherItems.map(it => `
+            <div class="check-item ${it.checked ? 'checked' : ''}">
+              <div class="check-main" onclick="toggleTripItem('${trip.id}','${it.id}')">
+                <div class="check-box">${it.checked ? icon('check', 14) : ''}</div>
+                <div><div class="item-name">${esc(it.name)}</div></div>
+              </div>
+              <button class="icon-btn danger" onclick="deleteTripItem('${trip.id}','${it.id}')" title="Remove item">${icon('close', 14)}</button>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  return `
+    ${renderHeader(trip.name, formatTripDateRange(trip) || 'Packing checklist', true)}
+    <div class="progress-sticky">
+      <div class="trip-meta">${p.done} / ${p.total} packed (${p.pct}%)</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${p.pct}%"></div></div>
+    </div>
+    <div class="action-row">
+      <button class="btn-secondary" onclick="addTripCategory('${trip.id}')">+ Add card</button>
+      <button class="btn-export" onclick="exportTripTXT('full')" title="Download .txt">${icon('fileText', 16)}</button>
+      <button class="btn-export" onclick="exportTripPDF('full')" title="Export PDF">${iconPdfBtn()}</button>
+      <div class="menu-dropdown">
+        <button class="btn-secondary" onclick="toggleMenu(event)">⋮ More</button>
+        <div class="menu-panel ${menuOpen ? 'open' : ''}" id="trip-menu">
+          <button onclick="promptRenameTrip('${trip.id}')">Rename trip</button>
+          <button onclick="exportTripTXT('remaining')">Export remaining (TXT)</button>
+          <button onclick="exportTripPDF('remaining')">Export remaining (PDF)</button>
+          <button onclick="resetTrip('${trip.id}')">Reset all checks</button>
+          <button class="danger" onclick="deleteTrip('${trip.id}')">Delete trip</button>
+        </div>
+      </div>
+    </div>
+    ${catsHtml}`;
 }
 
 function render() {
   const root = document.getElementById('app-root');
   if (screen === 'home') root.innerHTML = renderHome();
-  else if (screen === 'template') root.innerHTML = renderTemplate();
   else if (screen === 'trip') root.innerHTML = renderTrip();
   else if (screen === 'about') root.innerHTML = renderAbout();
   applyTheme();
@@ -589,7 +933,7 @@ document.addEventListener('click', () => { if (menuOpen) { menuOpen = false; ren
 function addCategory() {
   const order = state.masterTemplate.categories.length;
   state.masterTemplate.categories.push({ id: uid(), name: 'New Category', order });
-  saveState(); navigate('template');
+  saveState(); aboutTab = 'template'; navigate('about');
 }
 function renameCategory(id, name) {
   const c = state.masterTemplate.categories.find(x => x.id === id);
@@ -599,7 +943,7 @@ function deleteCategory(id) {
   if (!confirm('Delete this category and all its items?')) return;
   state.masterTemplate.categories = state.masterTemplate.categories.filter(c => c.id !== id);
   state.masterTemplate.items = state.masterTemplate.items.filter(i => i.categoryId !== id);
-  saveState(); navigate('template');
+  saveState(); aboutTab = 'template'; navigate('about');
 }
 function moveCategory(id, dir) {
   const cats = getCategories();
@@ -607,13 +951,13 @@ function moveCategory(id, dir) {
   const swap = idx + dir;
   if (swap < 0 || swap >= cats.length) return;
   const tmp = cats[idx].order; cats[idx].order = cats[swap].order; cats[swap].order = tmp;
-  saveState(); navigate('template');
+  saveState(); aboutTab = 'template'; navigate('about');
 }
 function addTemplateItem(catId) {
   const name = prompt('Item name:');
   if (!name || !name.trim()) return;
   state.masterTemplate.items.push({ id: uid(), categoryId: catId, name: name.trim() });
-  saveState(); navigate('template');
+  saveState(); aboutTab = 'template'; navigate('about');
 }
 function renameTemplateItem(id, name) {
   const it = state.masterTemplate.items.find(x => x.id === id);
@@ -621,7 +965,7 @@ function renameTemplateItem(id, name) {
 }
 function deleteTemplateItem(id) {
   state.masterTemplate.items = state.masterTemplate.items.filter(i => i.id !== id);
-  saveState(); navigate('template');
+  saveState(); aboutTab = 'template'; navigate('about');
 }
 
 // ── Trip actions ──
@@ -638,24 +982,103 @@ function resetTrip(tripId) {
 function deleteTrip(tripId) {
   if (!confirm('Delete this trip?')) return;
   state.trips = state.trips.filter(t => t.id !== tripId);
-  saveState(); navigate('home');
+  saveState();
+  if (screen === 'trip' && activeTripId === tripId) navigate('home');
+  else render();
 }
-function promptAddTripItem(tripId) {
-  const cats = getCategories();
-  let catId = cats[0] ? cats[0].id : uid();
-  if (cats.length > 1) {
-    const names = cats.map((c, i) => `${i + 1}. ${c.name}`).join('\n');
-    const pick = prompt(`Category number:\n${names}`, '1');
-    const idx = parseInt(pick, 10) - 1;
-    if (idx >= 0 && idx < cats.length) catId = cats[idx].id;
-  }
+function deleteTripItem(tripId, itemId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  trip.items = trip.items.filter(i => i.id !== itemId);
+  saveState();
+  navigate('trip', tripId);
+}
+function addTripItem(tripId, catId) {
   const name = prompt('Item name:');
   if (!name || !name.trim()) return;
   const trip = state.trips.find(t => t.id === tripId);
   if (trip) {
     trip.items.push({ id: uid(), categoryId: catId, name: name.trim(), note: '', checked: false, fromTemplate: false });
-    saveState(); navigate('trip', tripId);
+    saveState();
+    navigate('trip', tripId);
   }
+}
+
+function renameTripCategory(tripId, catId, name) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  ensureTripShape(trip);
+  const cat = trip.categories.find(c => c.id === catId);
+  if (cat) { cat.name = name.trim() || cat.name; saveState(); }
+}
+
+function addTripCategory(tripId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  ensureTripShape(trip);
+  const name = prompt('Card name:', 'New Category');
+  if (!name || !name.trim()) return;
+  const order = trip.categories.length ? Math.max(...trip.categories.map(c => c.order)) + 1 : 0;
+  trip.categories.push({ id: uid(), name: name.trim(), order });
+  saveState();
+  navigate('trip', tripId);
+}
+
+function removeTripCategory(tripId, catId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  ensureTripShape(trip);
+  if (!confirm('Remove this card and all its items from this trip?')) return;
+  trip.categories = trip.categories.filter(c => c.id !== catId);
+  trip.items = trip.items.filter(i => i.categoryId !== catId);
+  saveState();
+  navigate('trip', tripId);
+}
+
+function nextCategoryCopyName(categories, sourceName) {
+  const baseName = sourceName.replace(/\s*\(\d+\)\s*$/, '').trim();
+  const escaped = baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('^' + escaped + '(?: \\((\\d+)\\))?$');
+  let max = 1;
+  categories.forEach(c => {
+    const m = c.name.match(re);
+    if (m) max = Math.max(max, m[1] ? parseInt(m[1], 10) : 1);
+  });
+  return max === 1 ? baseName + ' (2)' : baseName + ' (' + (max + 1) + ')';
+}
+
+function duplicateTripCategory(tripId, catId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  ensureTripShape(trip);
+  const src = trip.categories.find(c => c.id === catId);
+  if (!src) return;
+  const order = Math.max(...trip.categories.map(c => c.order)) + 1;
+  const newCatId = uid();
+  const newName = nextCategoryCopyName(trip.categories, src.name);
+  trip.categories.push({ id: newCatId, name: newName, order });
+  trip.items.filter(i => i.categoryId === catId).forEach(it => {
+    trip.items.push({
+      id: uid(), categoryId: newCatId, name: it.name, note: it.note || '',
+      checked: false, fromTemplate: false
+    });
+  });
+  saveState();
+  navigate('trip', tripId);
+}
+
+function moveTripCategory(tripId, catId, dir) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  const cats = getTripCategories(trip);
+  const idx = cats.findIndex(c => c.id === catId);
+  const swap = idx + dir;
+  if (swap < 0 || swap >= cats.length) return;
+  const tmp = cats[idx].order;
+  cats[idx].order = cats[swap].order;
+  cats[swap].order = tmp;
+  saveState();
+  navigate('trip', tripId);
 }
 
 // ── Export helpers ──
@@ -690,30 +1113,37 @@ function buildTripText(trip, mode) {
     '  Three Cats LSP · threecats-lsp.com',
     '═══════════════════════════════════════',
     `Trip: ${trip.name}`,
-    trip.date ? `Date: ${trip.date}` : '',
+    formatTripDateRange(trip) ? `Dates: ${formatTripDateRange(trip)}` : '',
     `Progress: ${p.done}/${p.total} packed`,
     mode === 'remaining' ? '(Remaining items only)' : '',
     ''
   ].filter(Boolean);
 
-  const cats = getCategories();
-  const grouped = {};
+  const cats = getTripCategories(trip);
   let items = trip.items;
   if (mode === 'remaining') items = items.filter(i => !i.checked);
-  items.forEach(it => {
-    const cn = getCategoryName(it.categoryId);
-    if (!grouped[cn]) grouped[cn] = [];
-    grouped[cn].push(it);
-  });
+  const knownIds = new Set(cats.map(c => c.id));
 
-  Object.keys(grouped).forEach(cn => {
-    lines.push(`▸ ${cn.toUpperCase()}`);
-    grouped[cn].forEach(it => {
+  cats.forEach(cat => {
+    const catItems = items.filter(i => i.categoryId === cat.id);
+    if (!catItems.length) return;
+    lines.push(`▸ ${cat.name.toUpperCase()}`);
+    catItems.forEach(it => {
       const mark = it.checked ? '[x]' : '[ ]';
       lines.push(`  ${mark} ${it.name}`);
     });
     lines.push('');
   });
+
+  const otherItems = items.filter(i => !knownIds.has(i.categoryId));
+  if (otherItems.length) {
+    lines.push('▸ OTHER');
+    otherItems.forEach(it => {
+      const mark = it.checked ? '[x]' : '[ ]';
+      lines.push(`  ${mark} ${it.name}`);
+    });
+    lines.push('');
+  }
   lines.push('— Generated by Get In Water v' + APP_VERSION);
   return lines.join('\n');
 }
@@ -740,82 +1170,221 @@ function exportTripTXT(mode) {
   downloadBlob(buildTripText(trip, mode), `GIW_${dateStr()}_${safeFilename(trip.name)}_${tag}.txt`, 'text/plain');
 }
 
-function buildPdfDoc(title, subtitle, sections) {
+// ── PDF export (DejaVu Sans — full Unicode / Cyrillic) ──
+let _pdfFontCache = null;
+async function loadPDFFonts(doc) {
+  if (_pdfFontCache) {
+    doc.addFileToVFS('DejaVuSans.ttf', _pdfFontCache.regular);
+    doc.addFileToVFS('DejaVuSans-Bold.ttf', _pdfFontCache.bold);
+    doc.addFont('DejaVuSans.ttf', 'DejaVuSans', 'normal');
+    doc.addFont('DejaVuSans-Bold.ttf', 'DejaVuSans', 'bold');
+    doc.setFont('DejaVuSans', 'normal');
+    return true;
+  }
+  try {
+    const [rResp, bResp] = await Promise.all([
+      fetch('https://cdn.jsdelivr.net/npm/dejavu-fonts-ttf@2.37.3/ttf/DejaVuSans.ttf'),
+      fetch('https://cdn.jsdelivr.net/npm/dejavu-fonts-ttf@2.37.3/ttf/DejaVuSans-Bold.ttf')
+    ]);
+    if (!rResp.ok || !bResp.ok) throw new Error('Font fetch failed');
+    const [rBuf, bBuf] = await Promise.all([rResp.arrayBuffer(), bResp.arrayBuffer()]);
+    function toBase64(buf) {
+      const bytes = new Uint8Array(buf);
+      const CHUNK = 8192;
+      let bin = '';
+      for (let i = 0; i < bytes.length; i += CHUNK) {
+        bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+      }
+      return btoa(bin);
+    }
+    _pdfFontCache = { regular: toBase64(rBuf), bold: toBase64(bBuf) };
+    doc.addFileToVFS('DejaVuSans.ttf', _pdfFontCache.regular);
+    doc.addFileToVFS('DejaVuSans-Bold.ttf', _pdfFontCache.bold);
+    doc.addFont('DejaVuSans.ttf', 'DejaVuSans', 'normal');
+    doc.addFont('DejaVuSans-Bold.ttf', 'DejaVuSans', 'bold');
+    doc.setFont('DejaVuSans', 'normal');
+    return true;
+  } catch (e) {
+    console.error('[GIW] DejaVu font load failed:', e);
+    alert('Could not load PDF fonts. Check your internet connection and try again.');
+    return false;
+  }
+}
+
+const PDF_PW = 210;
+const PDF_PH = 297;
+const PDF_ML = 16;
+const PDF_MR = 16;
+const PDF_HEADER_H = 12;
+const PDF_FOOTER_H = 8;
+const PDF_CONTENT_TOP = PDF_HEADER_H + 3;
+const PDF_CONTENT_BOT = PDF_PH - PDF_FOOTER_H - 3;
+const PDF_CW = PDF_PW - PDF_ML - PDF_MR;
+const PDF_SECTION_BAR_H = 6;
+const PDF_SECTION_GAP = 4;
+const PDF_ITEM_ROW_H = 5.5;
+
+function formatPdfDate(dateStr) {
+  if (!dateStr) {
+    return new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+  try {
+    return new Date(dateStr + 'T12:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  } catch (e) {
+    return dateStr;
+  }
+}
+
+async function buildPdfDoc(meta, sections) {
   const { jsPDF } = window.jspdf;
   if (!jsPDF) { alert('PDF library not loaded.'); return null; }
   const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
-  const margin = 18;
-  let y = margin;
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(16);
-  doc.setTextColor(0, 85, 170);
-  doc.text('GET IN WATER', margin, y);
-  y += 7;
-  doc.setFontSize(11);
-  doc.setTextColor(60, 60, 60);
-  doc.text(title, margin, y);
-  y += 5;
-  if (subtitle) { doc.setFontSize(9); doc.text(subtitle, margin, y); y += 6; }
-  doc.setDrawColor(0, 150, 200);
-  doc.line(margin, y, 210 - margin, y);
-  y += 8;
+  if (!(await loadPDFFonts(doc))) return null;
+
+  let y = PDF_CONTENT_TOP;
+  const nowStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const tripDate = meta.date || formatPdfDate(meta.dateStart);
+
+  function drawHeader() {
+    doc.setFillColor(3, 12, 24);
+    doc.rect(0, 0, PDF_PW, PDF_HEADER_H, 'F');
+    doc.setFillColor(0, 180, 220);
+    doc.roundedRect(PDF_ML, 2, 8, 8, 1.5, 1.5, 'F');
+    doc.setFont('DejaVuSans', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(255, 255, 255);
+    doc.text('GIW', PDF_ML + 4, 7.2, { align: 'center' });
+    doc.setFontSize(9);
+    doc.text('GET IN WATER', PDF_ML + 11, 5.8);
+    doc.setFont('DejaVuSans', 'normal');
+    doc.setFontSize(7.5);
+    doc.text(meta.tripLabel || 'Packing Checklist', PDF_ML + 11, 9.5);
+    doc.text(tripDate, PDF_PW - PDF_MR, 5.8, { align: 'right' });
+    if (meta.subtitle) {
+      doc.setFontSize(6.5);
+      doc.text(meta.subtitle, PDF_PW - PDF_MR, 9.2, { align: 'right' });
+    }
+    doc.setTextColor(0, 0, 0);
+    y = PDF_CONTENT_TOP;
+  }
+
+  function drawFooter() {
+    doc.setFillColor(235, 245, 252);
+    doc.rect(0, PDF_PH - PDF_FOOTER_H, PDF_PW, PDF_FOOTER_H, 'F');
+    doc.setFont('DejaVuSans', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(70, 90, 110);
+    doc.text('\u00a9 Three Cats LSP  \u00b7  @threecats_lsp  \u00b7  Have a safe and fun trip!', PDF_ML, PDF_PH - 3.2);
+    doc.text('Exported ' + nowStr + '  \u00b7  v' + APP_VERSION, PDF_PW - PDF_MR, PDF_PH - 3.2, { align: 'right' });
+    doc.setTextColor(0, 0, 0);
+  }
+
+  function checkY(need) {
+    if (y + need > PDF_CONTENT_BOT) {
+      drawFooter();
+      doc.addPage();
+      drawHeader();
+    }
+  }
+
+  let sectionIndex = 0;
+
+  function drawSectionTitle(title) {
+    const gap = sectionIndex === 0 ? 0 : PDF_SECTION_GAP;
+    sectionIndex += 1;
+    checkY(gap + PDF_SECTION_BAR_H + 3);
+    y += gap;
+    doc.setFillColor(0, 130, 180);
+    doc.rect(PDF_ML, y, PDF_CW, PDF_SECTION_BAR_H, 'F');
+    doc.setFont('DejaVuSans', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(255, 255, 255);
+    doc.text(title, PDF_ML + 2, y + 4.2);
+    doc.setTextColor(0, 0, 0);
+    y += PDF_SECTION_BAR_H + 3;
+  }
+
+  function drawItemLine(line) {
+    doc.setFont('DejaVuSans', 'normal');
+    doc.setFontSize(9);
+    const wrapped = doc.splitTextToSize(line, PDF_CW - 6);
+    const blockH = PDF_ITEM_ROW_H * wrapped.length;
+    checkY(blockH + 1.5);
+    wrapped.forEach((row, i) => {
+      doc.text(row, PDF_ML + 3, y + 3.8 + i * PDF_ITEM_ROW_H);
+    });
+    y += blockH + 1.5;
+  }
+
+  drawHeader();
+
+  if (meta.modeLabel) {
+    checkY(6);
+    doc.setFont('DejaVuSans', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(90, 110, 130);
+    doc.text(meta.modeLabel, PDF_ML, y + 3.2);
+    doc.setTextColor(0, 0, 0);
+    y += 6;
+  }
 
   sections.forEach(sec => {
-    if (y > 270) { doc.addPage(); y = margin; }
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(0, 120, 180);
-    doc.text(sec.title, margin, y);
-    y += 6;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(40, 40, 40);
-    sec.items.forEach(line => {
-      if (y > 275) { doc.addPage(); y = margin; }
-      const wrapped = doc.splitTextToSize(line, 170);
-      doc.text(wrapped, margin + 4, y);
-      y += wrapped.length * 4.5 + 1;
+    drawSectionTitle(sec.title);
+    sec.items.forEach(item => {
+      const line = typeof item === 'string' ? item : item.line;
+      drawItemLine(line);
     });
-    y += 4;
   });
 
-  y = 285;
-  doc.setFontSize(7);
-  doc.setTextColor(120, 120, 120);
-  doc.text('Three Cats LSP · Get In Water v' + APP_VERSION + ' · threecats-lsp.com/get-in-water/', margin, y);
+  drawFooter();
   return doc;
 }
 
-function exportTemplatePDF() {
+async function exportTemplatePDF() {
   const sections = getCategories().map(cat => ({
     title: cat.name,
-    items: state.masterTemplate.items.filter(i => i.categoryId === cat.id).map(it => `• ${it.name}`)
+    items: state.masterTemplate.items
+      .filter(i => i.categoryId === cat.id)
+      .map(it => '\u2022  ' + it.name)
   }));
-  const doc = buildPdfDoc('Master Gear Template', '', sections);
-  if (doc) doc.save(`GIW_${dateStr()}_MasterTemplate.pdf`);
+  const doc = await buildPdfDoc({
+    tripLabel: 'Master Gear Template',
+    date: '',
+    subtitle: 'Three Cats LSP'
+  }, sections);
+  if (doc) doc.save('GIW_' + dateStr() + '_MasterTemplate.pdf');
   showExportToast();
 }
 
-function exportTripPDF(mode) {
+async function exportTripPDF(mode) {
   const trip = state.trips.find(t => t.id === activeTripId);
   if (!trip) return;
   const p = tripProgress(trip);
   let items = trip.items;
   if (mode === 'remaining') items = items.filter(i => !i.checked);
-  const grouped = {};
-  items.forEach(it => {
-    const cn = getCategoryName(it.categoryId);
-    if (!grouped[cn]) grouped[cn] = [];
-    grouped[cn].push(it);
-  });
-  const sections = Object.keys(grouped).map(cn => ({
-    title: cn,
-    items: grouped[cn].map(it => `${it.checked ? '☑' : '☐'} ${it.name}`)
-  }));
-  const sub = `${trip.date ? trip.date + ' · ' : ''}${p.done}/${p.total} packed` + (mode === 'remaining' ? ' · Remaining only' : '');
-  const doc = buildPdfDoc(trip.name, sub, sections);
+
+  const sections = getTripCategories(trip).map(cat => ({
+    title: cat.name,
+    items: items.filter(i => i.categoryId === cat.id).map(it => (it.checked ? '\u2611  ' : '\u2610  ') + it.name)
+  })).filter(sec => sec.items.length);
+  const knownIds = new Set(getTripCategories(trip).map(c => c.id));
+  const orphanItems = items.filter(i => !knownIds.has(i.categoryId));
+  if (orphanItems.length) {
+    sections.push({
+      title: 'Other',
+      items: orphanItems.map(it => (it.checked ? '\u2611  ' : '\u2610  ') + it.name)
+    });
+  }
+
+  const doc = await buildPdfDoc({
+    tripLabel: trip.name,
+    date: formatTripDateRange(trip),
+    subtitle: p.done + '/' + p.total + ' packed',
+    modeLabel: mode === 'remaining' ? 'Remaining items only' : ''
+  }, sections);
+
   const tag = mode === 'remaining' ? 'Remaining' : 'Full';
-  if (doc) doc.save(`GIW_${dateStr()}_${safeFilename(trip.name)}_${tag}.pdf`);
+  if (doc) doc.save('GIW_' + dateStr() + '_' + safeFilename(trip.name) + '_' + tag + '.pdf');
   showExportToast();
 }
 
@@ -823,6 +1392,44 @@ function exportTripPDF(mode) {
 state = loadState();
 initBubbles();
 render();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(r => console.log('[SW] registered, scope:', r.scope))
+      .catch(e => console.warn('[SW] registration failed:', e));
+  });
+}
+
+let _pwaPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _pwaPrompt = e;
+  const banner = document.createElement('div');
+  banner.id = 'pwaBanner';
+  banner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border-hi);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.4);font-family:Outfit,sans-serif;max-width:340px;width:90%;';
+  banner.innerHTML = '<span style="font-size:28px;">\uD83E\uDD3F</span>'
+    + '<div style="flex:1;"><div style="color:var(--text);font-weight:600;font-size:14px;">Install Get In Water</div>'
+    + '<div style="color:var(--muted);font-size:12px;margin-top:2px;">Add to home screen for offline packing lists</div></div>'
+    + '<button onclick="_pwaPrompt.prompt();_pwaPrompt.userChoice.then(()=>{_pwaPrompt=null;document.getElementById(\'pwaBanner\').remove();})" style="background:linear-gradient(135deg,#00d9ff,#00b8a0);border:none;border-radius:8px;padding:8px 14px;color:#030c18;font-weight:700;font-size:12px;cursor:pointer;">INSTALL</button>'
+    + '<button onclick="this.parentNode.remove()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0;line-height:1;">&times;</button>';
+  document.body.appendChild(banner);
+});
+
+if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !navigator.standalone) {
+  setTimeout(() => {
+    if (document.getElementById('pwaBanner')) return;
+    const b = document.createElement('div');
+    b.id = 'pwaBanner';
+    b.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border-hi);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:12px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.6);font-family:Outfit,sans-serif;max-width:340px;width:90%;';
+    b.innerHTML = '<span style="font-size:24px;">\uD83E\uDD3F</span>'
+      + '<div style="flex:1;"><div style="color:var(--text);font-weight:600;font-size:13px;">Install on iPhone / iPad</div>'
+      + '<div style="color:var(--muted);font-size:11px;margin-top:3px;">Tap <strong style="color:var(--accent);">Share \u2191</strong> then <strong style="color:var(--accent);">Add to Home Screen</strong></div></div>'
+      + '<button onclick="this.parentNode.remove()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0;line-height:1;">&times;</button>';
+    document.body.appendChild(b);
+  }, 2500);
+}
 </script>
 </body>
 </html>
