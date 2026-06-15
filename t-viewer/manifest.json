@@ -1,24 +1,14 @@
 {
-  "name": "LSP T-Viewer",
+  "name": "T-Viewer",
   "short_name": "T-Viewer",
-  "description": "Dive table viewer by Three Cats LSP.",
-  "start_url": "/t-viewer/",
+  "description": "Lightweight text viewer for LSP deco logs",
+  "start_url": ".",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#0a1628",
   "theme_color": "#0a1628",
+  "orientation": "any",
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }
