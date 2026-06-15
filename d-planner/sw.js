@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dplanner-v1';
+const CACHE_NAME = 'dplanner-v2';
 const ASSETS = [
   '/d-planner/',
   '/d-planner/index.html'
