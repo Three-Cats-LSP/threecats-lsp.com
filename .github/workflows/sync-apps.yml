@@ -22,7 +22,11 @@ jobs:
                -H "Accept: application/vnd.github.v3.raw" \
                -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner/contents/index.html" \
                -o d-planner/index.html
-          echo "D-Planner index.html synced"
+          curl -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner/contents/download.html" \
+               -o d-planner/download.html
+          echo "D-Planner synced"
 
       - name: Pull latest T-Viewer index.html
         if: github.event.action == 'sync-t-viewer' || github.event_name == 'workflow_dispatch'
@@ -32,7 +36,11 @@ jobs:
                -H "Accept: application/vnd.github.v3.raw" \
                -L "https://api.github.com/repos/Three-Cats-LSP/T-Viewer/contents/index.html" \
                -o t-viewer/index.html
-          echo "T-Viewer index.html synced"
+          curl -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               -L "https://api.github.com/repos/Three-Cats-LSP/T-Viewer/contents/download.html" \
+               -o t-viewer/download.html
+          echo "T-Viewer synced"
 
       - name: Pull latest D-Planner APK
         if: github.event.action == 'sync-apk-d-planner' || github.event_name == 'workflow_dispatch'
