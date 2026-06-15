@@ -12,8 +12,8 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Get In Water" name="apple-mobile-web-app-title"/>
 <meta content="Dive trip packing checklist — gear, camera, travel docs. Companion to LSP D-Planner." name="description"/>
-<link href="icon-192.png" rel="icon" type="image/png"/>
-<link href="icon-192.png" rel="apple-touch-icon"/>
+<link href="icon-192v2.png" rel="icon" type="image/png"/>
+<link href="icon-192v2.png" rel="apple-touch-icon"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Noto+Sans:wght@400;500;600;700&amp;family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -740,7 +740,7 @@ function renderHeader(title, subtitle, showBack) {
     ? (screen === 'about'
       ? `<button class="btn-back btn-close" onclick="navigate('home')" title="Close">${icon('close', 14)}</button>`
       : `<button class="btn-back" onclick="navigate('home')">← Back</button>`)
-    : `<div class="brand-icon"><img src="icon-192.png" width="44" height="44" alt=""/></div>
+    : `<div class="brand-icon"><img src="icon-192v2.png" width="44" height="44" alt=""/></div>
         <div class="brand-text"><h1>${esc(title || 'GET IN WATER')}</h1><p>${esc(subtitle || 'Trip Packing Checklist')}</p></div>`;
   return `
     <header class="hdr">
