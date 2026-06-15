@@ -14,7 +14,7 @@ jobs:
         with:
           token: ${{ secrets.SYNC_TOKEN }}
 
-      - name: Pull latest D-Planner index.html
+      - name: Pull latest D-Planner files
         if: github.event.action == 'sync-d-planner' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p d-planner
@@ -28,7 +28,7 @@ jobs:
                -o d-planner/download.html
           echo "D-Planner synced"
 
-      - name: Pull latest T-Viewer index.html
+      - name: Pull latest T-Viewer files
         if: github.event.action == 'sync-t-viewer' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p t-viewer
@@ -67,5 +67,4 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add d-planner/ t-viewer/
-          git diff --staged --quiet || git commit -m "Sync apps from upstream repos"
-          git push
+          git diff --staged --quiet || (git commit -m "Sync apps from upstream repos" && git pull --rebase && git push)
