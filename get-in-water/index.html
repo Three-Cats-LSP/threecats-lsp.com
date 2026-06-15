@@ -126,13 +126,22 @@ header.hdr {
   background: linear-gradient(90deg, var(--border-hi), transparent);
 }
 .card.collapsible .card-title { cursor: pointer; user-select: none; margin-bottom: 0; display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+.card-title-left {
+  display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0;
+  font-family: var(--font-user); font-weight: 600; font-size: 13px; color: var(--accent);
+}
+.card-title-right {
+  display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: auto;
+}
 .card-title .card-add-btn { flex-shrink: 0; }
 .check-item .check-main { display: flex; align-items: flex-start; gap: 10px; flex: 1; min-width: 0; cursor: pointer; }
 .card.collapsible .card-title::after { display: none; }
 .card.collapsible .card-title .card-caret { flex-shrink: 0; transition: transform 0.2s; font-size: 10px; color: var(--muted); }
 .card-title input {
   background: transparent; border: none; color: var(--accent);
-  font-family: var(--font-user); flex: 1; min-width: 0;
+  font-family: var(--font-user);
+  field-sizing: content;
+  flex: 0 1 auto; min-width: 4ch; max-width: 100%;
   letter-spacing: normal; text-transform: none;
   font-weight: 600; font-size: 13px;
 }
@@ -790,14 +799,18 @@ function renderTemplateContent() {
     html += `
       <div class="card collapsible card-open" id="cat-${cat.id}">
         <div class="card-title" onclick="toggleCard(this)">
-          <input value="${esc(cat.name)}" onclick="event.stopPropagation()" onchange="renameCategory('${cat.id}',this.value)" title="Rename card"/>
-          <div class="card-title-actions" onclick="event.stopPropagation()">
-            <button class="icon-btn icon-btn-sm" onclick="moveCategory('${cat.id}',-1)" title="Move up">${icon('chevUp', 13)}</button>
-            <button class="icon-btn icon-btn-sm" onclick="moveCategory('${cat.id}',1)" title="Move down">${icon('chevDown', 13)}</button>
-            <button class="icon-btn icon-btn-sm danger" onclick="deleteCategory('${cat.id}')" title="Remove card">${icon('close', 13)}</button>
+          <div class="card-title-left" onclick="event.stopPropagation()">
+            <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameCategory('${cat.id}',this.value)" title="Rename card"/>
+            <div class="card-title-actions">
+              <button class="icon-btn icon-btn-sm" onclick="moveCategory('${cat.id}',-1)" title="Move up">${icon('chevUp', 13)}</button>
+              <button class="icon-btn icon-btn-sm" onclick="moveCategory('${cat.id}',1)" title="Move down">${icon('chevDown', 13)}</button>
+              <button class="icon-btn icon-btn-sm danger" onclick="deleteCategory('${cat.id}')" title="Remove card">${icon('close', 13)}</button>
+            </div>
           </div>
-          <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addTemplateItem('${cat.id}')" title="Add item">${icon('plus', 13)}</button>
-          <span class="card-caret">${icon('chevDown', 11)}</span>
+          <div class="card-title-right">
+            <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addTemplateItem('${cat.id}')" title="Add item">${icon('plus', 13)}</button>
+            <span class="card-caret">${icon('chevDown', 11)}</span>
+          </div>
         </div>
         <div class="card-collapsible-body">
           ${items.map(it => `
@@ -845,15 +858,19 @@ function renderTrip() {
     return `
       <div class="card collapsible card-open">
         <div class="card-title" onclick="toggleCard(this)">
-          <input value="${esc(cat.name)}" onclick="event.stopPropagation()" onchange="renameTripCategory('${trip.id}','${cat.id}',this.value)" title="Rename card"/>
-          <div class="card-title-actions" onclick="event.stopPropagation()">
-            <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${trip.id}','${cat.id}',-1)" title="Move up">${icon('chevUp', 13)}</button>
-            <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${trip.id}','${cat.id}',1)" title="Move down">${icon('chevDown', 13)}</button>
-            <button class="icon-btn icon-btn-sm" onclick="duplicateTripCategory('${trip.id}','${cat.id}')" title="Duplicate card">${icon('copy', 13)}</button>
-            <button class="icon-btn icon-btn-sm danger" onclick="removeTripCategory('${trip.id}','${cat.id}')" title="Remove card">${icon('close', 13)}</button>
+          <div class="card-title-left" onclick="event.stopPropagation()">
+            <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameTripCategory('${trip.id}','${cat.id}',this.value)" title="Rename card"/>
+            <div class="card-title-actions">
+              <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${trip.id}','${cat.id}',-1)" title="Move up">${icon('chevUp', 13)}</button>
+              <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${trip.id}','${cat.id}',1)" title="Move down">${icon('chevDown', 13)}</button>
+              <button class="icon-btn icon-btn-sm" onclick="duplicateTripCategory('${trip.id}','${cat.id}')" title="Duplicate card">${icon('copy', 13)}</button>
+              <button class="icon-btn icon-btn-sm danger" onclick="removeTripCategory('${trip.id}','${cat.id}')" title="Remove card">${icon('close', 13)}</button>
+            </div>
           </div>
-          <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addTripItem('${trip.id}','${cat.id}')" title="Add item">${icon('plus', 13)}</button>
-          <span class="card-caret">${icon('chevDown', 11)}</span>
+          <div class="card-title-right">
+            <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addTripItem('${trip.id}','${cat.id}')" title="Add item">${icon('plus', 13)}</button>
+            <span class="card-caret">${icon('chevDown', 11)}</span>
+          </div>
         </div>
         <div class="card-collapsible-body">
           ${items.length ? items.map(it => `
@@ -872,7 +889,10 @@ function renderTrip() {
   if (otherItems.length) {
     catsHtml += `
       <div class="card collapsible card-open">
-        <div class="card-title" onclick="toggleCard(this)">Other <span class="card-caret">${icon('chevDown', 11)}</span></div>
+        <div class="card-title" onclick="toggleCard(this)">
+          <div class="card-title-left">Other</div>
+          <div class="card-title-right"><span class="card-caret">${icon('chevDown', 11)}</span></div>
+        </div>
         <div class="card-collapsible-body">
           ${otherItems.map(it => `
             <div class="check-item ${it.checked ? 'checked' : ''}">
