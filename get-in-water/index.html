@@ -835,20 +835,38 @@ function criticalItemsRemaining(trip) {
   return trip.items.filter(i => i.critical && !isItemPacked(i, trip));
 }
 
-function createTripFromTemplate(name, dateStart, dateEnd, location, tags) {
-  const items = state.masterTemplate.items.map(it => ({
-    id: uid(), categoryId: it.categoryId, ...copyItemFields(it)
-  }));
+function createTripFromTemplate(name, dateStart, dateEnd, location, tags, sourceId) {
+  sourceId = sourceId || '__master__';
+  let categories, items;
+  if (sourceId === '__master__') {
+    categories = state.masterTemplate.categories.map(c => ({
+      id: c.id, name: c.name, order: c.order
+    }));
+    items = state.masterTemplate.items.map(it => ({
+      id: uid(), categoryId: it.categoryId, ...copyItemFields(it)
+    }));
+  } else {
+    const tpl = getSavedTemplate(sourceId);
+    if (!tpl) return null;
+    const catIdMap = {};
+    categories = tpl.categories.map(c => {
+      const newId = uid();
+      catIdMap[c.id] = newId;
+      return { id: newId, name: c.name, order: c.order };
+    });
+    items = tpl.items
+      .filter(it => catIdMap[it.categoryId])
+      .map(it => ({
+        id: uid(), categoryId: catIdMap[it.categoryId], ...copyItemFields(it)
+      }));
+  }
   const start = dateStart || '';
   const end = dateEnd || start;
   const trip = {
     id: uid(), name, location: location || '', tags: tags || [],
     dateStart: start, dateEnd: end, createdAt: Date.now(),
     archived: false, unpackMode: false, returnMode: false, viewSection: 'all', celebrated: false, returnCelebrated: false,
-    categories: state.masterTemplate.categories.map(c => ({
-      id: c.id, name: c.name, order: c.order
-    })),
-    items
+    categories, items
   };
   state.trips.unshift(trip);
   saveState();
@@ -1093,9 +1111,21 @@ function mountTripDateModal(startId, endId, oneDayId) {
 }
 
 function promptNewTrip() {
+  const masterCount = state.masterTemplate.items.length;
+  const templateOptions = (state.savedTemplates || []).map(t => {
+    const n = t.items.length;
+    return `<option value="${t.id}">${esc(t.name)} (${n} item${n !== 1 ? 's' : ''})</option>`;
+  }).join('');
+  const selectStyle = 'width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px';
   openModal(`
     <h3>New Trip</h3>
     <div class="modal-field"><label>Trip name</label><input id="trip-name" placeholder="e.g. Osezaki" autofocus/></div>
+    <div class="modal-field"><label>Template</label>
+      <select id="trip-template" style="${selectStyle}">
+        <option value="__master__">Master gear list (${masterCount} item${masterCount !== 1 ? 's' : ''})</option>
+        ${templateOptions}
+      </select>
+    </div>
     <div class="modal-field"><label>Location / site</label><input id="trip-location" placeholder="e.g. Red Sea — Brothers"/></div>
     <div class="modal-field"><label>Tags</label><input id="trip-tags" placeholder="#daytrip #coldwater #maldives"/></div>
     <div class="modal-field-row">
@@ -1120,7 +1150,9 @@ function promptNewTrip() {
         showToast('Finish date must be on or after start');
         return;
       }
-      const id = createTripFromTemplate(name, dateStart, dateEnd, location, tags);
+      const sourceId = document.getElementById('trip-template').value || '__master__';
+      const id = createTripFromTemplate(name, dateStart, dateEnd, location, tags, sourceId);
+      if (!id) { showToast('Template not found'); return; }
       closeModal();
       navigate('trip', id);
     };
