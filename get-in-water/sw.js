@@ -1,10 +1,13 @@
-const CACHE_NAME = 'giw-v1.3.0';
+const CACHE_NAME = 'giw-v1.3.1';
 const ASSETS = [
   '/get-in-water/',
   '/get-in-water/index.html',
   '/get-in-water/manifest.json',
-  '/get-in-water/icon-192v2.png',
-  '/get-in-water/icon-512v2.png'
+  '/get-in-water/sw.js',
+  '/get-in-water/icon-192.png',
+  '/get-in-water/icon-512.png',
+  '/get-in-water/icon-192-light.png',
+  '/get-in-water/icon-512-light.png'
 ];
 
 self.addEventListener('install', e => {

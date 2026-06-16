@@ -12,8 +12,8 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Get In Water" name="apple-mobile-web-app-title"/>
 <meta content="Dive trip packing checklist — gear, camera, travel docs. Companion to LSP D-Planner." name="description"/>
-<link href="icon-192.png" rel="icon" type="image/png"/>
-<link href="icon-192.png" rel="apple-touch-icon"/>
+<link href="icon-192.png" rel="icon" type="image/png" id="favicon"/>
+<link href="icon-192.png" rel="apple-touch-icon" id="apple-touch-icon"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Noto+Sans:wght@400;500;600;700&amp;family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -81,6 +81,7 @@ header.hdr {
   display: flex; align-items: center; justify-content: center; overflow: hidden;
   background: #030c18; border: 1px solid var(--accent);
 }
+body.light-theme .brand-icon { background: #f5f7f9; }
 .brand-icon img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .brand-text h1 {
   font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px;
@@ -90,6 +91,19 @@ header.hdr {
   font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 1.5px;
   text-transform: uppercase; color: var(--muted); margin-top: 3px;
 }
+.brand.trip-hdr { align-items: center; gap: 10px; }
+.trip-header-text { flex: 1; min-width: 0; }
+.trip-header-text h1 {
+  font-family: var(--font-user); font-size: 17px; font-weight: 600;
+  letter-spacing: 0.3px; text-transform: none; line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.trip-header-text p {
+  font-size: 9px; letter-spacing: 0.5px; text-transform: none;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.trip-header-tags { margin-top: 5px; }
+.trip-header-tags .trip-tag { font-size: 8px; padding: 2px 6px; }
 .hdr-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
 .theme-toggle {
   display: inline-flex; align-items: center; justify-content: center;
@@ -195,6 +209,15 @@ header.hdr {
 .btn-export:focus { outline: none; }
 .btn-export:active { background: var(--accent); color: var(--bg); opacity: 1; }
 .btn-export:hover { background: rgba(0,200,255,0.1); }
+.btn-export.btn-icon-only {
+  width: 40px; height: 40px; padding: 0; min-width: 0;
+}
+.btn-export.btn-icon-only svg { width: 18px; height: 18px; }
+.btn-export.btn-reset-red { border-color: var(--red) !important; color: var(--red) !important; }
+.btn-export.btn-reset-red:hover { background: rgba(255,71,87,0.12) !important; }
+.btn-export.btn-reset-red:active { background: var(--red) !important; color: var(--bg) !important; opacity: 1; }
+body.light-theme .btn-export.btn-reset-red { border-color: #FF3131 !important; color: #FF3131 !important; background: rgba(255,49,49,0.06) !important; }
+body.light-theme .btn-export.btn-reset-red:hover { background: rgba(255,49,49,0.15) !important; }
 .btn-export-pdf-label {
   display: inline-block; width: 16px; height: 16px;
   font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
@@ -316,7 +339,7 @@ header.hdr {
 .menu-panel button:last-child { border-bottom: none; }
 .menu-panel button:hover { background: rgba(0,200,255,0.08); color: var(--accent); }
 .menu-panel button.danger { color: var(--red); }
-.export-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.export-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; }
 .about-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
 .about-tab-btn {
   flex: 1; padding: 8px; border-radius: 8px;
@@ -326,6 +349,83 @@ header.hdr {
 }
 .about-tab-btn.active { border-color: var(--accent); background: var(--accent); color: #030c18; }
 body.light-theme .about-tab-btn.active { color: #fff; }
+.home-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; }
+.home-toolbar input, .home-toolbar select {
+  flex: 1; min-width: 120px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 10px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 13px;
+}
+.home-toolbar label { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); white-space: nowrap; cursor: pointer; }
+.trip-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.trip-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; padding: 2px 6px; border-radius: 4px;
+  background: rgba(0,200,255,0.12); color: var(--accent); border: 1px solid var(--border-hi);
+}
+.trip-location { font-size: 11px; color: var(--tip); margin-top: 2px; }
+.trip-countdown { color: var(--accent2); font-weight: 600; }
+.trip-card.archived { opacity: 0.65; }
+.section-tabs {
+  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.section-tabs::-webkit-scrollbar { display: none; }
+.section-tab {
+  flex-shrink: 0; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-hi);
+  background: var(--surface); color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.5px; cursor: pointer; white-space: nowrap;
+}
+.section-tab.active { border-color: var(--accent); background: rgba(0,200,255,0.15); color: var(--accent); }
+.critical-banner {
+  background: rgba(255,109,0,0.15); border: 1px solid var(--orange); border-radius: 10px;
+  padding: 10px 12px; margin-bottom: 10px; font-size: 12px; color: var(--orange); line-height: 1.45;
+}
+.ready-banner {
+  background: rgba(38,208,124,0.15); border: 1px solid var(--green); border-radius: 10px;
+  padding: 10px 12px; margin-bottom: 10px; font-size: 13px; color: var(--green); text-align: center;
+}
+.check-item.critical-item .item-name::before { content: '★ '; color: var(--orange); }
+.item-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; align-items: center; }
+.item-badge {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; padding: 1px 5px; border-radius: 3px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+}
+.qty-controls {
+  display: flex; align-items: center; gap: 2px; flex-shrink: 0;
+}
+.qty-btn {
+  width: 24px; height: 24px; border-radius: 4px; border: 1px solid var(--border-hi);
+  background: var(--surface); color: var(--accent); cursor: pointer; font-size: 14px; line-height: 1;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+}
+.qty-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; min-width: 28px; text-align: center; color: var(--tip); }
+.check-item .item-actions { display: flex; gap: 3px; flex-shrink: 0; align-items: flex-start; }
+.modal-box.modal-wide { max-width: 420px; }
+.modal-checklist { max-height: 220px; overflow-y: auto; margin: 8px 0; }
+.modal-check-row {
+  display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px; cursor: pointer;
+}
+.modal-check-row input { width: 16px; height: 16px; accent-color: var(--accent); }
+.template-gallery { display: grid; gap: 10px; }
+.template-card {
+  background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 12px;
+}
+.template-card-master { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--card2)); }
+.template-card h4 { font-size: 14px; margin-bottom: 4px; color: var(--accent); }
+.template-card p { font-size: 12px; color: var(--muted); line-height: 1.45; margin-bottom: 8px; }
+.template-card-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.template-card-meta { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); margin-bottom: 8px; }
+.celebrate-overlay {
+  display: none; position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.55);
+  align-items: center; justify-content: center; padding: 20px;
+}
+.celebrate-overlay.open { display: flex; }
+.celebrate-box {
+  background: var(--card); border: 1px solid var(--green); border-radius: 16px; padding: 28px 24px;
+  text-align: center; max-width: 320px; animation: popIn 0.35s ease;
+}
+@keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.celebrate-box .emoji { font-size: 48px; margin-bottom: 12px; }
+.celebrate-box h3 { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--green); margin-bottom: 8px; }
 @media (max-width: 600px) {
   .card { padding: 12px 10px; }
   .icon-btn-sm { width: 24px; height: 24px; font-size: 11px; }
@@ -342,16 +442,110 @@ body.light-theme .about-tab-btn.active { color: #fff; }
 <div id="modal-overlay">
   <div class="modal-box" id="modal-content"></div>
 </div>
+<div class="celebrate-overlay" id="celebrate-overlay" onclick="closeCelebrate()">
+  <div class="celebrate-box" onclick="event.stopPropagation()">
+    <div class="emoji">🤿</div>
+    <h3>Ready to dive!</h3>
+    <p style="font-size:14px;color:var(--tip);line-height:1.5;margin-bottom:16px">Everything is packed. Have a safe and fun trip!</p>
+    <button class="btn-primary" onclick="closeCelebrate()">Let's go</button>
+  </div>
+</div>
 <script src="capacitor-bridge.js"></script>
 <script>
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.3.0';
 const STORAGE_KEY = 'giw_v1';
+
+const BAG_TAGS = [
+  { id: 'carry-on', label: 'Carry-on' },
+  { id: 'checked', label: 'Checked bag' },
+  { id: 'camera', label: 'Camera case' },
+  { id: 'boat', label: 'Boat bin' }
+];
+
+const TRIP_SECTIONS = [
+  { id: 'night_before', label: 'Night before' },
+  { id: 'at_dock', label: 'At the dock' },
+  { id: 'before_dive', label: 'Before first dive' },
+  { id: 'after_dive', label: 'After last dive' }
+];
+
+const STARTER_TEMPLATES = {
+  rec: {
+    name: 'Recreational diver',
+    desc: 'Day boat / resort essentials — core gear, travel docs, personal items.',
+    categories: ['Core Dive Gear', 'Travel & Docs', 'Personal & Safety'],
+    items: {
+      'Core Dive Gear': ['BCD', 'Regulator', 'Fins', 'Mask', 'Wetsuit', 'Weights & belt', 'Dive computer', 'SMB + spool', 'Surface marker'],
+      'Travel & Docs': ['Passport / ID', 'Dive certification', 'Insurance', 'Logbook', 'Cash / cards'],
+      'Personal & Safety': ['Sunscreen', 'Meds', 'Towel', 'Dry bag', 'Snacks / water', 'Phone charger']
+    }
+  },
+  photo: {
+    name: 'Underwater photographer',
+    desc: 'Camera housing, strobes, batteries, and dive gear for photo trips.',
+    categories: ['Core Dive Gear', 'Camera & Photo', 'Travel & Docs', 'Personal & Safety'],
+    items: {
+      'Core Dive Gear': ['BCD', 'Regulator', 'Fins', 'Mask', 'Wetsuit / Drysuit', 'Dive computer', 'SMB + spool'],
+      'Camera & Photo': ['Housing', 'Camera body', 'Lens(es)', 'Strobes', 'Sync cords', 'Batteries', 'Chargers', 'Memory cards', 'Desiccant packs', 'Dome port cover', 'Focus light'],
+      'Travel & Docs': ['Passport / ID', 'Dive certification', 'Insurance', 'Customs paperwork for camera gear'],
+      'Personal & Safety': ['Dry bag', 'Lens cloth', 'Snacks / water', 'Phone charger']
+    }
+  },
+  tech: {
+    name: 'Technical diver',
+    desc: 'Stages, deco gas, redundancy, and travel for tech diving.',
+    categories: ['Core Dive Gear', 'Tanks & Gas', 'Travel & Docs', 'Personal & Safety'],
+    items: {
+      'Core Dive Gear': ['BCD / wing', 'Primary reg', 'Backup reg', 'Fins', 'Mask', 'Drysuit / undersuit', 'Dive computer', 'Backup computer', 'SMB + spool', 'Backup SMB', 'Torch', 'Backup torch', 'Knife / cutter', 'Slates / wet notes'],
+      'Tanks & Gas': ['Back gas cylinder(s)', 'Stage / deco bottles', 'DIN / Yoke adapter', 'O2 analyzer', 'Gas analysis log', 'Tank keys / tool'],
+      'Travel & Docs': ['Passport / ID', 'Tech certification', 'Insurance', 'Logbook', 'Dive insurance card'],
+      'Personal & Safety': ['First aid kit', 'O2 kit checklist', 'Meds', 'Dry bag', 'Snacks / water']
+    }
+  }
+};
 
 let state = null;
 let screen = 'home';
 let activeTripId = null;
 let menuOpen = false;
-let aboutTab = 'template';
+let aboutTab = 'starters';
+let homeSearch = '';
+let activeSavedTemplateId = null;
+let editingMasterGear = false;
+
+function starterToSaved(key, tpl) {
+  const categories = tpl.categories.map((name, order) => ({ id: uid(), name, order }));
+  const byName = n => categories.find(c => c.name === n).id;
+  const items = [];
+  tpl.categories.forEach(catName => {
+    (tpl.items[catName] || []).forEach(name => {
+      items.push({ id: uid(), categoryId: byName(catName), name, note: '', qty: 1, packed: 0, critical: false, bag: '', sections: [] });
+    });
+  });
+  return { id: 'starter_' + key, name: tpl.name, desc: tpl.desc, builtIn: true, categories, items };
+}
+
+function getDefaultSavedTemplates() {
+  return Object.entries(STARTER_TEMPLATES).map(([key, tpl]) => starterToSaved(key, tpl));
+}
+
+function getSavedTemplate(id) {
+  return state.savedTemplates && state.savedTemplates.find(t => t.id === id);
+}
+
+function ensureSavedTemplates(data) {
+  if (!data.savedTemplates || !data.savedTemplates.length) {
+    data.savedTemplates = getDefaultSavedTemplates();
+    return;
+  }
+  data.savedTemplates.forEach(t => {
+    if (!t.categories) t.categories = [];
+    if (!t.items) t.items = [];
+    if (t.desc == null) t.desc = '';
+    if (t.builtIn == null) t.builtIn = false;
+    t.items.forEach(ensureItem);
+  });
+}
 
 function uid() { return 'id_' + Math.random().toString(36).slice(2, 11) + Date.now().toString(36); }
 
@@ -371,7 +565,78 @@ function defaultTemplate() {
   add('Camera & Photo', ['Housing', 'Camera body', 'Lens(es)', 'Strobes', 'Sync cords', 'Batteries', 'Chargers', 'Memory cards', 'Desiccant packs', 'Dome port cover']);
   add('Travel & Docs', ['Passport / ID', 'Dive certification', 'Insurance', 'Logbook', 'Dive insurance card', 'Cash / cards']);
   add('Personal & Safety', ['Sunscreen', 'Meds', 'First aid kit', 'Towel', 'Dry bag', 'Snacks / water', 'Phone charger']);
+  items.forEach(ensureItem);
   return { categories: cats, items };
+}
+
+function ensureItem(item) {
+  if (!item) return item;
+  if (!item.qty || item.qty < 1) item.qty = 1;
+  if (item.packed == null) item.packed = item.checked ? item.qty : 0;
+  if (item.critical == null) item.critical = false;
+  if (item.bag == null) item.bag = '';
+  if (!Array.isArray(item.sections)) item.sections = [];
+  if (item.note == null) item.note = '';
+  item.packed = Math.max(0, Math.min(item.packed, item.qty));
+  item.checked = item.packed >= item.qty;
+  return item;
+}
+
+function isItemPacked(item) {
+  ensureItem(item);
+  return item.packed >= item.qty;
+}
+
+function bagLabel(id) {
+  const b = BAG_TAGS.find(x => x.id === id);
+  return b ? b.label : '';
+}
+
+function parseTagsInput(str) {
+  return String(str || '').split(/[\s,]+/).map(t => t.trim()).filter(Boolean)
+    .map(t => (t.startsWith('#') ? t : '#' + t).toLowerCase());
+}
+
+function formatTagsHtml(tags) {
+  if (!tags || !tags.length) return '';
+  return tags.map(t => `<span class="trip-tag">${esc(t)}</span>`).join('');
+}
+
+function tripCountdown(trip) {
+  const start = trip.dateStart || '';
+  if (!start) return '';
+  try {
+    const today = new Date(); today.setHours(12, 0, 0, 0);
+    const ds = new Date(start + 'T12:00:00');
+    const diff = Math.round((ds - today) / 86400000);
+    if (diff > 0) return diff + ' day' + (diff !== 1 ? 's' : '');
+    if (diff === 0) return 'Today';
+    const end = trip.dateEnd || start;
+    const de = new Date(end + 'T12:00:00');
+    if (today <= de) return 'In progress';
+    return '';
+  } catch (e) { return ''; }
+}
+
+function itemMatchesSection(item, sectionId) {
+  ensureItem(item);
+  if (!sectionId || sectionId === 'all') return true;
+  if (!item.sections.length) return true;
+  return item.sections.includes(sectionId);
+}
+
+function itemDisplayName(item) {
+  ensureItem(item);
+  return item.qty > 1 ? item.qty + '\u00d7 ' + item.name : item.name;
+}
+
+function copyItemFields(src) {
+  ensureItem(src);
+  return {
+    name: src.name, note: src.note || '', qty: src.qty, packed: 0,
+    critical: !!src.critical, bag: src.bag || '', sections: [...(src.sections || [])],
+    checked: false, fromTemplate: !!src.fromTemplate
+  };
 }
 
 function loadState() {
@@ -383,11 +648,13 @@ function loadState() {
       return data;
     }
   } catch (e) {}
-  return {
+  const fresh = {
     masterTemplate: defaultTemplate(),
     trips: [],
-    settings: { theme: 'dark' }
+    savedTemplates: getDefaultSavedTemplates(),
+    settings: { theme: 'dark', homeSort: 'created', hideCompleted: false, showArchived: false, pinnedTripId: null }
   };
+  return fresh;
 }
 
 function ensureTripShape(trip) {
@@ -397,29 +664,59 @@ function ensureTripShape(trip) {
     delete trip.date;
   }
   if (!trip.dateEnd) trip.dateEnd = trip.dateStart || '';
+  if (trip.location == null) trip.location = '';
+  if (!Array.isArray(trip.tags)) trip.tags = [];
+  if (trip.archived == null) trip.archived = false;
+  if (trip.unpackMode == null) trip.unpackMode = false;
+  if (trip.viewSection == null) trip.viewSection = 'all';
+  if (trip.celebrated == null) trip.celebrated = false;
   if (!trip.categories && state && state.masterTemplate) {
     trip.categories = state.masterTemplate.categories.map(c => ({
       id: c.id, name: c.name, order: c.order
     }));
   }
+  if (trip.items) trip.items.forEach(ensureItem);
 }
 
 function migrateState(data) {
+  if (!data.masterTemplate) data.masterTemplate = defaultTemplate();
+  if (data.masterTemplate.items) data.masterTemplate.items.forEach(ensureItem);
   if (!data.trips) data.trips = [];
-  const tpl = data.masterTemplate || defaultTemplate();
+  ensureSettingsFromData(data);
+  ensureSavedTemplates(data);
   data.trips.forEach(trip => {
     if (trip.date && !trip.dateStart) {
       trip.dateStart = trip.date;
       delete trip.date;
     }
     if (!trip.dateEnd) trip.dateEnd = trip.dateStart || '';
+    if (trip.location == null) trip.location = '';
+    if (!Array.isArray(trip.tags)) trip.tags = [];
+    if (trip.archived == null) trip.archived = false;
+    if (trip.unpackMode == null) trip.unpackMode = false;
+    if (trip.viewSection == null) trip.viewSection = 'all';
+    if (trip.celebrated == null) trip.celebrated = false;
+    const tpl = data.masterTemplate;
     if (!trip.categories && tpl.categories) {
       trip.categories = tpl.categories.map(c => ({
         id: c.id, name: c.name, order: c.order
       }));
     }
+    if (trip.items) trip.items.forEach(it => {
+      ensureItem(it);
+      if (it.checked && it.packed === 0) it.packed = it.qty;
+    });
   });
 }
+
+function ensureSettingsFromData(data) {
+  if (!data.settings) data.settings = { theme: 'dark', homeSort: 'created', hideCompleted: false, showArchived: false, pinnedTripId: null };
+  if (!data.settings.homeSort) data.settings.homeSort = 'created';
+  if (data.settings.hideCompleted == null) data.settings.hideCompleted = false;
+  if (data.settings.showArchived == null) data.settings.showArchived = false;
+}
+
+function ensureSettings() { ensureSettingsFromData(state); }
 
 function getTripCategories(trip) {
   ensureTripShape(trip);
@@ -449,6 +746,30 @@ function formatTripDateRange(trip) {
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  updateWidgetSnapshot();
+}
+
+function updateWidgetSnapshot() {
+  const tripId = state.settings && state.settings.pinnedTripId;
+  if (!tripId) return;
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip || trip.archived) return;
+  ensureTripShape(trip);
+  const p = tripProgress(trip);
+  const payload = JSON.stringify({
+    name: trip.name,
+    remaining: p.total - p.done,
+    total: p.total,
+    done: p.done,
+    updated: Date.now()
+  });
+  try {
+    localStorage.setItem('giw_widget', payload);
+    if (window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) {
+      const wb = Capacitor.Plugins && Capacitor.Plugins.WidgetBridge;
+      if (wb && wb.update) wb.update({ json: payload }).catch(() => {});
+    }
+  } catch (e) {}
 }
 
 function getCategories() {
@@ -461,24 +782,36 @@ function getCategoryName(id) {
 }
 
 function tripProgress(trip) {
-  const total = trip.items.length;
-  const done = trip.items.filter(i => i.checked).length;
+  ensureTripShape(trip);
+  let total = 0, done = 0;
+  trip.items.forEach(i => {
+    ensureItem(i);
+    total += i.qty;
+    done += i.packed;
+  });
   return { done, total, pct: total ? Math.round((done / total) * 100) : 0 };
 }
 
-function createTripFromTemplate(name, dateStart, dateEnd) {
+function tripIsComplete(trip) {
+  const p = tripProgress(trip);
+  return p.total > 0 && p.done >= p.total;
+}
+
+function criticalItemsRemaining(trip) {
+  ensureTripShape(trip);
+  return trip.items.filter(i => i.critical && !isItemPacked(i));
+}
+
+function createTripFromTemplate(name, dateStart, dateEnd, location, tags) {
   const items = state.masterTemplate.items.map(it => ({
-    id: uid(), categoryId: it.categoryId, name: it.name, note: it.note || '',
-    checked: false, fromTemplate: true
+    id: uid(), categoryId: it.categoryId, ...copyItemFields(it)
   }));
   const start = dateStart || '';
   const end = dateEnd || start;
   const trip = {
-    id: uid(),
-    name,
-    dateStart: start,
-    dateEnd: end,
-    createdAt: Date.now(),
+    id: uid(), name, location: location || '', tags: tags || [],
+    dateStart: start, dateEnd: end, createdAt: Date.now(),
+    archived: false, unpackMode: false, viewSection: 'all', celebrated: false,
     categories: state.masterTemplate.categories.map(c => ({
       id: c.id, name: c.name, order: c.order
     })),
@@ -505,10 +838,18 @@ const ICON_PATHS = {
   moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
   sun: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
   help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
-  menu: '<line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>'
+  menu: '<line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>',
+  edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+  reset: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>'
 };
 
+function iconMerge(size) {
+  const s = size || 18;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.25" stroke-linecap="round"><path d="M2 12h8.25"/></g><path fill="currentColor" d="M10.25 8.75 14.75 12 10.25 15.25z"/><g fill="currentColor"><circle cx="18.25" cy="6.5" r="1.55"/><circle cx="18.25" cy="10.5" r="1.55"/><circle cx="18.25" cy="14.5" r="1.55"/><circle cx="18.25" cy="18.5" r="1.55"/></g></svg>`;
+}
+
 function icon(name, size) {
+  if (name === 'merge') return iconMerge(size);
   const path = ICON_PATHS[name];
   if (!path) return '';
   const s = size || 16;
@@ -535,6 +876,20 @@ function initBubbles() {
   }
 }
 
+function appLogoSrc() {
+  return state && state.settings.theme === 'light' ? 'icon-192-light.png' : 'icon-192.png';
+}
+
+function updateAppLogo() {
+  const src = appLogoSrc();
+  const logo = document.getElementById('brandLogo');
+  if (logo) logo.src = src;
+  const fav = document.getElementById('favicon');
+  if (fav) fav.href = src;
+  const apple = document.getElementById('apple-touch-icon');
+  if (apple) apple.href = src;
+}
+
 function toggleTheme() {
   const isLight = document.body.classList.toggle('light-theme');
   document.getElementById('themeIcon').textContent = isLight ? '☀️' : '🌙';
@@ -542,6 +897,7 @@ function toggleTheme() {
   saveState();
   const meta = document.getElementById('theme-color-active');
   if (meta) meta.setAttribute('content', isLight ? '#f5f7f9' : '#030c18');
+  updateAppLogo();
 }
 
 function applyTheme() {
@@ -551,8 +907,12 @@ function applyTheme() {
     const meta = document.getElementById('theme-color-active');
     if (meta) meta.setAttribute('content', '#f5f7f9');
   } else {
+    document.body.classList.remove('light-theme');
     document.getElementById('themeIcon').textContent = '🌙';
+    const meta = document.getElementById('theme-color-active');
+    if (meta) meta.setAttribute('content', '#030c18');
   }
+  updateAppLogo();
 }
 
 function showToast(msg) {
@@ -573,7 +933,28 @@ function navigate(s, tripId) {
 
 function switchAboutTab(tab) {
   aboutTab = tab;
+  if (tab !== 'starters') {
+    activeSavedTemplateId = null;
+    editingMasterGear = false;
+  }
   render();
+}
+
+function stayInMasterGearEditor() {
+  editingMasterGear = true;
+  activeSavedTemplateId = null;
+  aboutTab = 'starters';
+}
+
+function openMasterGearEditor() {
+  stayInMasterGearEditor();
+  navigate('about');
+}
+
+function closeMasterGearEditor() {
+  editingMasterGear = false;
+  aboutTab = 'starters';
+  navigate('about');
 }
 
 function openModal(html, onMount) {
@@ -598,36 +979,67 @@ function nextTripCopyName(baseName) {
   return max === 1 ? root + ' (2)' : root + ' (' + (max + 1) + ')';
 }
 
-function cloneTripFromSource(sourceTrip, name, dateStart, dateEnd) {
+function cloneTripFromSource(sourceTrip, name, dateStart, dateEnd, options) {
+  options = options || {};
   ensureTripShape(sourceTrip);
+  const catFilter = options.categoryIds;
   const catIdMap = {};
-  const categories = sourceTrip.categories.map(c => {
-    const newId = uid();
-    catIdMap[c.id] = newId;
-    return { id: newId, name: c.name, order: c.order };
-  });
-  const items = sourceTrip.items.map(it => ({
-    id: uid(),
-    categoryId: catIdMap[it.categoryId] || it.categoryId,
-    name: it.name,
-    note: it.note || '',
-    checked: false,
-    fromTemplate: !!it.fromTemplate
-  }));
+  const categories = sourceTrip.categories
+    .filter(c => !catFilter || catFilter.includes(c.id))
+    .map(c => {
+      const newId = uid();
+      catIdMap[c.id] = newId;
+      return { id: newId, name: c.name, order: c.order };
+    });
+  const items = sourceTrip.items
+    .filter(it => catIdMap[it.categoryId])
+    .map(it => ({
+      id: uid(), categoryId: catIdMap[it.categoryId],
+      ...copyItemFields(it)
+    }));
   const start = dateStart || '';
   const end = dateEnd || start;
   const trip = {
-    id: uid(),
-    name,
-    dateStart: start,
-    dateEnd: end,
-    createdAt: Date.now(),
-    categories,
-    items
+    id: uid(), name,
+    location: options.location != null ? options.location : (sourceTrip.location || ''),
+    tags: options.tags ? [...options.tags] : [...(sourceTrip.tags || [])],
+    dateStart: start, dateEnd: end, createdAt: Date.now(),
+    archived: false, unpackMode: false, viewSection: 'all', celebrated: false,
+    categories, items
   };
   state.trips.unshift(trip);
   saveState();
   return trip.id;
+}
+
+function getHomeTrips() {
+  ensureSettings();
+  let trips = state.trips.filter(t => {
+    ensureTripShape(t);
+    if (t.archived && !state.settings.showArchived) return false;
+    if (state.settings.hideCompleted && tripIsComplete(t) && !t.archived) return false;
+    return true;
+  });
+  const q = homeSearch.trim().toLowerCase();
+  if (q) {
+    trips = trips.filter(t => {
+      const hay = [t.name, t.location, ...(t.tags || []), ...t.items.map(i => i.name + ' ' + (i.note || ''))].join(' ').toLowerCase();
+      return hay.includes(q.replace(/^#/, '')) || (t.tags || []).some(tag => tag.toLowerCase().includes(q));
+    });
+  }
+  const sort = state.settings.homeSort;
+  trips.sort((a, b) => {
+    if (sort === 'name') return a.name.localeCompare(b.name);
+    if (sort === 'progress') return tripProgress(b).pct - tripProgress(a).pct;
+    if (sort === 'date') {
+      const da = a.dateStart || '', db = b.dateStart || '';
+      if (da && db) return da.localeCompare(db);
+      if (da) return -1;
+      if (db) return 1;
+    }
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  });
+  return trips;
 }
 
 function mountTripDateModal(startId, endId, oneDayId) {
@@ -650,6 +1062,8 @@ function promptNewTrip() {
   openModal(`
     <h3>New Trip</h3>
     <div class="modal-field"><label>Trip name</label><input id="trip-name" placeholder="e.g. Osezaki" autofocus/></div>
+    <div class="modal-field"><label>Location / site</label><input id="trip-location" placeholder="e.g. Red Sea — Brothers"/></div>
+    <div class="modal-field"><label>Tags</label><input id="trip-tags" placeholder="#daytrip #coldwater #maldives"/></div>
     <div class="modal-field-row">
       <div class="modal-field"><label>Start date</label><input id="trip-date-start" type="date"/></div>
       <div class="modal-field"><label>Finish date</label><input id="trip-date-end" type="date"/></div>
@@ -664,13 +1078,15 @@ function promptNewTrip() {
     document.getElementById('trip-create-btn').onclick = () => {
       const name = document.getElementById('trip-name').value.trim();
       if (!name) { showToast('Enter a trip name'); return; }
+      const location = document.getElementById('trip-location').value.trim();
+      const tags = parseTagsInput(document.getElementById('trip-tags').value);
       const dateStart = document.getElementById('trip-date-start').value;
       const dateEnd = document.getElementById('trip-date-end').value || dateStart;
       if (dateStart && dateEnd && dateEnd < dateStart) {
         showToast('Finish date must be on or after start');
         return;
       }
-      const id = createTripFromTemplate(name, dateStart, dateEnd);
+      const id = createTripFromTemplate(name, dateStart, dateEnd, location, tags);
       closeModal();
       navigate('trip', id);
     };
@@ -713,21 +1129,32 @@ function promptDuplicateTrip(tripId) {
   });
 }
 
-function promptRenameTrip(tripId) {
+function promptEditTripDetails(tripId) {
   const trip = state.trips.find(t => t.id === tripId);
   if (!trip) return;
+  ensureTripShape(trip);
   openModal(`
-    <h3>Rename Trip</h3>
-    <div class="modal-field"><label>Trip name</label><input id="trip-rename" value="${esc(trip.name)}" autofocus/></div>
+    <h3>Trip details</h3>
+    <div class="modal-field"><label>Trip name</label><input id="trip-edit-name" value="${esc(trip.name)}" autofocus/></div>
+    <div class="modal-field"><label>Location / site</label><input id="trip-edit-location" value="${esc(trip.location || '')}"/></div>
+    <div class="modal-field"><label>Tags</label><input id="trip-edit-tags" value="${esc((trip.tags || []).join(' '))}" placeholder="#daytrip #coldwater"/></div>
+    <div class="modal-field-row">
+      <div class="modal-field"><label>Start date</label><input id="trip-edit-start" type="date" value="${esc(trip.dateStart || '')}"/></div>
+      <div class="modal-field"><label>Finish date</label><input id="trip-edit-end" type="date" value="${esc(trip.dateEnd || '')}"/></div>
+    </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn-primary" id="trip-rename-btn">Save</button>
+      <button class="btn-primary" id="trip-edit-save">Save</button>
     </div>
   `, () => {
-    document.getElementById('trip-rename-btn').onclick = () => {
-      const name = document.getElementById('trip-rename').value.trim();
+    document.getElementById('trip-edit-save').onclick = () => {
+      const name = document.getElementById('trip-edit-name').value.trim();
       if (!name) { showToast('Enter a trip name'); return; }
       trip.name = name;
+      trip.location = document.getElementById('trip-edit-location').value.trim();
+      trip.tags = parseTagsInput(document.getElementById('trip-edit-tags').value);
+      trip.dateStart = document.getElementById('trip-edit-start').value;
+      trip.dateEnd = document.getElementById('trip-edit-end').value || trip.dateStart;
       saveState();
       closeModal();
       navigate('trip', tripId);
@@ -735,17 +1162,71 @@ function promptRenameTrip(tripId) {
   });
 }
 
-function renderHeader(title, subtitle, showBack) {
-  const backOrClose = showBack
-    ? (screen === 'about'
-      ? `<button class="btn-back btn-close" onclick="navigate('home')" title="Close">${icon('close', 14)}</button>`
-      : `<button class="btn-back" onclick="navigate('home')">← Back</button>`)
-    : `<div class="brand-icon"><img src="icon-192.png" width="44" height="44" alt=""/></div>
+function promptBuddyCopy(tripId) {
+  const source = state.trips.find(t => t.id === tripId);
+  if (!source) return;
+  ensureTripShape(source);
+  const cats = getTripCategories(source);
+  const checks = cats.map(c =>
+    `<label class="modal-check-row"><input type="checkbox" class="buddy-cat" value="${c.id}" checked/> ${esc(c.name)}</label>`
+  ).join('');
+  openModal(`
+    <h3>Buddy copy</h3>
+    <p style="font-size:13px;color:var(--muted);margin:-6px 0 10px;line-height:1.45">Share a subset of your packing list. Checks start cleared.</p>
+    <div class="modal-field"><label>Trip name</label><input id="buddy-name" value="${esc(source.name + ' — Buddy')}" autofocus/></div>
+    <div class="modal-field"><label>Categories to include</label></div>
+    <div class="modal-checklist">${checks}</div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="buddy-create">Create buddy copy</button>
+    </div>
+  `, () => {
+    document.getElementById('buddy-create').onclick = () => {
+      const name = document.getElementById('buddy-name').value.trim();
+      if (!name) { showToast('Enter a name'); return; }
+      const ids = [...document.querySelectorAll('.buddy-cat:checked')].map(el => el.value);
+      if (!ids.length) { showToast('Select at least one category'); return; }
+      const id = cloneTripFromSource(source, name, source.dateStart, source.dateEnd, { categoryIds: ids, tags: [...(source.tags || []), '#buddy'] });
+      closeModal();
+      showToast('Buddy copy created');
+      navigate('trip', id);
+    };
+  });
+}
+
+function promptRenameTrip(tripId) {
+  promptEditTripDetails(tripId);
+}
+
+function renderHeader(title, subtitle, showBack, tags) {
+  let brandContent;
+  if (showBack) {
+    if (screen === 'about') {
+      brandContent = `
+        <button class="btn-back btn-close" onclick="navigate('home')" title="Close">${icon('close', 14)}</button>
+        <div class="brand-text trip-header-text">
+          <h1>Settings</h1>
+          <p>${esc(subtitle || 'Gear template & about')}</p>
+        </div>`;
+    } else {
+      const tagsHtml = tags && tags.length ? `<div class="trip-tags trip-header-tags">${formatTagsHtml(tags)}</div>` : '';
+      brandContent = `
+        <button class="btn-back" onclick="navigate('home')">← Back</button>
+        <div class="brand-text trip-header-text">
+          <h1>${esc(title || 'Trip')}</h1>
+          ${subtitle ? `<p>${esc(subtitle)}</p>` : ''}
+          ${tagsHtml}
+        </div>`;
+    }
+  } else {
+    brandContent = `<div class="brand-icon"><img id="brandLogo" src="${appLogoSrc()}" width="44" height="44" alt=""/></div>
         <div class="brand-text"><h1>${esc(title || 'GET IN WATER')}</h1><p>${esc(subtitle || 'Trip Packing Checklist')}</p></div>`;
+  }
+  const hdrClass = showBack && screen === 'trip' ? 'hdr trip-hdr-wrap' : 'hdr';
   return `
-    <header class="hdr">
-      <div class="brand">
-        ${backOrClose}
+    <header class="${hdrClass}">
+      <div class="brand${showBack && screen === 'trip' ? ' trip-hdr' : ''}">
+        ${brandContent}
       </div>
       <div class="hdr-actions">
         <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"><span class="theme-icon" id="themeIcon">🌙</span></button>
@@ -754,50 +1235,83 @@ function renderHeader(title, subtitle, showBack) {
     </header>`;
 }
 
-function renderHome() {
-  const trips = [...state.trips].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  let tripsHtml = '';
+function renderHomeTripsHtml() {
+  ensureSettings();
+  const trips = getHomeTrips();
   if (!trips.length) {
-    tripsHtml = `<div class="empty-state"><div style="font-size:36px">🧳</div><p>No trips yet.<br>Create one from your master gear template.</p></div>`;
-  } else {
-    tripsHtml = trips.map(t => {
-      const p = tripProgress(t);
-      const dateStr = formatTripDateRange(t);
-      return `
-        <div class="trip-card">
-          <div class="trip-card-head">
-            <div class="trip-card-main" onclick="navigate('trip','${t.id}')">
-              <h3>${esc(t.name)}</h3>
-              <div class="trip-meta">${dateStr ? esc(dateStr) + ' · ' : ''}${p.done}/${p.total} packed</div>
-            </div>
-            <div class="trip-card-actions">
-              <button class="icon-btn icon-btn-sm" onclick="promptDuplicateTrip('${t.id}')" title="Duplicate trip">${icon('copy', 14)}</button>
-              <button class="icon-btn icon-btn-sm danger" onclick="deleteTrip('${t.id}')" title="Remove trip">${icon('close', 14)}</button>
-            </div>
-          </div>
-          <div class="progress-bar" onclick="navigate('trip','${t.id}')"><div class="progress-fill" style="width:${p.pct}%"></div></div>
-        </div>`;
-    }).join('');
+    return `<div class="empty-state"><div style="font-size:36px">🧳</div><p>${homeSearch ? 'No trips match your search.' : 'No trips yet.<br>Create one from your master gear template.'}</p></div>`;
   }
+  return trips.map(t => {
+    const p = tripProgress(t);
+    const dateStr = formatTripDateRange(t);
+    const countdown = tripCountdown(t);
+    const pinned = state.settings.pinnedTripId === t.id;
+    return `
+      <div class="trip-card ${t.archived ? 'archived' : ''}">
+        <div class="trip-card-head">
+          <div class="trip-card-main" onclick="navigate('trip','${t.id}')">
+            <h3>${esc(t.name)}${pinned ? ' 📌' : ''}${t.archived ? ' <span style="font-size:11px;color:var(--muted)">(archived)</span>' : ''}</h3>
+            ${t.location ? `<div class="trip-location">${esc(t.location)}</div>` : ''}
+            <div class="trip-meta">${dateStr ? esc(dateStr) : ''}${dateStr && countdown ? ' · ' : ''}${countdown ? `<span class="trip-countdown">${esc(countdown)}</span> · ` : ''}${p.done}/${p.total} packed</div>
+            ${(t.tags && t.tags.length) ? `<div class="trip-tags">${formatTagsHtml(t.tags)}</div>` : ''}
+          </div>
+          <div class="trip-card-actions">
+            <button class="icon-btn icon-btn-sm" onclick="promptDuplicateTrip('${t.id}')" title="Duplicate trip">${icon('copy', 14)}</button>
+            <button class="icon-btn icon-btn-sm danger" onclick="deleteTrip('${t.id}')" title="Remove trip">${icon('close', 14)}</button>
+          </div>
+        </div>
+        <div class="progress-bar" onclick="navigate('trip','${t.id}')"><div class="progress-fill" style="width:${p.pct}%"></div></div>
+      </div>`;
+  }).join('');
+}
+
+function renderHome() {
   return `
     ${renderHeader('GET IN WATER', 'Trip Packing Checklist', false)}
     <div class="action-row">
       <button class="btn-primary btn-icon-only" onclick="promptNewTrip()" title="New trip">${icon('plus', 18)}</button>
     </div>
+    <div class="home-toolbar">
+      <input type="search" id="home-search" placeholder="Search trips, tags, gear…" value="${esc(homeSearch)}" oninput="setHomeSearch(this.value)"/>
+      <select onchange="setHomeSort(this.value)">
+        <option value="created" ${state.settings.homeSort === 'created' ? 'selected' : ''}>Newest</option>
+        <option value="date" ${state.settings.homeSort === 'date' ? 'selected' : ''}>By date</option>
+        <option value="progress" ${state.settings.homeSort === 'progress' ? 'selected' : ''}>By progress</option>
+        <option value="name" ${state.settings.homeSort === 'name' ? 'selected' : ''}>By name</option>
+      </select>
+    </div>
+    <div class="home-toolbar" style="margin-top:-4px">
+      <label><input type="checkbox" ${state.settings.hideCompleted ? 'checked' : ''} onchange="setHideCompleted(this.checked)"/> Hide completed</label>
+      <label><input type="checkbox" ${state.settings.showArchived ? 'checked' : ''} onchange="setShowArchived(this.checked)"/> Show archived</label>
+    </div>
     <div class="card">
       <div class="card-title">Your Trips</div>
-      ${tripsHtml}
+      <div id="home-trips">${renderHomeTripsHtml()}</div>
     </div>`;
 }
 
+function refreshHomeTrips() {
+  const box = document.getElementById('home-trips');
+  if (box) box.innerHTML = renderHomeTripsHtml();
+}
+
+function setHomeSearch(v) {
+  homeSearch = v;
+  if (screen === 'home') refreshHomeTrips();
+  else render();
+}
+function setHomeSort(v) { state.settings.homeSort = v; saveState(); render(); }
+function setHideCompleted(v) { state.settings.hideCompleted = v; saveState(); render(); }
+function setShowArchived(v) { state.settings.showArchived = v; saveState(); render(); }
+
 function renderTemplateContent() {
   const cats = getCategories();
+  const itemCount = state.masterTemplate.items.length;
   let html = `
+    <p style="font-size:13px;color:var(--tip);line-height:1.55;margin-bottom:12px">Your <strong>master gear list</strong> — ${itemCount} item${itemCount !== 1 ? 's' : ''} in ${cats.length} card${cats.length !== 1 ? 's' : ''}. New trips start from this list.</p>
     <div class="export-row">
       <button class="btn-export" onclick="exportTemplateTXT()" title="Download .txt">${icon('fileText', 16)}</button>
       <button class="btn-export" onclick="exportTemplatePDF()" title="Export PDF">${iconPdfBtn()}</button>
-    </div>
-    <div class="action-row">
       <button class="btn-secondary btn-icon-only" onclick="addCategory()" title="Add card">${icon('plus', 18)}</button>
     </div>`;
   cats.forEach((cat) => {
@@ -819,29 +1333,140 @@ function renderTemplateContent() {
           </div>
         </div>
         <div class="card-collapsible-body">
-          ${items.map(it => `
-            <div class="edit-row">
-              <input value="${esc(it.name)}" onchange="renameTemplateItem('${it.id}',this.value)"/>
-              <button class="icon-btn danger" onclick="deleteTemplateItem('${it.id}')" title="Delete item">${icon('close', 14)}</button>
-            </div>`).join('')}
+          ${items.length ? items.map(it => renderItemRow({ type: 'template', tripId: '' }, it)).join('') : `<div class="empty-state" style="padding:12px 4px"><p style="margin:0;font-size:12px">No items — tap + to add</p></div>`}
         </div>
       </div>`;
   });
   return html;
 }
 
+function renderMasterGearEditor() {
+  return `
+    <div class="action-row">
+      <button class="btn-secondary" onclick="closeMasterGearEditor()">← All templates</button>
+    </div>
+    ${renderTemplateContent()}`;
+}
+
+function renderStartersTab() {
+  if (editingMasterGear) return renderMasterGearEditor();
+  if (activeSavedTemplateId) return renderSavedTemplateEditor();
+  return renderTemplatesGallery();
+}
+
+function renderMasterGearCard() {
+  const catCount = state.masterTemplate.categories.length;
+  const itemCount = state.masterTemplate.items.length;
+  return `
+    <div class="template-card template-card-master">
+      <h4>Master gear list</h4>
+      <p>Your default packing list — categories and items copied when you start a new trip.</p>
+      <div class="template-card-meta">${catCount} card${catCount !== 1 ? 's' : ''} · ${itemCount} item${itemCount !== 1 ? 's' : ''}</div>
+      <div class="template-card-actions">
+        <button class="btn-primary btn-icon-only" onclick="openMasterGearEditor()" title="Edit master gear list">${icon('edit', 18)}</button>
+      </div>
+    </div>`;
+}
+
+function renderTemplatesGallery() {
+  const templates = state.savedTemplates || [];
+  const cards = templates.map(tpl => {
+    const itemCount = tpl.items.length;
+    const catCount = tpl.categories.length;
+    return `
+    <div class="template-card">
+      <h4>${esc(tpl.name)}${tpl.builtIn ? ' <span style="font-size:10px;color:var(--muted)">· built-in</span>' : ''}</h4>
+      <p>${esc(tpl.desc || 'No description')}</p>
+      <div class="template-card-meta">${catCount} card${catCount !== 1 ? 's' : ''} · ${itemCount} item${itemCount !== 1 ? 's' : ''}</div>
+      <div class="template-card-actions">
+        <button class="btn-secondary btn-icon-only" onclick="openSavedTemplateEditor('${tpl.id}')" title="Edit">${icon('edit', 18)}</button>
+        <button class="btn-secondary btn-icon-only" onclick="mergeSavedTemplate('${tpl.id}')" title="Add to master gear list">${icon('merge', 18)}</button>
+      </div>
+    </div>`;
+  }).join('');
+  return `
+    <p style="font-size:13px;color:var(--tip);line-height:1.55;margin-bottom:12px">Reusable packing lists. Copy and edit a template, then add its items to your master gear list.</p>
+    <div class="action-row">
+      <button class="btn-primary btn-icon-only" onclick="promptNewSavedTemplate()" title="New template">${icon('plus', 18)}</button>
+    </div>
+    <div class="template-gallery">${renderMasterGearCard()}${cards || '<div class="empty-state" style="grid-column:1/-1"><p>No starter templates yet.</p></div>'}</div>`;
+}
+
+function renderSavedTemplateEditor() {
+  const tpl = getSavedTemplate(activeSavedTemplateId);
+  if (!tpl) { activeSavedTemplateId = null; return renderTemplatesGallery(); }
+  const cats = [...tpl.categories].sort((a, b) => a.order - b.order);
+  let catsHtml = cats.map(cat => {
+    const items = tpl.items.filter(i => i.categoryId === cat.id);
+    return `
+      <div class="card collapsible card-open">
+        <div class="card-title" onclick="toggleCard(this)">
+          <div class="card-title-left" onclick="event.stopPropagation()">
+            <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameSavedCategory('${tpl.id}','${cat.id}',this.value)" title="Rename card"/>
+            <div class="card-title-actions">
+              <button class="icon-btn icon-btn-sm" onclick="moveSavedCategory('${tpl.id}','${cat.id}',-1)" title="Move up">${icon('chevUp', 13)}</button>
+              <button class="icon-btn icon-btn-sm" onclick="moveSavedCategory('${tpl.id}','${cat.id}',1)" title="Move down">${icon('chevDown', 13)}</button>
+              <button class="icon-btn icon-btn-sm danger" onclick="deleteSavedCategory('${tpl.id}','${cat.id}')" title="Remove card">${icon('close', 13)}</button>
+            </div>
+          </div>
+          <div class="card-title-right">
+            <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addSavedTemplateItem('${tpl.id}','${cat.id}')" title="Add item">${icon('plus', 13)}</button>
+            <span class="card-caret">${icon('chevDown', 11)}</span>
+          </div>
+        </div>
+        <div class="card-collapsible-body">
+          ${items.length ? items.map(it => renderItemRow({ type: 'saved', tripId: tpl.id }, it)).join('') : `<div class="empty-state" style="padding:12px 4px"><p style="margin:0;font-size:12px">No items — tap + to add</p></div>`}
+        </div>
+      </div>`;
+  }).join('');
+  return `
+    <div class="action-row">
+      <button class="btn-secondary" onclick="closeSavedTemplateEditor()">← All templates</button>
+    </div>
+    <div class="card">
+      <div class="modal-field"><label style="display:block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Template name</label>
+        <input style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px" value="${esc(tpl.name)}" onchange="updateSavedTemplateMeta('${tpl.id}',this.value,null)"/></div>
+      <div class="modal-field" style="margin-top:10px"><label style="display:block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Description</label>
+        <input style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px" value="${esc(tpl.desc || '')}" placeholder="What is this template for?" onchange="updateSavedTemplateMeta('${tpl.id}',null,this.value)"/></div>
+    </div>
+    <div class="action-row">
+      <button class="btn-secondary btn-icon-only" onclick="addSavedCategory('${tpl.id}')" title="Add card">${icon('plus', 18)}</button>
+    </div>
+    ${catsHtml}
+    <div class="action-row" style="margin-top:8px">
+      <button class="btn-primary btn-icon-only" onclick="mergeSavedTemplate('${tpl.id}')" title="Add to master gear list">${icon('merge', 18)}</button>
+      ${tpl.builtIn
+        ? `<button class="btn-export btn-reset-red btn-icon-only" onclick="resetSavedTemplate('${tpl.id}')" title="Reset to default">${icon('reset', 18)}</button>`
+        : `<button class="btn-secondary btn-danger" onclick="deleteSavedTemplate('${tpl.id}')">Delete template</button>`}
+    </div>`;
+}
+
+function renderDataTab() {
+  return `
+    <div class="card">
+      <div class="card-title">Backup & restore</div>
+      <p style="font-size:13px;color:var(--tip);line-height:1.55;margin-bottom:12px">Export all trips and your master template as JSON. Restore on a new device by importing the file.</p>
+      <div class="action-row">
+        <button class="btn-primary" onclick="exportBackupJSON()">Export backup (JSON)</button>
+        <button class="btn-secondary" onclick="document.getElementById('import-json-input').click()">Import backup</button>
+        <input type="file" id="import-json-input" accept="application/json,.json" style="display:none" onchange="importBackupJSON(this)"/>
+      </div>
+    </div>`;
+}
+
 function renderAbout() {
   return `
     ${renderHeader('GET IN WATER', 'Settings & About', true)}
     <div class="about-tabs">
-      <button class="about-tab-btn ${aboutTab === 'template' ? 'active' : ''}" onclick="switchAboutTab('template')">Gear template</button>
+      <button class="about-tab-btn ${aboutTab === 'starters' ? 'active' : ''}" onclick="switchAboutTab('starters')">Templates</button>
+      <button class="about-tab-btn ${aboutTab === 'data' ? 'active' : ''}" onclick="switchAboutTab('data')">Data</button>
       <button class="about-tab-btn ${aboutTab === 'about' ? 'active' : ''}" onclick="switchAboutTab('about')">About</button>
     </div>
-    ${aboutTab === 'template' ? renderTemplateContent() : `
+    ${aboutTab === 'starters' ? renderStartersTab() : aboutTab === 'data' ? renderDataTab() : `
     <div class="card">
       <div class="card-title">Companion to LSP D-Planner</div>
       <p style="font-size:14px;line-height:1.6;color:var(--tip)">
-        Get In Water helps you pack for dive trips. Edit your master gear template under <strong>Gear template</strong>, start a trip checklist, and tick items off as you pack. Export TXT or PDF for printing.
+        Get In Water helps you pack for dive trips. Edit your <strong>master gear list</strong> under Templates, start a trip checklist, and tick items off as you pack. Export TXT or PDF for printing.
       </p>
     </div>
     <a class="link-card" href="https://threecats-lsp.com" target="_blank" rel="noopener">🏠 Three Cats LSP · Diver's Toolkit</a>
@@ -853,6 +1478,70 @@ function renderAbout() {
     <p style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:16px;opacity:0.7">v${APP_VERSION} · Three Cats LSP</p>`}`;
 }
 
+function renderItemRow(ctx, it) {
+  const { type, tripId } = ctx;
+  ensureItem(it);
+  if (type === 'template' || type === 'saved') {
+    const badges = [];
+    if (it.qty > 1) badges.push(`<span class="item-badge">${it.qty}×</span>`);
+    if (it.critical) badges.push(`<span class="item-badge">★ critical</span>`);
+    if (it.bag) badges.push(`<span class="item-badge">${esc(bagLabel(it.bag))}</span>`);
+    const delFn = type === 'saved'
+      ? `deleteSavedTemplateItem('${tripId}','${it.id}')`
+      : `deleteTemplateItem('${it.id}')`;
+    return `
+      <div class="edit-row">
+        <div style="flex:1;min-width:0">
+          <div class="item-name">${esc(it.name)}</div>
+          ${it.note ? `<div class="item-note">${esc(it.note)}</div>` : ''}
+          ${badges.length ? `<div class="item-meta">${badges.join('')}</div>` : ''}
+        </div>
+        <button class="icon-btn" onclick="openItemEditor('${type}','${tripId}','${it.id}')" title="Edit">${icon('edit', 14)}</button>
+        <button class="icon-btn danger" onclick="${delFn}" title="Delete">${icon('close', 14)}</button>
+      </div>`;
+  }
+  const packed = isItemPacked(it);
+  const showInUnpack = tripId && state.trips.find(t => t.id === tripId)?.unpackMode;
+  if (showInUnpack && !packed) return '';
+  const trip = tripId ? state.trips.find(t => t.id === tripId) : null;
+  if (trip && !itemMatchesSection(it, trip.viewSection)) return '';
+  const cls = ['check-item', packed ? 'checked' : '', it.critical ? 'critical-item' : ''].filter(Boolean).join(' ');
+  const onToggle = type === 'trip'
+    ? `onclick="toggleTripItem('${tripId}','${it.id}')"`
+    : '';
+  const qtyHtml = it.qty > 1 ? `
+    <div class="qty-controls" onclick="event.stopPropagation()">
+      <button class="qty-btn" onclick="adjustItemQty('${type}','${tripId || ''}','${it.id}',-1)">−</button>
+      <span class="qty-label">${it.packed}/${it.qty}</span>
+      <button class="qty-btn" onclick="adjustItemQty('${type}','${tripId || ''}','${it.id}',1)">+</button>
+    </div>` : '';
+  const badges = [];
+  if (it.bag) badges.push(`<span class="item-badge">${esc(bagLabel(it.bag))}</span>`);
+  if (it.sections && it.sections.length) {
+    it.sections.forEach(sid => {
+      const sec = TRIP_SECTIONS.find(s => s.id === sid);
+      if (sec) badges.push(`<span class="item-badge">${esc(sec.label)}</span>`);
+    });
+  }
+  const editBtn = `<button class="icon-btn" onclick="event.stopPropagation(); openItemEditor('${type}','${tripId || ''}','${it.id}')" title="Edit item">${icon('edit', 14)}</button>`;
+  const delBtn = type === 'trip'
+    ? `<button class="icon-btn danger" onclick="deleteTripItem('${tripId}','${it.id}')" title="Remove item">${icon('close', 14)}</button>`
+    : `<button class="icon-btn danger" onclick="deleteTemplateItem('${it.id}')" title="Delete item">${icon('close', 14)}</button>`;
+  return `
+    <div class="${cls}">
+      <div class="check-main" ${onToggle}>
+        <div class="check-box">${packed ? icon('check', 14) : ''}</div>
+        <div style="flex:1;min-width:0">
+          <div class="item-name">${esc(itemDisplayName(it))}</div>
+          ${it.note ? `<div class="item-note">${esc(it.note)}</div>` : ''}
+          ${badges.length ? `<div class="item-meta">${badges.join('')}</div>` : ''}
+        </div>
+      </div>
+      ${qtyHtml}
+      <div class="item-actions">${editBtn}${delBtn}</div>
+    </div>`;
+}
+
 function renderTrip() {
   const trip = state.trips.find(t => t.id === activeTripId);
   if (!trip) return renderHome();
@@ -860,9 +1549,33 @@ function renderTrip() {
   const p = tripProgress(trip);
   const cats = getTripCategories(trip);
   const knownIds = new Set(cats.map(c => c.id));
+  const criticalLeft = criticalItemsRemaining(trip);
+  const complete = tripIsComplete(trip);
+
+  if (complete && !trip.celebrated && !trip.unpackMode) {
+    trip.celebrated = true;
+    saveState();
+    setTimeout(() => document.getElementById('celebrate-overlay').classList.add('open'), 300);
+  }
+
+  const sectionTabs = `<div class="section-tabs">
+    <button class="section-tab ${trip.viewSection === 'all' ? 'active' : ''}" onclick="setTripSection('${trip.id}','all')">All</button>
+    ${TRIP_SECTIONS.map(s => `<button class="section-tab ${trip.viewSection === s.id ? 'active' : ''}" onclick="setTripSection('${trip.id}','${s.id}')">${esc(s.label)}</button>`).join('')}
+  </div>`;
+
+  let banner = '';
+  if (criticalLeft.length && !trip.unpackMode) {
+    banner = `<div class="critical-banner">⚠ ${criticalLeft.length} critical item${criticalLeft.length !== 1 ? 's' : ''} not packed: ${criticalLeft.slice(0, 3).map(i => esc(i.name)).join(', ')}${criticalLeft.length > 3 ? '…' : ''}</div>`;
+  } else if (complete && !trip.unpackMode) {
+    banner = `<div class="ready-banner">✓ All packed — ready to dive!</div>`;
+  } else if (trip.unpackMode) {
+    banner = `<div class="critical-banner" style="border-color:var(--accent);color:var(--accent);background:rgba(0,200,255,0.1)">Unpack mode — tap items as you repack</div>`;
+  }
 
   let catsHtml = cats.map(cat => {
     const items = trip.items.filter(i => i.categoryId === cat.id);
+    const rows = items.map(it => renderItemRow({ type: 'trip', tripId: trip.id }, it)).filter(Boolean).join('');
+    if (!rows && trip.viewSection !== 'all') return '';
     return `
       <div class="card collapsible card-open">
         <div class="card-title" onclick="toggleCard(this)">
@@ -881,45 +1594,35 @@ function renderTrip() {
           </div>
         </div>
         <div class="card-collapsible-body">
-          ${items.length ? items.map(it => `
-            <div class="check-item ${it.checked ? 'checked' : ''}">
-              <div class="check-main" onclick="toggleTripItem('${trip.id}','${it.id}')">
-                <div class="check-box">${it.checked ? icon('check', 14) : ''}</div>
-                <div><div class="item-name">${esc(it.name)}</div>${it.note ? `<div class="item-note">${esc(it.note)}</div>` : ''}</div>
-              </div>
-              <button class="icon-btn danger" onclick="deleteTripItem('${trip.id}','${it.id}')" title="Remove item">${icon('close', 14)}</button>
-            </div>`).join('') : `<div class="empty-state" style="padding:12px 4px"><p style="margin:0;font-size:12px">No items yet — tap + to add</p></div>`}
+          ${rows || `<div class="empty-state" style="padding:12px 4px"><p style="margin:0;font-size:12px">No items in this section — tap + to add</p></div>`}
         </div>
       </div>`;
   }).join('');
 
   const otherItems = trip.items.filter(it => !knownIds.has(it.categoryId));
-  if (otherItems.length) {
+  const otherRows = otherItems.map(it => renderItemRow({ type: 'trip', tripId: trip.id }, it)).filter(Boolean).join('');
+  if (otherRows) {
     catsHtml += `
       <div class="card collapsible card-open">
         <div class="card-title" onclick="toggleCard(this)">
           <div class="card-title-left">Other</div>
           <div class="card-title-right"><span class="card-caret">${icon('chevDown', 11)}</span></div>
         </div>
-        <div class="card-collapsible-body">
-          ${otherItems.map(it => `
-            <div class="check-item ${it.checked ? 'checked' : ''}">
-              <div class="check-main" onclick="toggleTripItem('${trip.id}','${it.id}')">
-                <div class="check-box">${it.checked ? icon('check', 14) : ''}</div>
-                <div><div class="item-name">${esc(it.name)}</div></div>
-              </div>
-              <button class="icon-btn danger" onclick="deleteTripItem('${trip.id}','${it.id}')" title="Remove item">${icon('close', 14)}</button>
-            </div>`).join('')}
-        </div>
+        <div class="card-collapsible-body">${otherRows}</div>
       </div>`;
   }
 
+  const subtitle = [formatTripDateRange(trip), trip.location].filter(Boolean).join(' · ') || 'Packing checklist';
+  const pinned = state.settings.pinnedTripId === trip.id;
+
   return `
-    ${renderHeader(trip.name, formatTripDateRange(trip) || 'Packing checklist', true)}
+    ${renderHeader(trip.name, subtitle, true, trip.tags)}
     <div class="progress-sticky">
-      <div class="trip-meta">${p.done} / ${p.total} packed (${p.pct}%)</div>
+      <div class="trip-meta">${p.done} / ${p.total} packed (${p.pct}%)${trip.unpackMode ? ' · Unpacking' : ''}</div>
       <div class="progress-bar"><div class="progress-fill" style="width:${p.pct}%"></div></div>
     </div>
+    ${banner}
+    ${sectionTabs}
     <div class="action-row">
       <button class="btn-secondary btn-icon-only" onclick="addTripCategory('${trip.id}')" title="Add card">${icon('plus', 18)}</button>
       <button class="btn-export" onclick="exportTripTXT('full')" title="Download .txt">${icon('fileText', 16)}</button>
@@ -927,15 +1630,67 @@ function renderTrip() {
       <div class="menu-dropdown">
         <button class="btn-secondary btn-icon-only" onclick="toggleMenu(event)" title="More">${icon('menu', 18)}</button>
         <div class="menu-panel ${menuOpen ? 'open' : ''}" id="trip-menu">
-          <button onclick="promptRenameTrip('${trip.id}')">Rename trip</button>
+          <button onclick="promptEditTripDetails('${trip.id}')">Trip details</button>
+          <button onclick="toggleUnpackMode('${trip.id}')">${trip.unpackMode ? 'Exit unpack mode' : 'Unpack mode'}</button>
+          <button onclick="togglePinTrip('${trip.id}')">${pinned ? 'Unpin from widget' : 'Pin for home widget'}</button>
+          <button onclick="promptBuddyCopy('${trip.id}')">Buddy copy</button>
+          <button onclick="shareRemaining('${trip.id}')">Share remaining list</button>
           <button onclick="exportTripTXT('remaining')">Export remaining (TXT)</button>
           <button onclick="exportTripPDF('remaining')">Export remaining (PDF)</button>
+          <button onclick="exportTripTXT('bag')">Export by bag (TXT)</button>
           <button onclick="resetTrip('${trip.id}')">Reset all checks</button>
+          <button onclick="toggleArchiveTrip('${trip.id}')">${trip.archived ? 'Restore from archive' : 'Archive trip'}</button>
           <button class="danger" onclick="deleteTrip('${trip.id}')">Delete trip</button>
         </div>
       </div>
     </div>
     ${catsHtml}`;
+}
+
+function closeCelebrate() {
+  document.getElementById('celebrate-overlay').classList.remove('open');
+}
+
+function setTripSection(tripId, sectionId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (trip) { trip.viewSection = sectionId; saveState(); navigate('trip', tripId); }
+}
+
+function toggleUnpackMode(tripId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  trip.unpackMode = !trip.unpackMode;
+  saveState();
+  showToast(trip.unpackMode ? 'Unpack mode on' : 'Pack mode');
+  navigate('trip', tripId);
+}
+
+function togglePinTrip(tripId) {
+  ensureSettings();
+  state.settings.pinnedTripId = state.settings.pinnedTripId === tripId ? null : tripId;
+  saveState();
+  showToast(state.settings.pinnedTripId ? 'Pinned for widget' : 'Unpinned');
+  navigate('trip', tripId);
+}
+
+function toggleArchiveTrip(tripId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  trip.archived = !trip.archived;
+  saveState();
+  showToast(trip.archived ? 'Trip archived' : 'Trip restored');
+  if (trip.archived) navigate('home');
+  else navigate('trip', tripId);
+}
+
+async function shareRemaining(tripId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  const text = buildTripText(trip, 'remaining');
+  if (navigator.share) {
+    try { await navigator.share({ title: trip.name + ' — remaining', text }); return; } catch (e) {}
+  }
+  downloadBlob(text, `GIW_${dateStr()}_${safeFilename(trip.name)}_Remaining.txt`, 'text/plain');
 }
 
 function render() {
@@ -958,7 +1713,7 @@ document.addEventListener('click', () => { if (menuOpen) { menuOpen = false; ren
 function addCategory() {
   const order = state.masterTemplate.categories.length;
   state.masterTemplate.categories.push({ id: uid(), name: 'New Category', order });
-  saveState(); aboutTab = 'template'; navigate('about');
+  saveState(); stayInMasterGearEditor(); navigate('about');
 }
 function renameCategory(id, name) {
   const c = state.masterTemplate.categories.find(x => x.id === id);
@@ -968,7 +1723,7 @@ function deleteCategory(id) {
   if (!confirm('Delete this category and all its items?')) return;
   state.masterTemplate.categories = state.masterTemplate.categories.filter(c => c.id !== id);
   state.masterTemplate.items = state.masterTemplate.items.filter(i => i.categoryId !== id);
-  saveState(); aboutTab = 'template'; navigate('about');
+  saveState(); stayInMasterGearEditor(); navigate('about');
 }
 function moveCategory(id, dir) {
   const cats = getCategories();
@@ -976,13 +1731,14 @@ function moveCategory(id, dir) {
   const swap = idx + dir;
   if (swap < 0 || swap >= cats.length) return;
   const tmp = cats[idx].order; cats[idx].order = cats[swap].order; cats[swap].order = tmp;
-  saveState(); aboutTab = 'template'; navigate('about');
+  saveState(); stayInMasterGearEditor(); navigate('about');
 }
 function addTemplateItem(catId) {
-  const name = prompt('Item name:');
-  if (!name || !name.trim()) return;
-  state.masterTemplate.items.push({ id: uid(), categoryId: catId, name: name.trim() });
-  saveState(); aboutTab = 'template'; navigate('about');
+  const item = { id: uid(), categoryId: catId, name: 'New item', note: '', qty: 1, packed: 0, critical: false, bag: '', sections: [] };
+  state.masterTemplate.items.push(item);
+  saveState();
+  stayInMasterGearEditor();
+  openItemEditor('template', '', item.id);
 }
 function renameTemplateItem(id, name) {
   const it = state.masterTemplate.items.find(x => x.id === id);
@@ -990,19 +1746,111 @@ function renameTemplateItem(id, name) {
 }
 function deleteTemplateItem(id) {
   state.masterTemplate.items = state.masterTemplate.items.filter(i => i.id !== id);
-  saveState(); aboutTab = 'template'; navigate('about');
+  saveState(); stayInMasterGearEditor(); navigate('about');
 }
 
 // ── Trip actions ──
+function getItemRef(type, tripId, itemId) {
+  if (type === 'template') return state.masterTemplate.items.find(i => i.id === itemId);
+  if (type === 'saved') {
+    const tpl = getSavedTemplate(tripId);
+    return tpl && tpl.items.find(i => i.id === itemId);
+  }
+  const trip = state.trips.find(t => t.id === tripId);
+  return trip && trip.items.find(i => i.id === itemId);
+}
+
+function openItemEditor(type, tripId, itemId) {
+  const it = getItemRef(type, tripId, itemId);
+  if (!it) return;
+  ensureItem(it);
+  const sectionChecks = TRIP_SECTIONS.map(s =>
+    `<label class="modal-check-row"><input type="checkbox" class="item-sec" value="${s.id}" ${it.sections.includes(s.id) ? 'checked' : ''}/> ${esc(s.label)}</label>`
+  ).join('');
+  const bagOptions = BAG_TAGS.map(b =>
+    `<option value="${b.id}" ${it.bag === b.id ? 'selected' : ''}>${esc(b.label)}</option>`
+  ).join('');
+  openModal(`
+    <h3>Edit item</h3>
+    <div class="modal-field"><label>Name</label><input id="item-edit-name" value="${esc(it.name)}" autofocus/></div>
+    <div class="modal-field"><label>Note</label><input id="item-edit-note" value="${esc(it.note || '')}" placeholder="e.g. 32% nitrox, dry bag #2"/></div>
+    <div class="modal-field-row">
+      <div class="modal-field"><label>Quantity</label><input id="item-edit-qty" type="number" min="1" max="99" value="${it.qty}"/></div>
+      <div class="modal-field"><label>Bag / location</label>
+        <select id="item-edit-bag" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px">
+          <option value="">— None —</option>${bagOptions}
+        </select>
+      </div>
+    </div>
+    <div class="modal-field"><label class="modal-check-row" style="cursor:pointer"><input type="checkbox" id="item-edit-critical" ${it.critical ? 'checked' : ''}/> Critical — must not forget</label></div>
+    <div class="modal-field"><label>When to pack (leave empty = all phases)</label></div>
+    <div class="modal-checklist">${sectionChecks}</div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="item-edit-save">Save</button>
+    </div>
+  `, () => {
+    document.getElementById('item-edit-save').onclick = () => {
+      const name = document.getElementById('item-edit-name').value.trim();
+      if (!name) { showToast('Enter a name'); return; }
+      it.name = name;
+      it.note = document.getElementById('item-edit-note').value.trim();
+      it.qty = Math.max(1, parseInt(document.getElementById('item-edit-qty').value, 10) || 1);
+      it.bag = document.getElementById('item-edit-bag').value;
+      it.critical = document.getElementById('item-edit-critical').checked;
+      it.sections = [...document.querySelectorAll('.item-sec:checked')].map(el => el.value);
+      if (it.packed > it.qty) it.packed = it.qty;
+      it.checked = it.packed >= it.qty;
+      saveState();
+      closeModal();
+      if (type === 'template') { stayInMasterGearEditor(); navigate('about'); }
+      else if (type === 'saved') { aboutTab = 'starters'; openSavedTemplateEditor(tripId); }
+      else navigate('trip', tripId);
+    };
+  });
+}
+
+function adjustItemQty(type, tripId, itemId, delta) {
+  const it = getItemRef(type, tripId, itemId);
+  if (!it) return;
+  ensureItem(it);
+  const trip = type === 'trip' ? state.trips.find(t => t.id === tripId) : null;
+  if (trip && trip.unpackMode) {
+    it.packed = Math.max(0, Math.min(it.qty, it.packed + delta));
+  } else {
+    it.packed = Math.max(0, Math.min(it.qty, it.packed + delta));
+  }
+  it.checked = it.packed >= it.qty;
+  saveState();
+  render();
+}
+
 function toggleTripItem(tripId, itemId) {
   const trip = state.trips.find(t => t.id === tripId);
   const it = trip && trip.items.find(i => i.id === itemId);
-  if (it) { it.checked = !it.checked; saveState(); render(); }
+  if (!it) return;
+  ensureItem(it);
+  if (trip.unpackMode) {
+    if (it.packed > 0) it.packed--;
+  } else if (it.qty > 1) {
+    it.packed = it.packed >= it.qty ? 0 : Math.min(it.qty, it.packed + 1);
+  } else {
+    it.packed = it.packed >= it.qty ? 0 : it.qty;
+  }
+  it.checked = it.packed >= it.qty;
+  saveState();
+  render();
 }
 function resetTrip(tripId) {
   if (!confirm('Uncheck all items on this trip?')) return;
   const trip = state.trips.find(t => t.id === tripId);
-  if (trip) { trip.items.forEach(i => i.checked = false); saveState(); navigate('trip', tripId); }
+  if (trip) {
+    trip.items.forEach(i => { ensureItem(i); i.packed = 0; i.checked = false; });
+    trip.celebrated = false;
+    trip.unpackMode = false;
+    saveState();
+    navigate('trip', tripId);
+  }
 }
 function deleteTrip(tripId) {
   if (!confirm('Delete this trip?')) return;
@@ -1019,13 +1867,12 @@ function deleteTripItem(tripId, itemId) {
   navigate('trip', tripId);
 }
 function addTripItem(tripId, catId) {
-  const name = prompt('Item name:');
-  if (!name || !name.trim()) return;
   const trip = state.trips.find(t => t.id === tripId);
   if (trip) {
-    trip.items.push({ id: uid(), categoryId: catId, name: name.trim(), note: '', checked: false, fromTemplate: false });
+    const item = { id: uid(), categoryId: catId, name: 'New item', note: '', qty: 1, packed: 0, critical: false, bag: '', sections: [], checked: false, fromTemplate: false };
+    trip.items.push(item);
     saveState();
-    navigate('trip', tripId);
+    openItemEditor('trip', tripId, item.id);
   }
 }
 
@@ -1084,8 +1931,7 @@ function duplicateTripCategory(tripId, catId) {
   trip.categories.push({ id: newCatId, name: newName, order });
   trip.items.filter(i => i.categoryId === catId).forEach(it => {
     trip.items.push({
-      id: uid(), categoryId: newCatId, name: it.name, note: it.note || '',
-      checked: false, fromTemplate: false
+      id: uid(), categoryId: newCatId, ...copyItemFields(it)
     });
   });
   saveState();
@@ -1122,7 +1968,12 @@ function buildTemplateText() {
   getCategories().forEach(cat => {
     lines.push(`▸ ${cat.name.toUpperCase()}`);
     state.masterTemplate.items.filter(i => i.categoryId === cat.id).forEach(it => {
-      lines.push(`  • ${it.name}`);
+      ensureItem(it);
+      let line = '  • ' + itemDisplayName(it);
+      if (it.note) line += ' — ' + it.note;
+      if (it.bag) line += ' [' + bagLabel(it.bag) + ']';
+      if (it.critical) line += ' ★';
+      lines.push(line);
     });
     lines.push('');
   });
@@ -1130,44 +1981,88 @@ function buildTemplateText() {
   return lines.join('\n');
 }
 
+function formatItemExportLine(it, mode) {
+  ensureItem(it);
+  if (mode === 'remaining' && isItemPacked(it)) return null;
+  const mark = isItemPacked(it) ? '[x]' : '[ ]';
+  let line = `  ${mark} ${itemDisplayName(it)}`;
+  if (it.qty > 1 && it.packed > 0 && it.packed < it.qty) line += ` (${it.packed}/${it.qty} packed)`;
+  if (it.note) line += ' — ' + it.note;
+  if (it.critical) line += ' ★';
+  return line;
+}
+
 function buildTripText(trip, mode) {
   const p = tripProgress(trip);
+  ensureTripShape(trip);
   const lines = [
     '═══════════════════════════════════════',
     '  GET IN WATER — Trip Packing List',
     '  Three Cats LSP · threecats-lsp.com',
     '═══════════════════════════════════════',
     `Trip: ${trip.name}`,
+    trip.location ? `Location: ${trip.location}` : '',
     formatTripDateRange(trip) ? `Dates: ${formatTripDateRange(trip)}` : '',
+    (trip.tags && trip.tags.length) ? `Tags: ${trip.tags.join(' ')}` : '',
     `Progress: ${p.done}/${p.total} packed`,
     mode === 'remaining' ? '(Remaining items only)' : '',
+    mode === 'bag' ? '(Grouped by bag / location)' : '',
     ''
   ].filter(Boolean);
 
-  const cats = getTripCategories(trip);
-  let items = trip.items;
-  if (mode === 'remaining') items = items.filter(i => !i.checked);
-  const knownIds = new Set(cats.map(c => c.id));
-
-  cats.forEach(cat => {
-    const catItems = items.filter(i => i.categoryId === cat.id);
-    if (!catItems.length) return;
-    lines.push(`▸ ${cat.name.toUpperCase()}`);
-    catItems.forEach(it => {
-      const mark = it.checked ? '[x]' : '[ ]';
-      lines.push(`  ${mark} ${it.name}`);
+  if (mode === 'bag') {
+    const groups = {};
+    let items = trip.items;
+    if (mode === 'remaining') items = items.filter(i => !isItemPacked(i));
+    items.forEach(it => {
+      ensureItem(it);
+      const key = it.bag || '_none';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(it);
     });
-    lines.push('');
-  });
-
-  const otherItems = items.filter(i => !knownIds.has(i.categoryId));
-  if (otherItems.length) {
-    lines.push('▸ OTHER');
-    otherItems.forEach(it => {
-      const mark = it.checked ? '[x]' : '[ ]';
-      lines.push(`  ${mark} ${it.name}`);
+    const order = ['carry-on', 'checked', 'camera', 'boat', '_none'];
+    order.forEach(key => {
+      if (!groups[key] || !groups[key].length) return;
+      const title = key === '_none' ? 'UNASSIGNED' : bagLabel(key).toUpperCase();
+      lines.push(`▸ ${title}`);
+      groups[key].forEach(it => {
+        const row = formatItemExportLine(it, 'full');
+        if (row) lines.push(row);
+      });
+      lines.push('');
     });
-    lines.push('');
+    Object.keys(groups).filter(k => !order.includes(k)).forEach(key => {
+      lines.push(`▸ ${key.toUpperCase()}`);
+      groups[key].forEach(it => {
+        const row = formatItemExportLine(it, 'full');
+        if (row) lines.push(row);
+      });
+      lines.push('');
+    });
+  } else {
+    const cats = getTripCategories(trip);
+    let items = trip.items;
+    if (mode === 'remaining') items = items.filter(i => !isItemPacked(i));
+    const knownIds = new Set(cats.map(c => c.id));
+    cats.forEach(cat => {
+      const catItems = items.filter(i => i.categoryId === cat.id);
+      if (!catItems.length) return;
+      lines.push(`▸ ${cat.name.toUpperCase()}`);
+      catItems.forEach(it => {
+        const row = formatItemExportLine(it, mode);
+        if (row) lines.push(row);
+      });
+      lines.push('');
+    });
+    const otherItems = items.filter(i => !knownIds.has(i.categoryId));
+    if (otherItems.length) {
+      lines.push('▸ OTHER');
+      otherItems.forEach(it => {
+        const row = formatItemExportLine(it, mode);
+        if (row) lines.push(row);
+      });
+      lines.push('');
+    }
   }
   lines.push('— Generated by Get In Water v' + APP_VERSION);
   return lines.join('\n');
@@ -1191,8 +2086,282 @@ function exportTemplateTXT() {
 function exportTripTXT(mode) {
   const trip = state.trips.find(t => t.id === activeTripId);
   if (!trip) return;
-  const tag = mode === 'remaining' ? 'Remaining' : 'Full';
+  const tag = mode === 'remaining' ? 'Remaining' : mode === 'bag' ? 'ByBag' : 'Full';
   downloadBlob(buildTripText(trip, mode), `GIW_${dateStr()}_${safeFilename(trip.name)}_${tag}.txt`, 'text/plain');
+}
+
+function mergeSavedTemplate(id) {
+  const tpl = getSavedTemplate(id);
+  if (!tpl) return;
+  tpl.categories.forEach(cat => {
+    let masterCat = state.masterTemplate.categories.find(c => c.name === cat.name);
+    if (!masterCat) {
+      masterCat = { id: uid(), name: cat.name, order: state.masterTemplate.categories.length };
+      state.masterTemplate.categories.push(masterCat);
+    }
+    tpl.items.filter(i => i.categoryId === cat.id).forEach(it => {
+      ensureItem(it);
+      if (!state.masterTemplate.items.some(i => i.categoryId === masterCat.id && i.name === it.name)) {
+        state.masterTemplate.items.push({
+          id: uid(), categoryId: masterCat.id, name: it.name,
+          note: it.note || '', qty: it.qty || 1, packed: 0,
+          critical: !!it.critical, bag: it.bag || '', sections: [...(it.sections || [])]
+        });
+      }
+    });
+  });
+  saveState();
+  showToast('Template added to master gear list');
+  openMasterGearEditor();
+}
+
+function openSavedTemplateEditor(id) {
+  editingMasterGear = false;
+  activeSavedTemplateId = id;
+  aboutTab = 'starters';
+  navigate('about');
+}
+
+function closeSavedTemplateEditor() {
+  activeSavedTemplateId = null;
+  editingMasterGear = false;
+  aboutTab = 'starters';
+  navigate('about');
+}
+
+function createNewSavedTemplate() {
+  const tpl = {
+    id: uid(),
+    name: 'New template',
+    desc: '',
+    builtIn: false,
+    categories: [{ id: uid(), name: 'Gear', order: 0 }],
+    items: []
+  };
+  state.savedTemplates.push(tpl);
+  saveState();
+  openSavedTemplateEditor(tpl.id);
+}
+
+function cloneSavedTemplate(sourceId, name, desc) {
+  const src = getSavedTemplate(sourceId);
+  if (!src) return null;
+  const catIdMap = {};
+  const categories = src.categories.map(c => {
+    const newId = uid();
+    catIdMap[c.id] = newId;
+    return { id: newId, name: c.name, order: c.order };
+  });
+  const items = src.items.map(it => {
+    ensureItem(it);
+    return {
+      id: uid(), categoryId: catIdMap[it.categoryId], name: it.name,
+      note: it.note || '', qty: it.qty || 1, packed: 0,
+      critical: !!it.critical, bag: it.bag || '', sections: [...(it.sections || [])]
+    };
+  });
+  return { id: uid(), name, desc: desc || '', builtIn: false, categories, items };
+}
+
+function promptNewSavedTemplate() {
+  const templates = state.savedTemplates || [];
+  const copyOptions = templates.map(t =>
+    `<option value="${t.id}">${esc(t.name)}</option>`
+  ).join('');
+  openModal(`
+    <h3>New template</h3>
+    <p style="font-size:13px;color:var(--muted);margin:-6px 0 14px;line-height:1.45">New template or copy and edit an existing one.</p>
+    <div class="modal-field"><label>Template name</label><input id="new-tpl-name" placeholder="e.g. Cold water kit" autofocus/></div>
+    <div class="modal-field"><label>Description</label><input id="new-tpl-desc" placeholder="Optional"/></div>
+    <div class="modal-field"><label>Start from</label>
+      <select id="new-tpl-copy" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px">
+        <option value="">— Blank template —</option>
+        <option value="__master__">— Current master gear —</option>
+        ${copyOptions}
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="new-tpl-create">Create</button>
+    </div>
+  `, () => {
+    const copyEl = document.getElementById('new-tpl-copy');
+    copyEl.addEventListener('change', () => {
+      const nameEl = document.getElementById('new-tpl-name');
+      if (nameEl.value.trim()) return;
+      if (copyEl.value === '__master__') {
+        nameEl.value = 'Master gear';
+      } else if (copyEl.value) {
+        const src = getSavedTemplate(copyEl.value);
+        if (src) nameEl.value = src.name + ' (copy)';
+      }
+    });
+    document.getElementById('new-tpl-create').onclick = () => {
+      const name = document.getElementById('new-tpl-name').value.trim();
+      if (!name) { showToast('Enter a template name'); return; }
+      const desc = document.getElementById('new-tpl-desc').value.trim();
+      const copyFrom = document.getElementById('new-tpl-copy').value;
+      let tpl;
+      if (copyFrom === '__master__') {
+        tpl = cloneMasterAsSavedTemplate(name, desc);
+      } else if (copyFrom) {
+        tpl = cloneSavedTemplate(copyFrom, name, desc);
+        if (!tpl) { showToast('Could not copy template'); return; }
+      } else {
+        tpl = {
+          id: uid(), name, desc, builtIn: false,
+          categories: [{ id: uid(), name: 'Gear', order: 0 }],
+          items: []
+        };
+      }
+      state.savedTemplates.push(tpl);
+      saveState();
+      closeModal();
+      const msg = copyFrom === '__master__' ? 'Saved from master gear' : copyFrom ? 'Template copied' : 'Template created';
+      showToast(msg);
+      openSavedTemplateEditor(tpl.id);
+    };
+  });
+}
+
+function cloneMasterAsSavedTemplate(name, desc) {
+  const catIdMap = {};
+  const categories = state.masterTemplate.categories.map(c => {
+    const newId = uid();
+    catIdMap[c.id] = newId;
+    return { id: newId, name: c.name, order: c.order };
+  });
+  const items = state.masterTemplate.items.map(it => {
+    ensureItem(it);
+    return {
+      id: uid(), categoryId: catIdMap[it.categoryId], name: it.name,
+      note: it.note || '', qty: it.qty || 1, packed: 0,
+      critical: !!it.critical, bag: it.bag || '', sections: [...(it.sections || [])]
+    };
+  });
+  return { id: uid(), name, desc, builtIn: false, categories, items };
+}
+
+function updateSavedTemplateMeta(id, name, desc) {
+  const tpl = getSavedTemplate(id);
+  if (!tpl) return;
+  if (name != null && name.trim()) tpl.name = name.trim();
+  if (desc != null) tpl.desc = desc.trim();
+  saveState();
+}
+
+function resetSavedTemplate(id) {
+  const key = id.replace('starter_', '');
+  if (!STARTER_TEMPLATES[key]) return;
+  if (!confirm('Reset this template to the original built-in version? Your edits will be lost.')) return;
+  const fresh = starterToSaved(key, STARTER_TEMPLATES[key]);
+  const idx = state.savedTemplates.findIndex(t => t.id === id);
+  if (idx >= 0) state.savedTemplates[idx] = fresh;
+  saveState();
+  showToast('Template reset');
+  openSavedTemplateEditor(id);
+}
+
+function deleteSavedTemplate(id) {
+  const tpl = getSavedTemplate(id);
+  if (!tpl) return;
+  if (tpl.builtIn) { showToast('Built-in templates can be reset, not deleted'); return; }
+  if (!confirm('Delete this template permanently?')) return;
+  state.savedTemplates = state.savedTemplates.filter(t => t.id !== id);
+  if (activeSavedTemplateId === id) activeSavedTemplateId = null;
+  saveState();
+  showToast('Template deleted');
+  navigate('about');
+}
+
+function addSavedCategory(tplId) {
+  const tpl = getSavedTemplate(tplId);
+  if (!tpl) return;
+  tpl.categories.push({ id: uid(), name: 'New Category', order: tpl.categories.length });
+  saveState();
+  openSavedTemplateEditor(tplId);
+}
+
+function renameSavedCategory(tplId, catId, name) {
+  const tpl = getSavedTemplate(tplId);
+  const cat = tpl && tpl.categories.find(c => c.id === catId);
+  if (cat) { cat.name = name.trim() || cat.name; saveState(); }
+}
+
+function deleteSavedCategory(tplId, catId) {
+  const tpl = getSavedTemplate(tplId);
+  if (!tpl || !confirm('Delete this card and all its items?')) return;
+  tpl.categories = tpl.categories.filter(c => c.id !== catId);
+  tpl.items = tpl.items.filter(i => i.categoryId !== catId);
+  saveState();
+  openSavedTemplateEditor(tplId);
+}
+
+function moveSavedCategory(tplId, catId, dir) {
+  const tpl = getSavedTemplate(tplId);
+  if (!tpl) return;
+  const cats = [...tpl.categories].sort((a, b) => a.order - b.order);
+  const idx = cats.findIndex(c => c.id === catId);
+  const swap = idx + dir;
+  if (swap < 0 || swap >= cats.length) return;
+  const tmp = cats[idx].order;
+  cats[idx].order = cats[swap].order;
+  cats[swap].order = tmp;
+  saveState();
+  openSavedTemplateEditor(tplId);
+}
+
+function addSavedTemplateItem(tplId, catId) {
+  const tpl = getSavedTemplate(tplId);
+  if (!tpl) return;
+  const item = { id: uid(), categoryId: catId, name: 'New item', note: '', qty: 1, packed: 0, critical: false, bag: '', sections: [] };
+  tpl.items.push(item);
+  saveState();
+  openItemEditor('saved', tplId, item.id);
+}
+
+function deleteSavedTemplateItem(tplId, itemId) {
+  const tpl = getSavedTemplate(tplId);
+  if (!tpl) return;
+  tpl.items = tpl.items.filter(i => i.id !== itemId);
+  saveState();
+  openSavedTemplateEditor(tplId);
+}
+
+function exportBackupJSON() {
+  const payload = {
+    app: 'Get In Water',
+    version: APP_VERSION,
+    exportedAt: new Date().toISOString(),
+    data: state
+  };
+  downloadBlob(JSON.stringify(payload, null, 2), `GIW_Backup_${dateStr()}.json`, 'application/json');
+}
+
+function importBackupJSON(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      const data = parsed.data || parsed;
+      if (!data.masterTemplate || !data.trips) throw new Error('Invalid backup');
+      if (!confirm('Replace all current data with this backup?')) return;
+      migrateState(data);
+      state = data;
+      ensureSettings();
+      saveState();
+      homeSearch = '';
+      screen = 'home';
+      showToast('Backup restored');
+      render();
+    } catch (e) {
+      showToast('Import failed — invalid file');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
 }
 
 // ── PDF export (DejaVu Sans — full Unicode / Cyrillic) ──
@@ -1384,38 +2553,58 @@ async function exportTemplatePDF() {
 async function exportTripPDF(mode) {
   const trip = state.trips.find(t => t.id === activeTripId);
   if (!trip) return;
+  ensureTripShape(trip);
   const p = tripProgress(trip);
   let items = trip.items;
-  if (mode === 'remaining') items = items.filter(i => !i.checked);
+  if (mode === 'remaining') items = items.filter(i => !isItemPacked(i));
 
-  const sections = getTripCategories(trip).map(cat => ({
-    title: cat.name,
-    items: items.filter(i => i.categoryId === cat.id).map(it => (it.checked ? '\u2611  ' : '\u2610  ') + it.name)
-  })).filter(sec => sec.items.length);
-  const knownIds = new Set(getTripCategories(trip).map(c => c.id));
-  const orphanItems = items.filter(i => !knownIds.has(i.categoryId));
-  if (orphanItems.length) {
-    sections.push({
-      title: 'Other',
-      items: orphanItems.map(it => (it.checked ? '\u2611  ' : '\u2610  ') + it.name)
+  let sections;
+  if (mode === 'bag') {
+    const groups = {};
+    items.forEach(it => {
+      ensureItem(it);
+      const key = it.bag || '_none';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(it);
     });
+    sections = Object.keys(groups).sort().map(key => ({
+      title: key === '_none' ? 'Unassigned' : bagLabel(key),
+      items: groups[key].map(it => (isItemPacked(it) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it) + (it.note ? ' — ' + it.note : ''))
+    })).filter(sec => sec.items.length);
+  } else {
+    sections = getTripCategories(trip).map(cat => ({
+      title: cat.name,
+      items: items.filter(i => i.categoryId === cat.id).map(it => (isItemPacked(it) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it) + (it.note ? ' — ' + it.note : ''))
+    })).filter(sec => sec.items.length);
+    const knownIds = new Set(getTripCategories(trip).map(c => c.id));
+    const orphanItems = items.filter(i => !knownIds.has(i.categoryId));
+    if (orphanItems.length) {
+      sections.push({
+        title: 'Other',
+        items: orphanItems.map(it => (isItemPacked(it) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it))
+      });
+    }
   }
 
+  const subtitleParts = [p.done + '/' + p.total + ' packed'];
+  if (trip.location) subtitleParts.unshift(trip.location);
   const doc = await buildPdfDoc({
     tripLabel: trip.name,
     date: formatTripDateRange(trip),
-    subtitle: p.done + '/' + p.total + ' packed',
-    modeLabel: mode === 'remaining' ? 'Remaining items only' : ''
+    subtitle: subtitleParts.join(' · '),
+    modeLabel: mode === 'remaining' ? 'Remaining items only' : mode === 'bag' ? 'Grouped by bag' : ''
   }, sections);
 
-  const tag = mode === 'remaining' ? 'Remaining' : 'Full';
+  const tag = mode === 'remaining' ? 'Remaining' : mode === 'bag' ? 'ByBag' : 'Full';
   if (doc) doc.save('GIW_' + dateStr() + '_' + safeFilename(trip.name) + '_' + tag + '.pdf');
   showExportToast();
 }
 
 // ── Init ──
 state = loadState();
+ensureSettingsFromData(state);
 initBubbles();
+updateWidgetSnapshot();
 render();
 </script>
 <script>
