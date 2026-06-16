@@ -339,6 +339,14 @@ body.light-theme .btn-export.btn-reset-red:hover { background: rgba(255,49,49,0.
 .menu-panel button:last-child { border-bottom: none; }
 .menu-panel button:hover { background: rgba(0,200,255,0.08); color: var(--accent); }
 .menu-panel button.danger { color: var(--red); }
+.menu-panel-check {
+  display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text);
+  cursor: pointer; border-bottom: 1px solid var(--border);
+}
+.menu-panel-check:last-child { border-bottom: none; }
+.menu-panel-check:hover { background: rgba(0,200,255,0.08); color: var(--accent); }
+.menu-panel-check input { width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; }
 .export-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; }
 .about-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
 .about-tab-btn {
@@ -374,6 +382,18 @@ body.light-theme .about-tab-btn.active { color: #fff; }
   font-size: 9px; letter-spacing: 0.5px; cursor: pointer; white-space: nowrap;
 }
 .section-tab.active { border-color: var(--accent); background: rgba(0,200,255,0.15); color: var(--accent); }
+.trip-subbar {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px; min-width: 0;
+}
+.trip-subbar .section-tabs { flex: 1; min-width: 0; margin-bottom: 0; padding-bottom: 0; }
+.trip-mode-actions { display: flex; gap: 6px; flex-shrink: 0; margin-left: auto; }
+.trip-mode-btn {
+  flex-shrink: 0; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-hi);
+  background: var(--surface); color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.5px; cursor: pointer; white-space: nowrap;
+}
+.trip-mode-btn.active { border-color: var(--accent); background: rgba(0,200,255,0.15); color: var(--accent); }
+.trip-mode-btn.return-active { border-color: var(--yellow); background: rgba(255,183,3,0.12); color: var(--yellow); }
 .critical-banner {
   background: rgba(255,109,0,0.15); border: 1px solid var(--orange); border-radius: 10px;
   padding: 10px 12px; margin-bottom: 10px; font-size: 12px; color: var(--orange); line-height: 1.45;
@@ -573,18 +593,26 @@ function ensureItem(item) {
   if (!item) return item;
   if (!item.qty || item.qty < 1) item.qty = 1;
   if (item.packed == null) item.packed = item.checked ? item.qty : 0;
+  if (item.returnPacked == null) item.returnPacked = 0;
   if (item.critical == null) item.critical = false;
   if (item.bag == null) item.bag = '';
   if (!Array.isArray(item.sections)) item.sections = [];
   if (item.note == null) item.note = '';
   item.packed = Math.max(0, Math.min(item.packed, item.qty));
+  item.returnPacked = Math.max(0, Math.min(item.returnPacked, item.qty));
   item.checked = item.packed >= item.qty;
   return item;
 }
 
-function isItemPacked(item) {
+function itemPackedCount(item, trip) {
   ensureItem(item);
-  return item.packed >= item.qty;
+  if (trip && trip.returnMode) return item.returnPacked || 0;
+  return item.packed;
+}
+
+function isItemPacked(item, trip) {
+  ensureItem(item);
+  return itemPackedCount(item, trip) >= item.qty;
 }
 
 function bagLabel(id) {
@@ -633,7 +661,7 @@ function itemDisplayName(item) {
 function copyItemFields(src) {
   ensureItem(src);
   return {
-    name: src.name, note: src.note || '', qty: src.qty, packed: 0,
+    name: src.name, note: src.note || '', qty: src.qty, packed: 0, returnPacked: 0,
     critical: !!src.critical, bag: src.bag || '', sections: [...(src.sections || [])],
     checked: false, fromTemplate: !!src.fromTemplate
   };
@@ -668,6 +696,8 @@ function ensureTripShape(trip) {
   if (!Array.isArray(trip.tags)) trip.tags = [];
   if (trip.archived == null) trip.archived = false;
   if (trip.unpackMode == null) trip.unpackMode = false;
+  if (trip.returnMode == null) trip.returnMode = false;
+  if (trip.returnCelebrated == null) trip.returnCelebrated = false;
   if (trip.viewSection == null) trip.viewSection = 'all';
   if (trip.celebrated == null) trip.celebrated = false;
   if (!trip.categories && state && state.masterTemplate) {
@@ -694,6 +724,8 @@ function migrateState(data) {
     if (!Array.isArray(trip.tags)) trip.tags = [];
     if (trip.archived == null) trip.archived = false;
     if (trip.unpackMode == null) trip.unpackMode = false;
+    if (trip.returnMode == null) trip.returnMode = false;
+    if (trip.returnCelebrated == null) trip.returnCelebrated = false;
     if (trip.viewSection == null) trip.viewSection = 'all';
     if (trip.celebrated == null) trip.celebrated = false;
     const tpl = data.masterTemplate;
@@ -787,7 +819,7 @@ function tripProgress(trip) {
   trip.items.forEach(i => {
     ensureItem(i);
     total += i.qty;
-    done += i.packed;
+    done += trip.returnMode ? (i.returnPacked || 0) : i.packed;
   });
   return { done, total, pct: total ? Math.round((done / total) * 100) : 0 };
 }
@@ -799,7 +831,7 @@ function tripIsComplete(trip) {
 
 function criticalItemsRemaining(trip) {
   ensureTripShape(trip);
-  return trip.items.filter(i => i.critical && !isItemPacked(i));
+  return trip.items.filter(i => i.critical && !isItemPacked(i, trip));
 }
 
 function createTripFromTemplate(name, dateStart, dateEnd, location, tags) {
@@ -811,7 +843,7 @@ function createTripFromTemplate(name, dateStart, dateEnd, location, tags) {
   const trip = {
     id: uid(), name, location: location || '', tags: tags || [],
     dateStart: start, dateEnd: end, createdAt: Date.now(),
-    archived: false, unpackMode: false, viewSection: 'all', celebrated: false,
+    archived: false, unpackMode: false, returnMode: false, viewSection: 'all', celebrated: false, returnCelebrated: false,
     categories: state.masterTemplate.categories.map(c => ({
       id: c.id, name: c.name, order: c.order
     })),
@@ -1004,7 +1036,7 @@ function cloneTripFromSource(sourceTrip, name, dateStart, dateEnd, options) {
     location: options.location != null ? options.location : (sourceTrip.location || ''),
     tags: options.tags ? [...options.tags] : [...(sourceTrip.tags || [])],
     dateStart: start, dateEnd: end, createdAt: Date.now(),
-    archived: false, unpackMode: false, viewSection: 'all', celebrated: false,
+    archived: false, unpackMode: false, returnMode: false, viewSection: 'all', celebrated: false, returnCelebrated: false,
     categories, items
   };
   state.trips.unshift(trip);
@@ -1270,6 +1302,17 @@ function renderHome() {
     ${renderHeader('GET IN WATER', 'Trip Packing Checklist', false)}
     <div class="action-row">
       <button class="btn-primary btn-icon-only" onclick="promptNewTrip()" title="New trip">${icon('plus', 18)}</button>
+      <div class="menu-dropdown">
+        <button class="btn-secondary btn-icon-only" onclick="toggleHomeMenu(event)" title="Filter trips">${icon('menu', 18)}</button>
+        <div class="menu-panel ${menuOpen ? 'open' : ''}" id="home-menu">
+          <label class="menu-panel-check" onclick="event.stopPropagation()">
+            <input type="checkbox" ${state.settings.hideCompleted ? 'checked' : ''} onchange="setHideCompleted(this.checked)"/> Hide completed
+          </label>
+          <label class="menu-panel-check" onclick="event.stopPropagation()">
+            <input type="checkbox" ${state.settings.showArchived ? 'checked' : ''} onchange="setShowArchived(this.checked)"/> Show archived
+          </label>
+        </div>
+      </div>
     </div>
     <div class="home-toolbar">
       <input type="search" id="home-search" placeholder="Search trips, tags, gear…" value="${esc(homeSearch)}" oninput="setHomeSearch(this.value)"/>
@@ -1279,10 +1322,6 @@ function renderHome() {
         <option value="progress" ${state.settings.homeSort === 'progress' ? 'selected' : ''}>By progress</option>
         <option value="name" ${state.settings.homeSort === 'name' ? 'selected' : ''}>By name</option>
       </select>
-    </div>
-    <div class="home-toolbar" style="margin-top:-4px">
-      <label><input type="checkbox" ${state.settings.hideCompleted ? 'checked' : ''} onchange="setHideCompleted(this.checked)"/> Hide completed</label>
-      <label><input type="checkbox" ${state.settings.showArchived ? 'checked' : ''} onchange="setShowArchived(this.checked)"/> Show archived</label>
     </div>
     <div class="card">
       <div class="card-title">Your Trips</div>
@@ -1301,8 +1340,18 @@ function setHomeSearch(v) {
   else render();
 }
 function setHomeSort(v) { state.settings.homeSort = v; saveState(); render(); }
-function setHideCompleted(v) { state.settings.hideCompleted = v; saveState(); render(); }
-function setShowArchived(v) { state.settings.showArchived = v; saveState(); render(); }
+function setHideCompleted(v) {
+  state.settings.hideCompleted = v;
+  saveState();
+  if (screen === 'home') refreshHomeTrips();
+  else render();
+}
+function setShowArchived(v) {
+  state.settings.showArchived = v;
+  saveState();
+  if (screen === 'home') refreshHomeTrips();
+  else render();
+}
 
 function renderTemplateContent() {
   const cats = getCategories();
@@ -1499,11 +1548,11 @@ function renderItemRow(ctx, it) {
         <button class="icon-btn danger" onclick="${delFn}" title="Delete">${icon('close', 14)}</button>
       </div>`;
   }
-  const packed = isItemPacked(it);
-  const showInUnpack = tripId && state.trips.find(t => t.id === tripId)?.unpackMode;
-  if (showInUnpack && !packed) return '';
   const trip = tripId ? state.trips.find(t => t.id === tripId) : null;
+  if (trip && trip.unpackMode && it.packed < it.qty) return '';
+  const packed = isItemPacked(it, trip);
   if (trip && !itemMatchesSection(it, trip.viewSection)) return '';
+  const packedCount = itemPackedCount(it, trip);
   const cls = ['check-item', packed ? 'checked' : '', it.critical ? 'critical-item' : ''].filter(Boolean).join(' ');
   const onToggle = type === 'trip'
     ? `onclick="toggleTripItem('${tripId}','${it.id}')"`
@@ -1511,7 +1560,7 @@ function renderItemRow(ctx, it) {
   const qtyHtml = it.qty > 1 ? `
     <div class="qty-controls" onclick="event.stopPropagation()">
       <button class="qty-btn" onclick="adjustItemQty('${type}','${tripId || ''}','${it.id}',-1)">−</button>
-      <span class="qty-label">${it.packed}/${it.qty}</span>
+      <span class="qty-label">${packedCount}/${it.qty}</span>
       <button class="qty-btn" onclick="adjustItemQty('${type}','${tripId || ''}','${it.id}',1)">+</button>
     </div>` : '';
   const badges = [];
@@ -1551,19 +1600,40 @@ function renderTrip() {
   const criticalLeft = criticalItemsRemaining(trip);
   const complete = tripIsComplete(trip);
 
-  if (complete && !trip.celebrated && !trip.unpackMode) {
-    trip.celebrated = true;
-    saveState();
-    setTimeout(() => document.getElementById('celebrate-overlay').classList.add('open'), 300);
+  if (complete && !trip.unpackMode) {
+    if (trip.returnMode && !trip.returnCelebrated) {
+      trip.returnCelebrated = true;
+      saveState();
+      setTimeout(() => openCelebrateOverlay('return'), 300);
+    } else if (!trip.returnMode && !trip.celebrated) {
+      trip.celebrated = true;
+      saveState();
+      setTimeout(() => openCelebrateOverlay('pack'), 300);
+    }
   }
 
-  const sectionTabs = `<div class="section-tabs">
-    <button class="section-tab ${trip.viewSection === 'all' ? 'active' : ''}" onclick="setTripSection('${trip.id}','all')">All</button>
-    ${TRIP_SECTIONS.map(s => `<button class="section-tab ${trip.viewSection === s.id ? 'active' : ''}" onclick="setTripSection('${trip.id}','${s.id}')">${esc(s.label)}</button>`).join('')}
+  const sectionTabs = `<div class="trip-subbar">
+    <div class="section-tabs">
+      <button class="section-tab ${trip.viewSection === 'all' ? 'active' : ''}" onclick="setTripSection('${trip.id}','all')">All</button>
+      ${TRIP_SECTIONS.map(s => `<button class="section-tab ${trip.viewSection === s.id ? 'active' : ''}" onclick="setTripSection('${trip.id}','${s.id}')">${esc(s.label)}</button>`).join('')}
+    </div>
+    <div class="trip-mode-actions">
+      <button class="trip-mode-btn ${trip.unpackMode ? 'active' : ''}" onclick="toggleUnpackMode('${trip.id}')" title="${trip.unpackMode ? 'Exit unpack mode' : 'Unpack mode — tap items as you repack'}">${trip.unpackMode ? 'Unpacking' : 'Unpack'}</button>
+      <button class="trip-mode-btn ${trip.returnMode ? 'return-active' : ''}" onclick="toggleReturnMode('${trip.id}')" title="${trip.returnMode ? 'Exit return mode' : 'Return mode — pack gear for the trip home'}">${trip.returnMode ? 'Returning' : 'Return'}</button>
+    </div>
   </div>`;
 
   let banner = '';
-  if (criticalLeft.length && !trip.unpackMode) {
+  if (trip.returnMode) {
+    if (criticalLeft.length) {
+      banner = `<div class="critical-banner">⚠ ${criticalLeft.length} critical item${criticalLeft.length !== 1 ? 's' : ''} not packed for home: ${criticalLeft.slice(0, 3).map(i => esc(i.name)).join(', ')}${criticalLeft.length > 3 ? '…' : ''}</div>`;
+    } else if (complete) {
+      banner = `<div class="ready-banner">✓ All gear collected — ready to head home!</div>`;
+    } else {
+      const left = trip.items.filter(i => !isItemPacked(i, trip)).length;
+      banner = `<div class="critical-banner" style="border-color:var(--yellow);color:var(--yellow);background:rgba(255,183,3,0.1)">Return mode — ${left} item${left !== 1 ? 's' : ''} still to collect for the trip home</div>`;
+    }
+  } else if (criticalLeft.length && !trip.unpackMode) {
     banner = `<div class="critical-banner">⚠ ${criticalLeft.length} critical item${criticalLeft.length !== 1 ? 's' : ''} not packed: ${criticalLeft.slice(0, 3).map(i => esc(i.name)).join(', ')}${criticalLeft.length > 3 ? '…' : ''}</div>`;
   } else if (complete && !trip.unpackMode) {
     banner = `<div class="ready-banner">✓ All packed — ready to dive!</div>`;
@@ -1617,7 +1687,7 @@ function renderTrip() {
   return `
     ${renderHeader(trip.name, subtitle, true, trip.tags)}
     <div class="progress-sticky">
-      <div class="trip-meta">${p.done} / ${p.total} packed (${p.pct}%)${trip.unpackMode ? ' · Unpacking' : ''}</div>
+      <div class="trip-meta">${p.done} / ${p.total} ${trip.returnMode ? 'collected' : 'packed'} (${p.pct}%)${trip.returnMode ? ' · Return mode' : trip.unpackMode ? ' · Unpacking' : ''}</div>
       <div class="progress-bar"><div class="progress-fill" style="width:${p.pct}%"></div></div>
     </div>
     ${banner}
@@ -1630,7 +1700,6 @@ function renderTrip() {
         <button class="btn-secondary btn-icon-only" onclick="toggleMenu(event)" title="More">${icon('menu', 18)}</button>
         <div class="menu-panel ${menuOpen ? 'open' : ''}" id="trip-menu">
           <button onclick="promptEditTripDetails('${trip.id}')">Trip details</button>
-          <button onclick="toggleUnpackMode('${trip.id}')">${trip.unpackMode ? 'Exit unpack mode' : 'Unpack mode'}</button>
           <button onclick="togglePinTrip('${trip.id}')">${pinned ? 'Unpin from widget' : 'Pin for home widget'}</button>
           <button onclick="promptBuddyCopy('${trip.id}')">Buddy copy</button>
           <button onclick="shareRemaining('${trip.id}')">Share remaining list</button>
@@ -1650,6 +1719,26 @@ function closeCelebrate() {
   document.getElementById('celebrate-overlay').classList.remove('open');
 }
 
+function openCelebrateOverlay(kind) {
+  const overlay = document.getElementById('celebrate-overlay');
+  const emoji = overlay.querySelector('.emoji');
+  const title = overlay.querySelector('h3');
+  const text = overlay.querySelector('p');
+  const btn = overlay.querySelector('button');
+  if (kind === 'return') {
+    emoji.textContent = '🧳';
+    title.textContent = 'Ready to head home!';
+    text.textContent = 'All gear collected. Safe travels!';
+    btn.textContent = 'Done';
+  } else {
+    emoji.textContent = '🤿';
+    title.textContent = 'Ready to dive!';
+    text.textContent = 'Everything is packed. Have a safe and fun trip!';
+    btn.textContent = "Let's go";
+  }
+  overlay.classList.add('open');
+}
+
 function setTripSection(tripId, sectionId) {
   const trip = state.trips.find(t => t.id === tripId);
   if (trip) { trip.viewSection = sectionId; saveState(); navigate('trip', tripId); }
@@ -1659,8 +1748,26 @@ function toggleUnpackMode(tripId) {
   const trip = state.trips.find(t => t.id === tripId);
   if (!trip) return;
   trip.unpackMode = !trip.unpackMode;
+  if (trip.unpackMode) trip.returnMode = false;
   saveState();
   showToast(trip.unpackMode ? 'Unpack mode on' : 'Pack mode');
+  navigate('trip', tripId);
+}
+
+function toggleReturnMode(tripId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  if (!trip.returnMode) {
+    trip.returnMode = true;
+    trip.unpackMode = false;
+    trip.returnCelebrated = false;
+    trip.items.forEach(i => { ensureItem(i); i.returnPacked = 0; });
+    showToast('Return mode — check items as you pack for home');
+  } else {
+    trip.returnMode = false;
+    showToast('Exit return mode');
+  }
+  saveState();
   navigate('trip', tripId);
 }
 
@@ -1698,6 +1805,12 @@ function render() {
   else if (screen === 'trip') root.innerHTML = renderTrip();
   else if (screen === 'about') root.innerHTML = renderAbout();
   applyTheme();
+}
+
+function toggleHomeMenu(e) {
+  e.stopPropagation();
+  menuOpen = !menuOpen;
+  render();
 }
 
 function toggleMenu(e) {
@@ -1814,12 +1927,12 @@ function adjustItemQty(type, tripId, itemId, delta) {
   if (!it) return;
   ensureItem(it);
   const trip = type === 'trip' ? state.trips.find(t => t.id === tripId) : null;
-  if (trip && trip.unpackMode) {
-    it.packed = Math.max(0, Math.min(it.qty, it.packed + delta));
+  if (trip && trip.returnMode) {
+    it.returnPacked = Math.max(0, Math.min(it.qty, (it.returnPacked || 0) + delta));
   } else {
     it.packed = Math.max(0, Math.min(it.qty, it.packed + delta));
+    it.checked = it.packed >= it.qty;
   }
-  it.checked = it.packed >= it.qty;
   saveState();
   render();
 }
@@ -1829,14 +1942,22 @@ function toggleTripItem(tripId, itemId) {
   const it = trip && trip.items.find(i => i.id === itemId);
   if (!it) return;
   ensureItem(it);
-  if (trip.unpackMode) {
+  if (trip.returnMode) {
+    if (it.qty > 1) {
+      it.returnPacked = (it.returnPacked || 0) >= it.qty ? 0 : Math.min(it.qty, (it.returnPacked || 0) + 1);
+    } else {
+      it.returnPacked = (it.returnPacked || 0) >= it.qty ? 0 : it.qty;
+    }
+  } else if (trip.unpackMode) {
     if (it.packed > 0) it.packed--;
+    it.checked = it.packed >= it.qty;
   } else if (it.qty > 1) {
     it.packed = it.packed >= it.qty ? 0 : Math.min(it.qty, it.packed + 1);
+    it.checked = it.packed >= it.qty;
   } else {
     it.packed = it.packed >= it.qty ? 0 : it.qty;
+    it.checked = it.packed >= it.qty;
   }
-  it.checked = it.packed >= it.qty;
   saveState();
   render();
 }
@@ -1844,9 +1965,11 @@ function resetTrip(tripId) {
   if (!confirm('Uncheck all items on this trip?')) return;
   const trip = state.trips.find(t => t.id === tripId);
   if (trip) {
-    trip.items.forEach(i => { ensureItem(i); i.packed = 0; i.checked = false; });
+    trip.items.forEach(i => { ensureItem(i); i.packed = 0; i.returnPacked = 0; i.checked = false; });
     trip.celebrated = false;
+    trip.returnCelebrated = false;
     trip.unpackMode = false;
+    trip.returnMode = false;
     saveState();
     navigate('trip', tripId);
   }
@@ -1980,12 +2103,13 @@ function buildTemplateText() {
   return lines.join('\n');
 }
 
-function formatItemExportLine(it, mode) {
+function formatItemExportLine(it, mode, trip) {
   ensureItem(it);
-  if (mode === 'remaining' && isItemPacked(it)) return null;
-  const mark = isItemPacked(it) ? '[x]' : '[ ]';
+  if (mode === 'remaining' && isItemPacked(it, trip)) return null;
+  const mark = isItemPacked(it, trip) ? '[x]' : '[ ]';
+  const count = trip && trip.returnMode ? (it.returnPacked || 0) : it.packed;
   let line = `  ${mark} ${itemDisplayName(it)}`;
-  if (it.qty > 1 && it.packed > 0 && it.packed < it.qty) line += ` (${it.packed}/${it.qty} packed)`;
+  if (it.qty > 1 && count > 0 && count < it.qty) line += ` (${count}/${it.qty} ${trip && trip.returnMode ? 'collected' : 'packed'})`;
   if (it.note) line += ' — ' + it.note;
   if (it.critical) line += ' ★';
   return line;
@@ -2003,7 +2127,8 @@ function buildTripText(trip, mode) {
     trip.location ? `Location: ${trip.location}` : '',
     formatTripDateRange(trip) ? `Dates: ${formatTripDateRange(trip)}` : '',
     (trip.tags && trip.tags.length) ? `Tags: ${trip.tags.join(' ')}` : '',
-    `Progress: ${p.done}/${p.total} packed`,
+    `Progress: ${p.done}/${p.total} ${trip.returnMode ? 'collected' : 'packed'}`,
+    trip.returnMode ? '(Return mode — trip home checklist)' : '',
     mode === 'remaining' ? '(Remaining items only)' : '',
     mode === 'bag' ? '(Grouped by bag / location)' : '',
     ''
@@ -2012,7 +2137,7 @@ function buildTripText(trip, mode) {
   if (mode === 'bag') {
     const groups = {};
     let items = trip.items;
-    if (mode === 'remaining') items = items.filter(i => !isItemPacked(i));
+    if (mode === 'remaining') items = items.filter(i => !isItemPacked(i, trip));
     items.forEach(it => {
       ensureItem(it);
       const key = it.bag || '_none';
@@ -2025,7 +2150,7 @@ function buildTripText(trip, mode) {
       const title = key === '_none' ? 'UNASSIGNED' : bagLabel(key).toUpperCase();
       lines.push(`▸ ${title}`);
       groups[key].forEach(it => {
-        const row = formatItemExportLine(it, 'full');
+        const row = formatItemExportLine(it, 'full', trip);
         if (row) lines.push(row);
       });
       lines.push('');
@@ -2033,7 +2158,7 @@ function buildTripText(trip, mode) {
     Object.keys(groups).filter(k => !order.includes(k)).forEach(key => {
       lines.push(`▸ ${key.toUpperCase()}`);
       groups[key].forEach(it => {
-        const row = formatItemExportLine(it, 'full');
+        const row = formatItemExportLine(it, 'full', trip);
         if (row) lines.push(row);
       });
       lines.push('');
@@ -2041,14 +2166,14 @@ function buildTripText(trip, mode) {
   } else {
     const cats = getTripCategories(trip);
     let items = trip.items;
-    if (mode === 'remaining') items = items.filter(i => !isItemPacked(i));
+    if (mode === 'remaining') items = items.filter(i => !isItemPacked(i, trip));
     const knownIds = new Set(cats.map(c => c.id));
     cats.forEach(cat => {
       const catItems = items.filter(i => i.categoryId === cat.id);
       if (!catItems.length) return;
       lines.push(`▸ ${cat.name.toUpperCase()}`);
       catItems.forEach(it => {
-        const row = formatItemExportLine(it, mode);
+        const row = formatItemExportLine(it, mode, trip);
         if (row) lines.push(row);
       });
       lines.push('');
@@ -2057,7 +2182,7 @@ function buildTripText(trip, mode) {
     if (otherItems.length) {
       lines.push('▸ OTHER');
       otherItems.forEach(it => {
-        const row = formatItemExportLine(it, mode);
+        const row = formatItemExportLine(it, mode, trip);
         if (row) lines.push(row);
       });
       lines.push('');
@@ -2555,7 +2680,7 @@ async function exportTripPDF(mode) {
   ensureTripShape(trip);
   const p = tripProgress(trip);
   let items = trip.items;
-  if (mode === 'remaining') items = items.filter(i => !isItemPacked(i));
+  if (mode === 'remaining') items = items.filter(i => !isItemPacked(i, trip));
 
   let sections;
   if (mode === 'bag') {
@@ -2568,19 +2693,19 @@ async function exportTripPDF(mode) {
     });
     sections = Object.keys(groups).sort().map(key => ({
       title: key === '_none' ? 'Unassigned' : bagLabel(key),
-      items: groups[key].map(it => (isItemPacked(it) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it) + (it.note ? ' — ' + it.note : ''))
+      items: groups[key].map(it => (isItemPacked(it, trip) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it) + (it.note ? ' — ' + it.note : ''))
     })).filter(sec => sec.items.length);
   } else {
     sections = getTripCategories(trip).map(cat => ({
       title: cat.name,
-      items: items.filter(i => i.categoryId === cat.id).map(it => (isItemPacked(it) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it) + (it.note ? ' — ' + it.note : ''))
+      items: items.filter(i => i.categoryId === cat.id).map(it => (isItemPacked(it, trip) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it) + (it.note ? ' — ' + it.note : ''))
     })).filter(sec => sec.items.length);
     const knownIds = new Set(getTripCategories(trip).map(c => c.id));
     const orphanItems = items.filter(i => !knownIds.has(i.categoryId));
     if (orphanItems.length) {
       sections.push({
         title: 'Other',
-        items: orphanItems.map(it => (isItemPacked(it) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it))
+        items: orphanItems.map(it => (isItemPacked(it, trip) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it))
       });
     }
   }
