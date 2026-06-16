@@ -1286,7 +1286,7 @@ body.light-theme .deco-table tr[data-phase="switch"] td { color: #007A33 !import
 </div>
 <!-- Water -->
 <div id="waterRow" style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;">
-<span class="algo-label-text u1">Water:</span><span class="tip-icon" onclick="showTip('Water Type','Affects buoyancy pressure calculation (BAR_PER_METRE) used throughout all deco algorithms.\n\n• Salt (default) — 1025 kg/m³, ~0.1002 bar/m. Standard open ocean. Most conservative.\n• EN13319 — 1020 kg/m³, ~0.0997 bar/m. European dive computer standard. Slightly less pressure per metre.\n• Fresh — 1000 kg/m³, ~0.0981 bar/m. Lakes, rivers, quarries. Least dense — stops are shallower in absolute pressure terms.\n• Custom — enter density in kg/m³ manually for brackish water or specific dive sites.\n\nIn practice the difference between salt and fresh adds ~1-2% to stop depths and run times — significant at technical depths.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span>
+<span class="algo-label-text u1">Water:</span><span class="tip-icon" onclick="showTip('Water Type','Affects buoyancy pressure calculation (BAR_PER_METRE) used throughout all deco algorithms.\n\n• Salt (default) — 10.000 m/bar (0.10000 bar/m). MultiDeco/DiveKit/ApexDeco standard.\n• EN13319 — 10.080 m/bar (0.09921 bar/m). European dive-computer standard.\n• Fresh — 10.330 m/bar (0.09681 bar/m). Lakes, rivers, quarries. Least dense — stops are shallower in absolute pressure terms.\n• Custom — enter density in kg/m³ manually for brackish water or specific dive sites.\n\nIn practice the difference between salt and fresh adds ~1-2% to stop depths and run times — significant at technical depths.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span>
 <select class="u7" id="waterDensitySelect" onchange="setWaterDensity(this.value)">
 <option selected="" value="salt">Salt</option>
 <option value="en13319">EN13319</option>
@@ -1342,7 +1342,7 @@ body.light-theme .deco-table tr[data-phase="switch"] td { color: #007A33 !import
 </div>
 <!-- Water -->
 <div id="waterRowRec" style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;">
-<span class="algo-label-text u1">Water:</span><span class="tip-icon" onclick="showTip('Water Type','Affects buoyancy pressure calculation (BAR_PER_METRE) used throughout all deco algorithms.\n\n• Salt (default) — 1025 kg/m³, ~0.1002 bar/m. Standard open ocean. Most conservative.\n• EN13319 — 1020 kg/m³, ~0.0997 bar/m. European dive computer standard. Slightly less pressure per metre.\n• Fresh — 1000 kg/m³, ~0.0981 bar/m. Lakes, rivers, quarries. Least dense — stops are shallower in absolute pressure terms.\n• Custom — enter density in kg/m³ manually for brackish water or specific dive sites.\n\nIn practice the difference between salt and fresh adds ~1-2% to stop depths and run times — significant at technical depths.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span>
+<span class="algo-label-text u1">Water:</span><span class="tip-icon" onclick="showTip('Water Type','Affects buoyancy pressure calculation (BAR_PER_METRE) used throughout all deco algorithms.\n\n• Salt (default) — 10.000 m/bar (0.10000 bar/m). MultiDeco/DiveKit/ApexDeco standard.\n• EN13319 — 10.080 m/bar (0.09921 bar/m). European dive-computer standard.\n• Fresh — 10.330 m/bar (0.09681 bar/m). Lakes, rivers, quarries. Least dense — stops are shallower in absolute pressure terms.\n• Custom — enter density in kg/m³ manually for brackish water or specific dive sites.\n\nIn practice the difference between salt and fresh adds ~1-2% to stop depths and run times — significant at technical depths.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span>
 <select class="u7" id="waterDensitySelectRec" onchange="setWaterDensity(this.value)">
 <option selected="" value="salt">Salt</option>
 <option value="en13319">EN13319</option>
@@ -1838,8 +1838,8 @@ body.light-theme .deco-table tr[data-phase="switch"] td { color: #007A33 !import
 <div class="field">
 <label>He HT Comp 1 <span class="tip-icon" onclick="showTip('He Half-Time','Helium half-time for the fastest (compartment 1) tissue.\n\nBaker 1.88 min — canonical VPM-B value (Baker FORTRAN 1998, ApexDeco, MultiDeco).\nBühlmann 1.51 min — Bühlmann 2003 textbook value (Subsurface, Shearwater, DivePro).\n\nRatio to N2 comp 1 (4.0 min):\n Baker: 4.0 / 1.88 = 2.13\n Bühlmann: 4.0 / 1.51 = 2.65 (≈ √(28/4), physical diffusion ratio)\n\nPractical difference: negligible for dives &gt;15 min. Only measurable on very short deep bounce dives where fast-compartment He loading is significant.\n\nDefault: Baker 1.88 (matches VPM-B and ApexDeco).')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="heHalfTimeMode" onchange="updateHeHalfTime()">
-<option value="baker">1.88 min (Baker / VPM-B)</option>
-<option selected="" value="buhl2003">1.51 min (Bühlmann 2003)</option>
+<option selected="" value="baker">1.88 min (Baker / VPM-B)</option>
+<option value="buhl2003">1.51 min (Bühlmann 2003)</option>
 </select>
 </div>
 <div class="field">
@@ -3010,7 +3010,7 @@ body.light-theme .deco-table tr[data-phase="switch"] td { color: #007A33 !import
 <div class="info-box"><strong>Belgian military study (PMC10735712):</strong> Bühlmann ZHL-16C + GF replicated in Python and optimised against USN and DCIEM tables (both considered acceptably safe). Result: <strong>GF Low = 100, GF High ≥ 75</strong> best matches validated tables. Conclusion: lower GF Low (deep stops) is not necessarily safer — shallower-biased profiles with GF Lo=100 matched real-world validated tables most closely.</div>
 <div class="info-box"><strong>PrT — Pressure×Root-Time severity index:</strong><br/>
 <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">PrT = P_rel (bar) × √T (min)</code><br/>
-        where P_rel = gauge pressure at depth (bar) = depth / 10.078, T = bottom time (min).<br/>
+        where P_rel = gauge pressure at depth (bar) = depth × BAR_PER_METRE (10.000 bar/m salt, 10.330 fresh, 10.080 EN13319), T = bottom time (min).<br/>
          • PrT &lt; 15: recreational — GF High 80–90 is appropriate<br/>
          • PrT 15–25: moderate deco — GF High 75–80<br/>
          • PrT 25–40: serious deco — GF High 60–75 (VVAL-79/Van Liew)<br/>
@@ -3097,7 +3097,7 @@ body.light-theme .deco-table tr[data-phase="switch"] td { color: #007A33 !import
 <svg fill="none" height="16" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828L8.293 21H12.5c.524 0 .968-.381 1.05-.9l.437-2.786h1.8c3.476 0 5.893-1.408 6.656-5.49.343-1.818.044-3.145-.22-4.907z" fill="#009cde"></path><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z" fill="#003087" opacity="0.8"></path></svg>
           Support Development · Donate via PayPal
         </a></div>
-<p id="appVersionLabel" style="color: var(--muted); font-size:10px; margin-top:12px; letter-spacing:1px; opacity:0.6;">Version 2.10.1</p>
+<p id="appVersionLabel" style="color: var(--muted); font-size:10px; margin-top:12px; letter-spacing:1px; opacity:0.6;">Version 2.10.6</p>
 </div>
 </div>
 </div>
@@ -3179,7 +3179,7 @@ body.light-theme .deco-table tr[data-phase="switch"] td { color: #007A33 !import
   }
 })();
 
-const APP_VERSION = '2.10.1';
+const APP_VERSION = '2.10.6';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
@@ -3206,7 +3206,7 @@ const ZHL16C_HE_HT_BUHL2003 = [
   1.51, 3.02, 4.72, 6.99, 10.21, 14.48, 20.53, 29.11,
   41.20, 55.19, 70.69, 90.34, 115.29, 147.42, 188.24, 240.03,
 ];
-let ZHL16C_HE_HT = ZHL16C_HE_HT_BUHL2003.slice(); // default: Bühlmann 2003 (Shearwater/Subsurface)
+let ZHL16C_HE_HT = ZHL16C_HE_HT_BAKER.slice(); // default: Baker 1998 (VPM-B canonical, ApexDeco, MultiDeco)
 // He a/b values for weighted ceiling (Bühlmann ZHL-16C He)
 const ZHL16C_HE_AB = [
   [1.7424, 0.4245],[1.3830, 0.5747],[1.1919, 0.6527],[1.0458, 0.7223],
@@ -3270,18 +3270,18 @@ window.WATER_VAPOR = WATER_VAPOR; // expose for test harnesses
 
 // Water density pressure factors (bar per metre)
 const WATER_DENSITY = {
-  fresh:    0.09681,  // ApexDeco-convention (strict SI: 1000 kg/m³ → 0.09807)
-  en13319:  0.09964,  // 1020 kg/m³ — EN13319
-  salt:     0.10020,  // ApexDeco-convention (strict SI: 1025 kg/m³ → 0.10052, 1027 → 0.10071)
+  fresh:    0.09681,  // 10.330 m/bar — matches VPM SLP_FW_M
+  en13319:  0.09921,  // 10.080 m/bar — EN13319 standard (DiveKit/MultiDeco)
+  salt:     0.10000,  // 10.000 m/bar — industry standard (MultiDeco/DiveKit/ApexDeco)
 };
-// NOTE: WATER_DENSITY values are ApexDeco-convention empirical constants, NOT strict SI physics.
+// NOTE: WATER_DENSITY values are canonical m/bar-derived constants matching MultiDeco/DiveKit:
+//   salt:    10.000 m/bar = 0.10000 bar/m (MultiDeco/DiveKit/ApexDeco standard)
+//   fresh:   10.330 m/bar = 0.09681 bar/m
+//   EN13319: 10.080 m/bar = 0.09921 bar/m (EN13319 standard — DiveKit compatible)
 // Strict SI:  1000 kg/m³ × 9.80665 / 100000 = 0.09807 bar/m (fresh)
 //             1025 kg/m³ × 9.80665 / 100000 = 0.10052 bar/m (standard ocean)
-//             1027 kg/m³ × 9.80665 / 100000 = 0.10071 bar/m (ApexDeco ref density)
-// App uses rounded/matched constants to align output with ApexDeco and dive computers.
-// BAR_PER_METRE init = 1/10.078 = 0.09922 (ApexDeco default before setWater() is called).
-// Do NOT compare BAR_PER_METRE to strict SI range before setWater('salt') is called.
-let BAR_PER_METRE = 1/10.078; // ApexDeco init default (= 0.09922); updated by setWater()
+// Init = salt default (0.10000); overwritten by setWaterDensity() on startup.
+let BAR_PER_METRE = 0.10000; // salt default (10.000 m/bar); updated by setWaterDensity()
 window.BAR_PER_METRE = BAR_PER_METRE;
 
 // ── Narcosis settings ──
@@ -3659,8 +3659,8 @@ function updateWaterVapor() {
 }
 
 function updateHeHalfTime() {
-  const mode = document.getElementById('heHalfTimeMode')?.value || 'buhl2003';
-  const src = mode === 'buhl2003' ? ZHL16C_HE_HT_BUHL2003 : ZHL16C_HE_HT_BAKER;
+  const mode = document.getElementById('heHalfTimeMode')?.value || 'baker';
+  const src = mode === 'baker' ? ZHL16C_HE_HT_BAKER : ZHL16C_HE_HT_BUHL2003;
   // Update global array in-place (preserves all references)
   for (let i = 0; i < 16; i++) ZHL16C_HE_HT[i] = src[i];
   // Patch VPMEngine's internal ZHL16C_He[0].ht to match
@@ -5375,7 +5375,7 @@ function _doResetToDefaults(userDefaults) {
     minDeco9m:        '1',
     minDeco6m:        '3',
     // He half-time
-    heHalfTimeMode:   'buhl2003',
+    heHalfTimeMode:   'baker',
   };
 
   // Overlay user's personal advanced defaults on top of factory defaults (if any)
@@ -5527,8 +5527,9 @@ function runVPMSchedule(depthM, bt, descentRate, ascentRate, decoAscentRate, sur
   }
 
   // Build settings object for VPMEngine
-  // IMPORTANT: waterType 0=salt, 1=fresh (VPM engine uses its own SLP constants)
-  const waterTypeVal = (document.getElementById('waterDensitySelect')?.value === 'fresh') ? 1 : 0;
+  // IMPORTANT: waterType 0=salt, 1=fresh, 2=EN13319 (VPM engine uses its own SLP constants)
+  const _wdSel = document.getElementById('waterDensitySelect')?.value;
+  const waterTypeVal = _wdSel === 'fresh' ? 1 : _wdSel === 'en13319' ? 2 : 0;
 
   const settings = {
     metric:            dU,
@@ -5565,6 +5566,14 @@ function runVPMSchedule(depthM, bt, descentRate, ascentRate, decoAscentRate, sur
     settings._preTissues      = _lastVPMResult.finalTissues;
     settings._surfaceInterval = siMin;
     settings._prevBubbleState = _lastVPMResult.finalBubbleState;
+    // Carry CNS (decays on 90-min half-life) and OTU (daily accumulator, no decay)
+    // CNS half-life: 90 min (Baker 1998 / NOAA standard)
+    if (_lastVPMResult.finalCNS != null) {
+      settings._preCNS = _lastVPMResult.finalCNS * Math.pow(0.5, siMin / 90);
+    }
+    if (_lastVPMResult.finalOTU != null) {
+      settings._preOTU = _lastVPMResult.finalOTU; // OTU is a daily dose — no decay within a day
+    }
   }
   // ───────────────────────────────────────────────────────────────────────────
 
@@ -5596,7 +5605,9 @@ function runVPMSchedule(depthM, bt, descentRate, ascentRate, decoAscentRate, sur
   if (result.finalTissues) {
     _lastVPMResult = {
       finalTissues:    result.finalTissues,
-      finalBubbleState: result.finalBubbleState
+      finalBubbleState: result.finalBubbleState,
+      finalCNS:        result.totalCNS,   // carry CNS for repetitive dive (decays on 90-min half-life)
+      finalOTU:        result.totalOTU,   // carry OTU for repetitive dive (daily accumulator)
     };
     // Show/enable the repetitive dive UI now that we have a result
     const vpmRepRow = document.getElementById('vpmRepRow');
@@ -5611,6 +5622,7 @@ function runVPMSchedule(depthM, bt, descentRate, ascentRate, decoAscentRate, sur
 function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct, decoGases, model, _vpmBotFracs) {
   const dU = units === 'metric';
   const du = dU ? 'm' : 'ft';
+  const surfP = altSurfaceP || 1.01325; // altitude-correct surface pressure for ppO₂ display
   const plan = result.plan || [];
   const tbody = document.getElementById('decoTableBody');
   if (!tbody) return;
@@ -5641,13 +5653,13 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
     const hepct = parseInt(gasParts[1]) || 0;
     const gc = gasColor(o2pct);
     const gasDisp = getGasLabel(o2pct/100, hepct/100);
-    const pAmb = settings.metric ? (1.013 + seg.depth / 10.078) : (1.013 + seg.depth * 0.0305);
-    const ppO2 = (o2pct / 100 * (seg.startDepth !== undefined ? 1.013 + seg.startDepth / 10.078 : pAmb)).toFixed(2);
+    const pAmb = surfP + seg.depth * BAR_PER_METRE; // VPM depths always in metres internally
+    const ppO2 = (o2pct / 100 * (seg.startDepth !== undefined ? surfP + seg.startDepth * BAR_PER_METRE : pAmb)).toFixed(2);
 
     // Gas switch row
     if (segGas !== prevGas && seg.type !== 'descent') {
       const switchDepth = seg.type === 'stop' ? seg.depth : (seg.startDepth || seg.depth || 0);
-      const switchPAmb = 1.013 + switchDepth / 10.078;
+      const switchPAmb = surfP + switchDepth * BAR_PER_METRE;
       const switchPpO2 = (o2pct / 100 * switchPAmb).toFixed(2);
       html += `<tr data-phase="switch">
         <td style="font-size:16px;text-align:center;padding:10px 6px;">⇄</td>
@@ -5667,13 +5679,13 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
         <td data-label="Run" style="color:var(--accent);">${rtDisp}</td>
         <td data-label="Mix" style="color:${gc};">${gasDisp}</td>
         <td data-label="EAD" style="color:var(--muted);">—</td>
-        <td data-label="PPO2" style="color:var(--muted);">${(o2pct / 100 * (1.013 + seg.endDepth / 10.078)).toFixed(2)}</td>
+        <td data-label="PPO2" style="color:var(--muted);">${(o2pct / 100 * (surfP + seg.endDepth * BAR_PER_METRE)).toFixed(2)}</td>
         <td data-label="CNS%" style="color:var(--muted);">—</td>
       </tr>`;
       prevGas = segGas;
     } else if (seg.type === 'bottom') {
       const rtDisp = fmtRT(seg.runtime);
-      const pAmbB = 1.013 + seg.depth / 10.078;
+      const pAmbB = surfP + seg.depth * BAR_PER_METRE;
       const ppO2b = (o2pct / 100 * pAmbB).toFixed(2);
       html += `<tr class="btm-row" data-phase="bottom">
         <td><span style="color:var(--accent);font-size:13px;">🔵</span></td>
@@ -5687,7 +5699,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
       </tr>`;
     } else if (seg.type === 'ascent') {
       const rtDisp = fmtRT(seg.runtime);
-      const pAmbFrom = 1.013 + seg.startDepth / 10.078;
+      const pAmbFrom = surfP + seg.startDepth * BAR_PER_METRE;
       const ppO2a = (o2pct / 100 * pAmbFrom).toFixed(2);
       const fromD = dU ? seg.startDepth : Math.round(seg.startDepth * 3.28084);
       const toD   = dU ? seg.endDepth   : Math.round(seg.endDepth   * 3.28084);
@@ -5703,7 +5715,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
       </tr>`;
     } else if (seg.type === 'stop') {
       const rtDisp = fmtRT(seg.runtime);
-      const pAmbS = 1.013 + seg.depth / 10.078;
+      const pAmbS = surfP + seg.depth * BAR_PER_METRE;
       const ppO2s = (o2pct / 100 * pAmbS).toFixed(2);
       const ppO2Color = parseFloat(ppO2s) > 1.6 ? 'color:var(--red);font-weight:700;' : 'color:var(--muted);';
       // Cumulative CNS row highlight (same logic as Bühlmann, uses _cumCNS stored by VPM engine)
@@ -5739,7 +5751,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
   const cnsDisp = result.totalCNS != null ? result.totalCNS.toFixed(1) : '—';
   const otuDisp = result.totalOTU ?? '—';
   // PrT
-  const prtValVPM = (depthM / 10.078) * Math.sqrt(bt);
+  const prtValVPM = (depthM * BAR_PER_METRE) * Math.sqrt(bt);
   const prtDispVPM = prtValVPM.toFixed(1);
   const prtColorVPM = prtValVPM < 15 ? 'var(--green)' : prtValVPM < 25 ? 'var(--yellow)' : prtValVPM < 40 ? 'var(--orange)' : 'var(--red)';
   const cnsFootColor = result.totalCNS != null ? (result.totalCNS >= 100 ? 'var(--red)' : result.totalCNS >= 80 ? 'var(--orange)' : result.totalCNS >= 50 ? 'var(--yellow)' : 'var(--green)') : 'var(--muted)';
@@ -5778,7 +5790,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
     if (!durMin || !mixRaw || mixRaw === '-') return;
     const gasKey = mixRaw; // labels now always in O2/He format (e.g. '50/00', '21/35', '100/00')
     const sac = (ph === 'bottom') ? sacBotVPM : sacDecoVPM;
-    const absP = 1.013 + depthM2 * BAR_PER_METRE;
+    const absP = surfP + depthM2 * BAR_PER_METRE;
     gasConsVPM[gasKey] = (gasConsVPM[gasKey] || 0) + sac * absP * durMin;
   });
   const gasElVPM = document.getElementById('gasConsumptionSummary');
@@ -5997,7 +6009,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
     rt, deco: Math.round(deco),
     cns: result.totalCNS != null ? result.totalCNS.toFixed(1) + '%' : '-',
     otu: result.totalOTU != null ? String(result.totalOTU) : '-',
-    prt: ((depthM / 10.078) * Math.sqrt(bt)).toFixed(1),
+    prt: ((depthM * BAR_PER_METRE) * Math.sqrt(bt)).toFixed(1),
   };
 
   // Show results card
@@ -6034,7 +6046,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
     const bottomGasTagVPM = `<div style="display:inline-flex;align-items:center;gap:6px;background:#ffffff;border:2px solid #4169E1;border-radius:16px;padding:3px 10px;font-size:11px;color:#111111;font-weight:700;"><span style="color:#4169E1;font-size:10px;font-weight:700;">Bottom:</span> <strong>${gasLabel} — ${bottomO2pct}% O₂ @ surface→${rawDdisp}${du}</strong></div>`;
     const decoGasTagsVPM = decoGases.map((dg, i) => {
       const lbl = dg.o2 >= 99 ? '100%' : (dg.o2 === 21 && !dg.he) ? 'Air' : `${dg.o2}/${String(dg.he || 0).padStart(2,'0')}`;
-      const switchD = dg.o2 >= 99 ? 6 : Math.floor(((settings.ppO2Deco || 1.6) / (dg.o2/100) - 1.013) / (dU ? BAR_PER_METRE : BAR_PER_METRE * 0.3048) / (dU ? 1 : 3.28084));
+      const switchD = dg.o2 >= 99 ? (dU ? 6 : 20) : Math.floor(((settings.ppO2Deco || 1.6) / (dg.o2/100) - surfP) / BAR_PER_METRE * (dU ? 1 : 3.28084));
       const switchDdisp = dU ? Math.max(3, Math.floor(switchD/3)*3) : Math.max(10, Math.floor(switchD/10)*10);
       return `<div style="display:inline-flex;align-items:center;gap:6px;background:#ffffff;border:2px solid #4169E1;border-radius:16px;padding:3px 10px;font-size:11px;color:#111111;font-weight:600;"><span style="color:#4169E1;font-size:10px;font-weight:700;">Deco:</span> <strong>${lbl} — ${dg.o2}% O₂ @ ${switchDdisp}${du}</strong></div>`;
     }).join(' ');
@@ -6138,14 +6150,18 @@ const VPMEngine = (() => {
     function twoGammaOverR(gamma, r) {
         return (2.0 * gamma / r) / 1.0e5; 
     }
-    const SLP_SW_M = 10.078;
-    const SLP_FW_M = 10.337;
-    const SLP_SW_F = 33.066;
-    const SLP_FW_F = 33.914;
+    const SLP_SW_M = 10.000;  // salt, metric — MultiDeco/DiveKit/ApexDeco standard
+    const SLP_FW_M = 10.330;  // fresh, metric — matches ZHL WATER_DENSITY.fresh (0.09681 bar/m)
+    const SLP_EN_M = 10.080;  // EN13319, metric — matches DiveKit EN13319
+    const SLP_SW_F = 32.808;  // salt, imperial — 10.000 × 3.28084
+    const SLP_FW_F = 33.891;  // fresh, imperial — 10.330 × 3.28084
+    const SLP_EN_F = 33.071;  // EN13319, imperial — 10.080 × 3.28084
     function getSLP(settings) {
         if (settings.metric) {
+            if (settings.waterType === 2) return SLP_EN_M;
             return settings.waterType === 0 ? SLP_SW_M : SLP_FW_M;
         }
+        if (settings.waterType === 2) return SLP_EN_F;
         return settings.waterType === 0 ? SLP_SW_F : SLP_FW_F;
     }
     function getSurfacePressure(settings) {
@@ -6391,7 +6407,7 @@ const VPMEngine = (() => {
         const time = Math.abs(endDepth - startDepth) / rate;
         if (time <= 0) return 0;
         const ppH2O = WATER_VAPOR_PRESSURE;
-        const slp = settings.metric ? SLP_SW_M : SLP_SW_F;
+        const slp = getSLP(settings);
         const surfP = getSurfacePressure(settings);
         const maxP = Math.max(getAmbientPressure(startDepth, settings), getAmbientPressure(endDepth, settings));
         if (maxP > state.maxAmbientPressure) {
@@ -6527,7 +6543,7 @@ const VPMEngine = (() => {
         }
     }
     function calcStartOfDecoZone(state, startingDepth, ascentRate, o2Frac, heFrac, settings, setpoint) {
-        const slp = settings.metric ? SLP_SW_M : SLP_SW_F;
+        const slp = getSLP(settings);
         const surfP = getSurfacePressure(settings);
         const startAmb = getAmbientPressure(startingDepth, settings);
         const fractions = getInertFractions(o2Frac, heFrac, startAmb, setpoint);
@@ -6565,7 +6581,7 @@ const VPMEngine = (() => {
         return depthStart;
     }
     function projectedAscent(state, startingDepth, ascentRate, stopDepth, stepSize, o2Frac, heFrac, settings, setpoint) {
-        const slp = settings.metric ? SLP_SW_M : SLP_SW_F;
+        const slp = getSLP(settings);
         const surfP = getSurfacePressure(settings);
         const startAmb = getAmbientPressure(startingDepth, settings);
         const fractions = getInertFractions(o2Frac, heFrac, startAmb, setpoint);
@@ -6650,7 +6666,7 @@ const VPMEngine = (() => {
     }
     function boyleLawCompensation(state, firstStopDepth, decoStopDepth, stepSize, settings) {
         const surfP = getSurfacePressure(settings);
-        const unitsFactor = settings.metric ? SLP_SW_M : SLP_SW_F;
+        const unitsFactor = getSLP(settings);
         const firstStop = Math.max(0, firstStopDepth || state.firstStopDepth || 0);
         const currentStop = Math.max(0, decoStopDepth || firstStop);
         const nextStop = Math.max(0, currentStop - (stepSize || 0));
@@ -6699,7 +6715,7 @@ const VPMEngine = (() => {
     }
     function getVPMCeiling(state, settings) {
         const surfP = getSurfacePressure(settings);
-        const slp = settings.metric ? SLP_SW_M : SLP_SW_F;
+        const slp = getSLP(settings);
         let maxCeilingP = 0;
         for (let i = 0; i < NC; i++) {
             const pN2 = state.tissues[i].pN2;
@@ -6761,9 +6777,9 @@ const VPMEngine = (() => {
     function getGasPpO2Limit(gas, settings) {
         const o2pct = gas.o2 * 100;
         if (settings.ppO2Low && settings.ppO2Mid && settings.ppO2High) {
-            if (o2pct <= 28) return settings.ppO2Low;
-            if (o2pct <= 45) return settings.ppO2Mid;
-            if (o2pct < 100) return settings.ppO2High;
+            if (o2pct < 28)  return settings.ppO2Low;   // <28%: lean → 1.4
+            if (o2pct < 45)  return settings.ppO2Mid;   // 28–44%: mid → 1.5
+            if (o2pct < 100) return settings.ppO2High;  // ≥45%: rich → 1.6
         }
         return settings.ppO2Deco || 1.6;
     }
@@ -6900,8 +6916,8 @@ const VPMEngine = (() => {
         };
         let runtime = 0;
         let currentDepth = 0;
-        let totalOTU = 0;
-        let totalCNS = 0;
+        let totalOTU = settings._preOTU || 0;  // carry OTU from previous dive if repetitive
+        let totalCNS = settings._preCNS || 0;  // carry CNS (decayed) from previous dive if repetitive
         function addExposureToContext(ctx, fromDepth, toDepth, time) {
             if (time <= 0) return;
             const steps = Math.max(1, Math.ceil(Math.abs(toDepth - fromDepth)));
@@ -7897,7 +7913,7 @@ function runDecoSchedule() {
   const mdCompatMode  = (document.getElementById('decoTransitMode')?.value || 'schreiner') === 'multideco';
   updateWaterVapor();
   const ppo2High = ppo2Deco;
-  const ppo2Mid  = ppo2Bottom;
+  const ppo2Mid  = 1.5;         // mid-band: 28–44% O2 → 1.5 bar (not ppo2Bottom)
   const ppo2Low  = ppo2Bottom;
   // VPM-B: last stop must be 6m when using EAN50+O2 as deco gases
   // ApexDeco uses lastStop=6 for VPM — this determines where critical volume
@@ -8721,7 +8737,7 @@ function runDecoSchedule() {
   const otuFootColor = totalOTUval >= 300 ? 'var(--red)' : totalOTUval >= 200 ? 'var(--orange)' : totalOTUval >= 100 ? 'var(--yellow)' : 'var(--green)';
   // PrT = P_rel (bar) × √T(min) — Fraedrich/Balestra severity index
   // P_rel = gauge pressure at deepest depth, T = bottom time
-  const prtVal  = (depthM / 10.078) * Math.sqrt(bt);
+  const prtVal  = (depthM * BAR_PER_METRE) * Math.sqrt(bt);
   const prtDisp = prtVal.toFixed(1);
   // GF High guidance from evidence (Fraedrich 2019):
   // PrT <15 → GF Hi ≤80 ok; 15–25 → ≤75; 25–40 → ≤70; >40 → extreme caution
@@ -11179,7 +11195,7 @@ function renderTissueLoadChart() {
       const pTotal = pN2 + pHe;
 
       // Compute GF-adjusted M-value at this stop depth
-      const pAmb = altSurfaceP + s.depth / 10.078;
+      const pAmb = altSurfaceP + s.depth * BAR_PER_METRE;
       let a, b;
       if (pTotal > 0 && pHe > 0) {
         // Trimix: weighted a/b
@@ -12069,7 +12085,7 @@ function buildExportText(mode) {
 
     // PrT fallback if not in totals row
     if (prtExpVal === '-') {
-      const prtN = (parseFloat(depth) / 10.078) * Math.sqrt(parseFloat(bt));
+      const prtN = (parseFloat(depth) * BAR_PER_METRE) * Math.sqrt(parseFloat(bt));
       if (!isNaN(prtN)) prtExpVal = prtN.toFixed(1);
     }
 
@@ -12111,7 +12127,7 @@ function buildExportText(mode) {
       : _expBotLabel;
 
     // ── He half-time mode (VPM only) ──
-    const _heHtMode = document.getElementById('heHalfTimeMode')?.value || 'buhlmann2003';
+    const _heHtMode = document.getElementById('heHalfTimeMode')?.value || 'baker';
     const _heHtLabel = _heHtMode === 'baker' ? 'Baker 1.88 min' : 'Buhlmann 2003 1.51 min';
 
     // ── VPM altitude radii factor ──
@@ -12954,7 +12970,7 @@ function buildMessengerText(mode) {
       const dtV  = document.getElementById('decoDecoTimeDisplay')?.textContent?.trim().replace(/\s*min\s*/,'') || '-';
       const cnsV = document.getElementById('decoCNSDisplay')?.textContent?.trim() || '-';
       const otuV = document.getElementById('decoOTUDisplay')?.textContent?.trim() || '-';
-      const prtN = (parseFloat(document.getElementById('decoDepth')?.value||'0') / 10.078) * Math.sqrt(parseFloat(document.getElementById('decoBT')?.value||'0'));
+      const prtN = (parseFloat(document.getElementById('decoDepth')?.value||'0') * BAR_PER_METRE) * Math.sqrt(parseFloat(document.getElementById('decoBT')?.value||'0'));
       result.push('-'.repeat(28));
       result.push(`Run Time:${rtV}'00" Deco:${dtV}'00"`);
       result.push(`CNS:${cnsV} OTU:${otuV} PrT:${isNaN(prtN)?'-':prtN.toFixed(1)}`);
@@ -13253,7 +13269,7 @@ function calcContingency() {
   const _emDecoFmt = decoTimeFmt || `${decoTime}'00"`;
   const _emDepth   = parseFloat(document.getElementById('decoDepth')?.value || '0');
   const _emBT      = parseFloat(document.getElementById('decoBT')?.value || '0') + (contExtraBT || 0);
-  const _emPrT     = (_emDepth / 10.078 * Math.sqrt(_emBT)).toFixed(1);
+  const _emPrT     = (_emDepth * BAR_PER_METRE * Math.sqrt(_emBT)).toFixed(1);
   const _emOTU     = totalOTUc || '—';
   const cnsColor   = totalCNS && parseFloat(totalCNS) >= 100 ? 'var(--red)' : totalCNS && parseFloat(totalCNS) >= 80 ? 'var(--orange)' : 'var(--text)';
   const prtColorEm = parseFloat(_emPrT) < 15 ? 'var(--green)' : parseFloat(_emPrT) < 25 ? 'var(--yellow)' : parseFloat(_emPrT) < 40 ? 'var(--orange)' : 'var(--red)';
@@ -14543,7 +14559,7 @@ async function exportPDF(opts) {
   const _pdfAltLbl    = _pdfAltM === 0 ? 'Sea level' : `${_pdfAltM} m`;
   const _pdfAltSurfP  = 1.01325 * Math.exp(-_pdfAltM / 8434);
   const _pdfRadii     = isVPM && _pdfAltM > 0 ? Math.pow(1.01325 / _pdfAltSurfP, 1/3).toFixed(3) : null;
-  const _pdfHeHt      = document.getElementById('heHalfTimeMode')?.value || 'buhlmann2003';
+  const _pdfHeHt      = document.getElementById('heHalfTimeMode')?.value || 'baker';
   const _pdfHeHtLbl   = _pdfHeHt === 'baker' ? 'Baker 1.88 min' : 'Buhlmann 2003 1.51 min';
   const _pdfRepEl     = document.getElementById('vpmRepMode');
   const _pdfRepActive = isVPM && _pdfRepEl && _pdfRepEl.checked && typeof _lastVPMResult !== 'undefined' && _lastVPMResult;
@@ -15156,7 +15172,7 @@ async function exportPDF(opts) {
               decoSteps.forEach((s,si)=>{
                 const t=s._tissues[i];
                 const pN2r=t.pN2||0; const pHer=t.pHe||0; const pTr=pN2r+pHer;
-                const pAmb=altSurfaceP+s.depth/10.078;
+                const pAmb=altSurfaceP+s.depth * BAR_PER_METRE;
                 let ar=a_n2r, br=b_n2r;
                 if(pTr>0&&pHer>0){
                   const wN2=pN2r/pTr, wHe=pHer/pTr;
