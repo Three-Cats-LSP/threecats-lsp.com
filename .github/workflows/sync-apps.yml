@@ -64,7 +64,7 @@ jobs:
         if: github.event.action == 'sync-get-in-water' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p get-in-water
-          for f in index.html download.html manifest.json sw.js capacitor-bridge.js icon-192.png icon-512.png; do
+          for f in index.html download.html manifest.json sw.js capacitor-bridge.js icon-192.png icon-512.png icon-192-light.png icon-512-light.png; do
             curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                  -H "Accept: application/vnd.github.v3.raw" \
                  "https://api.github.com/repos/Three-Cats-LSP/Get-In-Water/contents/${f}" \
