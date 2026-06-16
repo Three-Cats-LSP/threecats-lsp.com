@@ -1441,33 +1441,22 @@ function renderSavedTemplateEditor() {
     </div>`;
 }
 
-function renderDataTab() {
+function renderAboutTab() {
   return `
-    <div class="card">
-      <div class="card-title">Backup & restore</div>
-      <p style="font-size:13px;color:var(--tip);line-height:1.55;margin-bottom:12px">Export all trips and your master template as JSON. Restore on a new device by importing the file.</p>
-      <div class="action-row">
-        <button class="btn-primary" onclick="exportBackupJSON()">Export backup (JSON)</button>
-        <button class="btn-secondary" onclick="document.getElementById('import-json-input').click()">Import backup</button>
-        <input type="file" id="import-json-input" accept="application/json,.json" style="display:none" onchange="importBackupJSON(this)"/>
-      </div>
-    </div>`;
-}
-
-function renderAbout() {
-  return `
-    ${renderHeader('GET IN WATER', 'Settings & About', true)}
-    <div class="about-tabs">
-      <button class="about-tab-btn ${aboutTab === 'starters' ? 'active' : ''}" onclick="switchAboutTab('starters')">Templates</button>
-      <button class="about-tab-btn ${aboutTab === 'data' ? 'active' : ''}" onclick="switchAboutTab('data')">Data</button>
-      <button class="about-tab-btn ${aboutTab === 'about' ? 'active' : ''}" onclick="switchAboutTab('about')">About</button>
-    </div>
-    ${aboutTab === 'starters' ? renderStartersTab() : aboutTab === 'data' ? renderDataTab() : `
     <div class="card">
       <div class="card-title">Companion to LSP D-Planner</div>
       <p style="font-size:14px;line-height:1.6;color:var(--tip)">
         Get In Water helps you pack for dive trips. Edit your <strong>master gear list</strong> under Templates, start a trip checklist, and tick items off as you pack. Export TXT or PDF for printing.
       </p>
+    </div>
+    <div class="card">
+      <div class="card-title">Backup & restore</div>
+      <p style="font-size:13px;color:var(--tip);line-height:1.55;margin-bottom:12px">Export all trips and your master gear as JSON. Restore on a new device by importing the file.</p>
+      <div class="action-row">
+        <button class="btn-secondary" onclick="exportBackupJSON()">Export backup (JSON)</button>
+        <button class="btn-secondary" onclick="document.getElementById('import-json-input').click()">Import backup</button>
+        <input type="file" id="import-json-input" accept="application/json,.json" style="display:none" onchange="importBackupJSON(this)"/>
+      </div>
     </div>
     <a class="link-card" href="https://threecats-lsp.com" target="_blank" rel="noopener">🏠 Three Cats LSP · Diver's Toolkit</a>
     <a class="link-card" href="https://github.com/Three-Cats-LSP/Get-In-Water" target="_blank" rel="noopener">GitHub · Get In Water</a>
@@ -1475,7 +1464,17 @@ function renderAbout() {
     <a class="link-card" href="https://www.thingiverse.com/Roman_Markovtsev/designs" target="_blank" rel="noopener">My Designs · Thingiverse</a>
     <a class="link-card" href="https://www.instagram.com/threecats_lsp" target="_blank" rel="noopener">Follow @threecats_lsp on Instagram</a>
     <a class="link-card" href="https://paypal.me/ThreeCatsLSP" target="_blank" rel="noopener">💙 Support Development · PayPal</a>
-    <p style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:16px;opacity:0.7">v${APP_VERSION} · Three Cats LSP</p>`}`;
+    <p style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:16px;opacity:0.7">v${APP_VERSION} · Three Cats LSP</p>`;
+}
+
+function renderAbout() {
+  return `
+    ${renderHeader('GET IN WATER', 'Settings & About', true)}
+    <div class="about-tabs">
+      <button class="about-tab-btn ${aboutTab === 'starters' ? 'active' : ''}" onclick="switchAboutTab('starters')">Templates</button>
+      <button class="about-tab-btn ${aboutTab === 'about' ? 'active' : ''}" onclick="switchAboutTab('about')">About</button>
+    </div>
+    ${aboutTab === 'starters' ? renderStartersTab() : renderAboutTab()}`;
 }
 
 function renderItemRow(ctx, it) {
