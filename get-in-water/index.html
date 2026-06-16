@@ -528,6 +528,7 @@ let state = null;
 let screen = 'home';
 let activeTripId = null;
 let menuOpen = false;
+let exportMenuOpen = false;
 let aboutTab = 'starters';
 let homeSearch = '';
 let activeSavedTemplateId = null;
@@ -959,6 +960,7 @@ function navigate(s, tripId) {
   screen = s;
   if (tripId !== undefined) activeTripId = tripId;
   menuOpen = false;
+  exportMenuOpen = false;
   render();
   window.scrollTo(0, 0);
 }
@@ -1359,8 +1361,13 @@ function renderTemplateContent() {
   let html = `
     <p style="font-size:13px;color:var(--tip);line-height:1.55;margin-bottom:12px">Your <strong>master gear list</strong> — ${itemCount} item${itemCount !== 1 ? 's' : ''} in ${cats.length} card${cats.length !== 1 ? 's' : ''}. New trips start from this list.</p>
     <div class="export-row">
-      <button class="btn-export" onclick="exportTemplateTXT()" title="Download .txt">${icon('fileText', 16)}</button>
-      <button class="btn-export" onclick="exportTemplatePDF()" title="Export PDF">${iconPdfBtn()}</button>
+      <div class="menu-dropdown">
+        <button class="btn-export btn-icon-only" onclick="toggleExportMenu(event)" title="Export">${icon('fileText', 16)}</button>
+        <div class="menu-panel ${exportMenuOpen ? 'open' : ''}" id="master-export-menu">
+          <button onclick="doTemplateExport('txt')">Master gear (TXT)</button>
+          <button onclick="doTemplateExport('pdf')">Master gear (PDF)</button>
+        </div>
+      </div>
       <button class="btn-secondary btn-icon-only" onclick="addCategory()" title="Add card">${icon('plus', 18)}</button>
     </div>`;
   cats.forEach((cat) => {
@@ -1694,8 +1701,17 @@ function renderTrip() {
     ${sectionTabs}
     <div class="action-row">
       <button class="btn-secondary btn-icon-only" onclick="addTripCategory('${trip.id}')" title="Add card">${icon('plus', 18)}</button>
-      <button class="btn-export" onclick="exportTripTXT('full')" title="Download .txt">${icon('fileText', 16)}</button>
-      <button class="btn-export" onclick="exportTripPDF('full')" title="Export PDF">${iconPdfBtn()}</button>
+      <div class="menu-dropdown">
+        <button class="btn-export btn-icon-only" onclick="toggleExportMenu(event)" title="Export">${icon('fileText', 16)}</button>
+        <div class="menu-panel ${exportMenuOpen ? 'open' : ''}" id="trip-export-menu">
+          <button onclick="doTripExport('full','txt')">Full checklist (TXT)</button>
+          <button onclick="doTripExport('full','pdf')">Full checklist (PDF)</button>
+          <button onclick="doTripExport('remaining','txt')">Remaining items (TXT)</button>
+          <button onclick="doTripExport('remaining','pdf')">Remaining items (PDF)</button>
+          <button onclick="doTripExport('bag','txt')">By bag (TXT)</button>
+          <button onclick="doTripExport('bag','pdf')">By bag (PDF)</button>
+        </div>
+      </div>
       <div class="menu-dropdown">
         <button class="btn-secondary btn-icon-only" onclick="toggleMenu(event)" title="More">${icon('menu', 18)}</button>
         <div class="menu-panel ${menuOpen ? 'open' : ''}" id="trip-menu">
@@ -1703,9 +1719,6 @@ function renderTrip() {
           <button onclick="togglePinTrip('${trip.id}')">${pinned ? 'Unpin from widget' : 'Pin for home widget'}</button>
           <button onclick="promptBuddyCopy('${trip.id}')">Buddy copy</button>
           <button onclick="shareRemaining('${trip.id}')">Share remaining list</button>
-          <button onclick="exportTripTXT('remaining')">Export remaining (TXT)</button>
-          <button onclick="exportTripPDF('remaining')">Export remaining (PDF)</button>
-          <button onclick="exportTripTXT('bag')">Export by bag (TXT)</button>
           <button onclick="resetTrip('${trip.id}')">Reset all checks</button>
           <button onclick="toggleArchiveTrip('${trip.id}')">${trip.archived ? 'Restore from archive' : 'Archive trip'}</button>
           <button class="danger" onclick="deleteTrip('${trip.id}')">Delete trip</button>
@@ -1810,16 +1823,45 @@ function render() {
 function toggleHomeMenu(e) {
   e.stopPropagation();
   menuOpen = !menuOpen;
+  exportMenuOpen = false;
+  render();
+}
+
+function toggleExportMenu(e) {
+  e.stopPropagation();
+  exportMenuOpen = !exportMenuOpen;
+  menuOpen = false;
   render();
 }
 
 function toggleMenu(e) {
   e.stopPropagation();
   menuOpen = !menuOpen;
+  exportMenuOpen = false;
   render();
 }
 
-document.addEventListener('click', () => { if (menuOpen) { menuOpen = false; render(); } });
+function doTripExport(mode, fmt) {
+  exportMenuOpen = false;
+  if (fmt === 'pdf') exportTripPDF(mode);
+  else exportTripTXT(mode);
+  render();
+}
+
+function doTemplateExport(fmt) {
+  exportMenuOpen = false;
+  if (fmt === 'pdf') exportTemplatePDF();
+  else exportTemplateTXT();
+  render();
+}
+
+document.addEventListener('click', () => {
+  if (menuOpen || exportMenuOpen) {
+    menuOpen = false;
+    exportMenuOpen = false;
+    render();
+  }
+});
 
 // ── Template editing ──
 function addCategory() {
@@ -2691,10 +2733,16 @@ async function exportTripPDF(mode) {
       if (!groups[key]) groups[key] = [];
       groups[key].push(it);
     });
-    sections = Object.keys(groups).sort().map(key => ({
-      title: key === '_none' ? 'Unassigned' : bagLabel(key),
-      items: groups[key].map(it => (isItemPacked(it, trip) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it) + (it.note ? ' — ' + it.note : ''))
-    })).filter(sec => sec.items.length);
+    const bagOrder = ['carry-on', 'checked', 'camera', 'boat', '_none'];
+    const itemLine = it => (isItemPacked(it, trip) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it) + (it.note ? ' — ' + it.note : '');
+    sections = [];
+    bagOrder.forEach(key => {
+      if (!groups[key] || !groups[key].length) return;
+      sections.push({ title: key === '_none' ? 'Unassigned' : bagLabel(key), items: groups[key].map(itemLine) });
+    });
+    Object.keys(groups).filter(k => !bagOrder.includes(k)).sort().forEach(key => {
+      sections.push({ title: bagLabel(key) || key, items: groups[key].map(itemLine) });
+    });
   } else {
     sections = getTripCategories(trip).map(cat => ({
       title: cat.name,
