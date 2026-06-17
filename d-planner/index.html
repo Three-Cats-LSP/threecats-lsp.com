@@ -888,15 +888,16 @@ body.light-theme .ok { background:#f0fff4; border-color:#116622; color:#116622; 
 .bmt-ref-row:last-child td { border-bottom:none; }
 .bmt-ref-row.bmt-ref-highlight { background:rgba(255,255,255,0.04); }
 .bmt-ref-row.bmt-ref-highlight td:first-child { border-left:2px solid var(--accent); padding-left:4px; }
-/* Right-align numeric columns: Depth(2), Stop(3), Run(5), TTS(6), PPO2(7), END(8), EAD(9), CNS%(10) */
-.deco-table th:nth-child(2), .deco-table td:nth-child(2),
-.deco-table th:nth-child(3), .deco-table td:nth-child(3),
-.deco-table th:nth-child(5), .deco-table td:nth-child(5),
-.deco-table th:nth-child(6), .deco-table td:nth-child(6),
-.deco-table th:nth-child(7), .deco-table td:nth-child(7),
-.deco-table th:nth-child(8), .deco-table td:nth-child(8),
-.deco-table th:nth-child(9), .deco-table td:nth-child(9),
-.deco-table th:nth-child(10), .deco-table td:nth-child(10) { text-align:right; }
+/* Right-align numeric columns + explicit max-widths to prevent stretching */
+.deco-table th:nth-child(2), .deco-table td:nth-child(2) { text-align:right; max-width:82px; }
+.deco-table th:nth-child(3), .deco-table td:nth-child(3) { text-align:right; max-width:46px; }
+.deco-table th:nth-child(4), .deco-table td:nth-child(4) { max-width:54px; }
+.deco-table th:nth-child(5), .deco-table td:nth-child(5) { text-align:right; max-width:46px; }
+.deco-table th:nth-child(6), .deco-table td:nth-child(6) { text-align:right; max-width:46px; }
+.deco-table th:nth-child(7), .deco-table td:nth-child(7) { text-align:right; max-width:42px; }
+.deco-table th:nth-child(8), .deco-table td:nth-child(8) { text-align:right; max-width:42px; }
+.deco-table th:nth-child(9), .deco-table td:nth-child(9) { text-align:right; max-width:42px; }
+.deco-table th:nth-child(10), .deco-table td:nth-child(10) { text-align:right; max-width:42px; }
 /* END column — always visible */
 .deco-table .end-col { display:table-cell; text-align:right; }
 /* Gas switch rows always left-aligned */
@@ -3201,7 +3202,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.10.31';
+const APP_VERSION = '2.10.32';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
