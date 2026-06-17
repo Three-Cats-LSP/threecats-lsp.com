@@ -3180,7 +3180,7 @@ body.light-theme .deco-table tr[data-phase="switch"] td { color: #007A33 !import
   }
 })();
 
-const APP_VERSION = '2.10.12';
+const APP_VERSION = '2.10.13';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
@@ -8528,6 +8528,27 @@ function runDecoSchedule() {
       steps.push({ type: stopType, depth: cur, dur: lastStopDisplay, gas: gasLabel, pO2: ppO2Check(cur, stopFN2, stopFHe), fN2: stopFN2, fHe: stopFHe, _tissues: tissues.map(t => ({ pN2: t.pN2, pHe: t.pHe })) });
     }
     // No stop needed and not lastStop — continue ascending
+  }
+
+  // ── Final ascent from lastStop (or last computed depth) to surface ──────
+  // BUGFIX (v2.10.13): this leg was previously missing entirely — the model
+  // treated surfacing as instantaneous (zero time, zero off-gassing) once the
+  // ascent loop finished. MultiDeco/DiveKit both use a dedicated, slower
+  // surface ascent rate (typically 3 m/min) for this final leg — confirmed via
+  // divekit.app's published inputs.json which lists surfaceAscentMPerMin as a
+  // dedicated separate field. Adding this leg makes LSP's RT/TTS include the
+  // same final-ascent time the reference tools already count.
+  if (cur > 0) {
+    const finalAscentDur = cur / surfaceRate;
+    const finalGas = getActiveGas(cur, bottomFN2, decoGases, getPPO2Limit, bottomMixLabel);
+    tissues = saturateLinear(tissues, cur, 0, finalAscentDur, finalGas.fN2, finalGas.fHe || 0);
+    steps.push({
+      type: 'ascent', from: cur, to: 0,
+      dur: finalAscentDur, gas: finalGas.label,
+      pO2: ppO2Check(cur, finalGas.fN2, finalGas.fHe || 0), fN2: finalGas.fN2, fHe: finalGas.fHe || 0,
+    });
+    rt += finalAscentDur;
+    cur = 0;
   }
 
   // Collapse consecutive ascent steps with the same gas into single rows
