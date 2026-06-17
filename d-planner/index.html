@@ -934,12 +934,12 @@ body.light-theme .asc-color { color: #1a9e55 !important; }
   text-align: right !important;
 }
 body.light-theme .deco-table tr[data-phase="switch"] td {
-  background: rgba(180,140,0,0.06) !important;
+  background: rgba(220,170,0,0.08) !important;
 }
 body.light-theme .deco-table tr[data-phase="switch"] td:first-child,
 body.light-theme .deco-table tr[data-phase="switch"] td:nth-child(2),
 body.light-theme .deco-table tr[data-phase="switch"] td[data-label="PPO2"] {
-  color: #b38a00 !important;
+  color: #cc9900 !important;
 }
 
 .deco-table tr:hover td { background:rgba(0,200,255,0.04); }
@@ -3203,7 +3203,7 @@ body.light-theme .deco-table tr[data-phase="switch"] td[data-label="PPO2"] {
   }
 })();
 
-const APP_VERSION = '2.10.19';
+const APP_VERSION = '2.10.20';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
@@ -5874,8 +5874,10 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
         <td data-label="Depth">${gasDisp} @ ${switchDepth}${du}</td>
         <td data-label="Stop"></td>
         <td data-label="Run"></td>
+        <td data-label="TTS"></td>
         <td data-label="Mix"></td>
         <td data-label="EAD"></td>
+        <td data-label="END" class="end-col"></td>
         <td data-label="PPO2">${switchPpO2}</td>
         <td data-label="CNS%"></td>
       </tr>`;
@@ -8973,8 +8975,10 @@ function runDecoSchedule() {
         <td data-label="Depth">${s.gas.replace(/\s+/g,'').toUpperCase()} @ ${switchDepthDisp}</td>
         <td data-label="Stop"></td>
         <td data-label="Run"></td>
+        <td data-label="TTS"></td>
         <td data-label="Mix"></td>
         <td data-label="EAD"></td>
+        <td data-label="END" class="end-col"></td>
         <td data-label="PPO2" style="${sppColor}">${switchPpO2}</td>
         <td data-label="CNS%"></td>
       </tr>`;
