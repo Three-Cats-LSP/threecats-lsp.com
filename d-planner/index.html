@@ -2145,6 +2145,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <thead><tr><th>Phase</th><th>Depth</th><th>Stop</th><th>Mix</th><th>Run</th><th>TTS</th><th>PPO2</th><th class="end-col">END</th><th>EAD</th><th>CNS%</th></tr></thead>
 <tbody id="decoTableBody"></tbody>
 </table></div>
+<div id="decoTotals" style="margin-top:4px;"></div>
 <!-- Icon legend -->
 <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;padding:12px 14px;background:var(--card2);border-radius:8px;border:1px solid var(--border);">
 <div class="u17">
@@ -3202,7 +3203,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.10.40';
+const APP_VERSION = '2.10.41';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
@@ -4413,19 +4414,23 @@ function planInfoTipIconHtml() {
 
 function buildPlanInfoRowHtml(o) {
   const decoColor = o.hasDeco ? 'var(--orange)' : 'var(--green)';
-  return `<tr style="background:rgba(0,200,255,0.04);border-top:2px solid var(--border-hi);" data-phase="totals">
-    <td colspan="20" style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:normal;">
+  const visibleHtml = `<div style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(0,200,255,0.04);border-top:2px solid var(--border-hi);display:flex;flex-wrap:wrap;gap:4px 12px;">
       ${planInfoTipIconHtml()}
-      <span style="color:var(--muted);">Run time:</span> <span style="color:var(--text);font-weight:700;margin-right:12px;">${o.runTime}</span>
-      <span style="color:var(--muted);">TTS:</span> <span style="color:var(--text);font-weight:700;margin-right:12px;">${o.tts}</span>
-      <span style="color:var(--muted);">Deco time:</span> <span style="color:${decoColor};font-weight:700;margin-right:12px;">${o.decoTime}</span>
-      <span style="color:var(--muted);">CNS:</span> <span style="color:${o.cnsColor};font-weight:700;margin-right:12px;">${o.cns}</span>
-      <span style="color:var(--muted);">OTU:</span> <span style="color:${o.otuColor || 'var(--text)'};font-weight:700;margin-right:12px;">${o.otu}</span>
-      <span style="color:var(--muted);">PrT:</span> <span style="color:${o.prtColor};font-weight:700;margin-right:12px;" title="${o.prtTitle || ''}">${o.prt}</span>
-      <span style="color:var(--muted);">Decozone:</span> <span style="color:var(--text);font-weight:700;margin-right:12px;">${o.decozone}</span>
-      <span style="color:var(--muted);">First deco:</span> <span style="color:var(--text);font-weight:700;">${o.decoStop}</span>
-    </td>
-  </tr>`;
+      <span><span style="color:var(--muted);">Run time:</span> <span style="color:var(--text);font-weight:700;">${o.runTime}</span></span>
+      <span><span style="color:var(--muted);">TTS:</span> <span style="color:var(--text);font-weight:700;">${o.tts}</span></span>
+      <span><span style="color:var(--muted);">Deco time:</span> <span style="color:${decoColor};font-weight:700;">${o.decoTime}</span></span>
+      <span><span style="color:var(--muted);">CNS:</span> <span style="color:${o.cnsColor};font-weight:700;">${o.cns}</span></span>
+      <span><span style="color:var(--muted);">OTU:</span> <span style="color:${o.otuColor || 'var(--text)'};font-weight:700;">${o.otu}</span></span>
+      <span><span style="color:var(--muted);">PrT:</span> <span style="color:${o.prtColor};font-weight:700;" title="${o.prtTitle || ''}">${o.prt}</span></span>
+      <span><span style="color:var(--muted);">Decozone:</span> <span style="color:var(--text);font-weight:700;">${o.decozone}</span></span>
+      <span><span style="color:var(--muted);">First deco:</span> <span style="color:var(--text);font-weight:700;">${o.decoStop}</span></span>
+    </div>`;
+  if (!window._contingencyRunning) {
+    const totalsEl = document.getElementById('decoTotals');
+    if (totalsEl) totalsEl.innerHTML = visibleHtml;
+  }
+  // Hidden row kept in tbody for all downstream readers (getPlanSummaryExport etc.)
+  return `<tr style="display:none;" data-phase="totals"><td colspan="20">Run time:${o.runTime} TTS:${o.tts} Deco time:${o.decoTime} CNS:${o.cns} OTU:${o.otu} PrT:${o.prt} Decozone:${o.decozone} First deco:${o.decoStop}</td></tr>`;
 }
 
 function formatPlanSummaryBlock(p, compact) {
@@ -8784,6 +8789,7 @@ function runDecoSchedule() {
   const descentTimeMin = Math.round((depthM / descentRate) * 10) / 10;
 
   tbody.innerHTML = '';
+  const _decoTotalsEl = document.getElementById('decoTotals'); if (_decoTotalsEl) _decoTotalsEl.innerHTML = '';
   let prevGas = bottomMixLabel;
   let rowRT = 0;
   // ── EAD (Equivalent Air Depth) ──
