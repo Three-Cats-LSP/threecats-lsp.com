@@ -3180,7 +3180,7 @@ body.light-theme .deco-table tr[data-phase="switch"] td { color: #007A33 !import
   }
 })();
 
-const APP_VERSION = '2.10.14';
+const APP_VERSION = '2.10.15';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
@@ -5963,8 +5963,8 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
   });
 
   // ── END column (Feature): inject cells + apply toggle state ──
-  applyEndColumn();
   injectTtsCells('decoTableBody', vpmRtAtBottomEnd);
+  applyEndColumn();
 
   // Surface Interval panel (collapsed) — pre-fill Dive 1 from this dive
   if (!_contingencyRunning) renderSurfIntPanel('tecSurfIntContainer', 'tecSi', depthM, bt);
@@ -9069,8 +9069,8 @@ function runDecoSchedule() {
   { const _tBtn=document.getElementById('tissueChartToggleBtn'); const _cBtn=document.getElementById('contingencyJumpBtn'); if(_tBtn)_tBtn.style.display='inline-block'; if(_cBtn)_cBtn.style.display='inline-block'; }
 
   // ── END column (Feature): inject cells + apply toggle state ──
-  applyEndColumn();
   injectTtsCells('decoTableBody', rtAtBottomEnd);
+  applyEndColumn();
 
   // ── CNS% high warning (post-render, totalCNSfrac now known) ──
   const decoAlertsEl = document.getElementById('decoAlerts');
