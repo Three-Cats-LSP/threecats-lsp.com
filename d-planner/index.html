@@ -3180,7 +3180,7 @@ body.light-theme .deco-table tr[data-phase="switch"] td { color: #007A33 !import
   }
 })();
 
-const APP_VERSION = '2.10.13';
+const APP_VERSION = '2.10.14';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
@@ -4299,6 +4299,18 @@ function parseRunMinutes(s) {
   const mmss = s.match(/(\d+)[''](\d+)/);
   if (mmss) return parseInt(mmss[1], 10) + parseInt(mmss[2], 10) / 60;
   return parseFloat(s) || 0;
+}
+
+// Top-level toMMSS — needed by fmtRowTTS / injectTtsCells which are called
+// from both ZHL and VPM paths (outside runDecoSchedule's local scope).
+// BUGFIX (v2.10.14): toMMSS was only defined inside runDecoSchedule, so
+// fmtRowTTS threw ReferenceError when called from the top-level injectTtsCells,
+// silently leaving every TTS cell blank.
+function toMMSS(minutes) {
+  const totalSec = Math.round(minutes * 60);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${m}'${String(s).padStart(2,'0')}"`;
 }
 
 function fmtRowTTS(rowRunMin, rtAtBottomEnd, finalRunMin) {
