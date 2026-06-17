@@ -946,6 +946,7 @@ body.light-theme .deco-table tr[data-phase="switch"] td {
  .deco-table:not(.table-view) tr td[colspan] { border-radius:8px;
  padding:10px 12px;
  font-size:11px;
+ text-align:left !important;
  }
 
  /* First cell = icon header bar */
@@ -2142,7 +2143,7 @@ body.light-theme .deco-table tr[data-phase="switch"] td {
 <span style="font-size:15px;">🟢</span> Safety Stop
         </div>
 <div class="u17">
-<span style="font-size:15px;">⇄</span> Gas Switch
+<span style="font-size:15px;color:#FFD700;">⇄</span> Gas Switch
         </div>
 </div>
 <!-- Alerts — populated by both Bühlmann and VPM renderers -->
@@ -3181,7 +3182,7 @@ body.light-theme .deco-table tr[data-phase="switch"] td {
   }
 })();
 
-const APP_VERSION = '2.10.17';
+const APP_VERSION = '2.10.18';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
