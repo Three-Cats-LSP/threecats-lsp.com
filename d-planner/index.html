@@ -888,14 +888,15 @@ body.light-theme .ok { background:#f0fff4; border-color:#116622; color:#116622; 
 .bmt-ref-row:last-child td { border-bottom:none; }
 .bmt-ref-row.bmt-ref-highlight { background:rgba(255,255,255,0.04); }
 .bmt-ref-row.bmt-ref-highlight td:first-child { border-left:2px solid var(--accent); padding-left:4px; }
-/* Right-align numeric columns: Depth(2), Stop(3), Run(4), EAD(6), END(7), PPO2(8), CNS%(9) */
+/* Right-align numeric columns: Depth(2), Stop(3), Run(4), TTS(5), EAD(7), END(8), PPO2(9), CNS%(10) */
 .deco-table th:nth-child(2), .deco-table td:nth-child(2),
 .deco-table th:nth-child(3), .deco-table td:nth-child(3),
 .deco-table th:nth-child(4), .deco-table td:nth-child(4),
-.deco-table th:nth-child(6), .deco-table td:nth-child(6),
+.deco-table th:nth-child(5), .deco-table td:nth-child(5),
 .deco-table th:nth-child(7), .deco-table td:nth-child(7),
 .deco-table th:nth-child(8), .deco-table td:nth-child(8),
-.deco-table th:nth-child(9), .deco-table td:nth-child(9) { text-align:right; }
+.deco-table th:nth-child(9), .deco-table td:nth-child(9),
+.deco-table th:nth-child(10), .deco-table td:nth-child(10) { text-align:right; }
 /* END column — always visible */
 .deco-table .end-col { display:table-cell; text-align:right; }
 /* Gas switch rows always left-aligned */
@@ -2119,7 +2120,7 @@ body.light-theme .deco-table tr[data-phase="switch"] td { color: #007A33 !import
 </div>
 <div id="decoSummary"></div>
 <table class="deco-table">
-<thead><tr><th>Phase</th><th>Depth</th><th>Stop</th><th>Run</th><th>Mix</th><th>EAD</th><th class="end-col">END</th><th>PPO2</th><th>CNS%</th></tr></thead>
+<thead><tr><th>Phase</th><th>Depth</th><th>Stop</th><th>Run</th><th>TTS</th><th>Mix</th><th>EAD</th><th class="end-col">END</th><th>PPO2</th><th>CNS%</th></tr></thead>
 <tbody id="decoTableBody"></tbody>
 </table>
 <!-- Icon legend -->
@@ -3421,10 +3422,10 @@ function injectEndCells() {
     const ph = tr.dataset.phase;
     if (ph === 'switch' || ph === 'totals') return; // these use colspan, no END cell
     const tds = tr.querySelectorAll('td');
-    if (tds.length < 7) return;
-    const eadCell = tds[5]; // EAD is the 6th column (index 5)
+    if (tds.length < 8) return;
+    const eadCell = tds[6]; // EAD column (after TTS + Mix)
     const depthM = endParseDepthM(tds[1]?.textContent || '');
-    const frac   = endParseFrac(tds[4]?.textContent || '');
+    const frac   = endParseFrac(tds[5]?.textContent || '');
     let disp = '—';
     if (depthM != null && frac) {
       const endM = calcEND(depthM, frac.fN2, frac.fHe);
@@ -4284,13 +4285,145 @@ function formatDecoZoneStart(depthM) {
   const disp = rounded % 1 === 0 ? String(Math.round(rounded)) : rounded.toFixed(1);
   return dU ? disp + ' m' : mToFt(depthM) + ' ft';
 }
-function getDecoZoneExportVal(fromTotalsEl) {
-  const el = fromTotalsEl || document.querySelector('#decoTableBody tr[data-phase="totals"] td');
-  if (el) {
-    const dzM = el.textContent.replace(/\s+/g, ' ').match(/Deco zone:\s*([\d.]+ (?:m|ft)|—)/i);
-    if (dzM) return dzM[1].trim();
+const PLAN_INFO_TIP = 'Summary metrics for this dive plan:\n\n• Run time — total elapsed from start of descent to surfacing\n• TTS — time to surface: ascent + deco only (excludes descent and bottom time)\n• Deco time — time spent at mandatory deco and safety stops\n• CNS — cumulative central nervous system oxygen toxicity (%)\n• OTU — oxygen tolerance units (daily exposure index)\n• PrT — gauge pressure (bar) × √bottom time — severity index for GF High selection\n• Decozone — depth where tissue inert-gas tension first exceeds ambient (GF-independent)\n• Deco stop — depth of the first mandatory decompression stop (GF-dependent)';
+
+function formatDecoStopDepth(depthM) {
+  return formatDecoZoneStart(depthM);
+}
+
+function parseRunMinutes(s) {
+  if (!s) return 0;
+  s = String(s).trim();
+  const colon = s.match(/^(\d+):(\d+)$/);
+  if (colon) return parseInt(colon[1], 10) + parseInt(colon[2], 10) / 60;
+  const mmss = s.match(/(\d+)[''](\d+)/);
+  if (mmss) return parseInt(mmss[1], 10) + parseInt(mmss[2], 10) / 60;
+  return parseFloat(s) || 0;
+}
+
+function fmtRowTTS(rowRunMin, rtAtBottomEnd, finalRunMin) {
+  if (rowRunMin == null || isNaN(rowRunMin) || rowRunMin < rtAtBottomEnd - 0.001) return '—';
+  return toMMSS(Math.max(0, finalRunMin - rowRunMin));
+}
+
+function parsePlanSummaryText(t) {
+  const s = (t || '').replace(/\s+/g, ' ');
+  return {
+    runTime:  (s.match(/Run time:\s*([\d'":]+)/i) || [])[1] || '-',
+    tts:      (s.match(/TTS:\s*([\d'":]+)/i) || [])[1] || '-',
+    decoTime: (s.match(/Deco time:\s*([\d'":]+)/i) || [])[1] || '-',
+    cns:      (s.match(/CNS:\s*([\d.]+%|-)/i) || [])[1] || '-',
+    otu:      (s.match(/OTU:\s*(\d+|-)/i) || [])[1] || '-',
+    prt:      (s.match(/PrT:\s*([\d.]+|-)/i) || [])[1] || '-',
+    decozone: ((s.match(/Decozone:\s*([\d.]+ (?:m|ft)|—|-)/i) || s.match(/Deco zone:\s*([\d.]+ (?:m|ft)|—|-)/i) || [])[1] || '').trim() || '-',
+    decoStop: (s.match(/Deco stop:\s*([\d.]+ (?:m|ft)|—|-)/i) || [])[1]?.trim() || '-',
+  };
+}
+
+function getContingencySummaryExport() {
+  const c = window._lastContingency;
+  const totRow = document.querySelector('#contingencyResult .deco-table tbody tr[data-phase="totals"] td');
+  if (totRow) {
+    const p = parsePlanSummaryText(totRow.textContent);
+    if (c) {
+      if (p.runTime === '-') p.runTime = c.lastRunFmt || `${c.lastRun}'00"`;
+      if (p.decoTime === '-') p.decoTime = c.decoTimeFmt || `${c.decoTime}'00"`;
+      if (p.cns === '-') p.cns = c.totalCNS || '-';
+      if (p.otu === '-') p.otu = c.totalOTU || '-';
+      if (p.prt === '-') p.prt = c.totalPrT || '-';
+      if (p.tts === '-') p.tts = c.tts || '-';
+      if (p.decozone === '-') p.decozone = c.decozoneDisp || formatDecoZoneStart(c.decoZoneStart);
+      if (p.decoStop === '-') p.decoStop = c.decoStop || '-';
+    }
+    return p;
   }
-  return formatDecoZoneStart(window._lastPlan?.decoZoneStart);
+  if (!c) return getPlanSummaryExport();
+  return {
+    runTime: c.lastRunFmt || `${c.lastRun}'00"`,
+    tts: c.tts || '-',
+    decoTime: c.decoTimeFmt || `${c.decoTime}'00"`,
+    cns: c.totalCNS || '-',
+    otu: c.totalOTU || '-',
+    prt: c.totalPrT || '-',
+    decozone: c.decozoneDisp || formatDecoZoneStart(c.decoZoneStart),
+    decoStop: c.decoStop || '-',
+  };
+}
+
+function getPlanSummaryExport(fromTotalsEl) {
+  const el = fromTotalsEl || document.querySelector('#decoTableBody tr[data-phase="totals"] td');
+  const lp = window._lastPlan || {};
+  if (el) {
+    const p = parsePlanSummaryText(el.textContent);
+    if (p.decozone === '-') p.decozone = formatDecoZoneStart(lp.decoZoneStart);
+    if (p.decoStop === '-') p.decoStop = formatDecoStopDepth(lp.firstStopDepth);
+    if (p.tts === '-' && lp.tts != null) p.tts = toMMSS(lp.tts);
+    return p;
+  }
+  return {
+    runTime: '-', decoTime: '-',
+    tts: lp.tts != null ? toMMSS(lp.tts) : '-',
+    cns: '-', otu: '-', prt: '-',
+    decozone: formatDecoZoneStart(lp.decoZoneStart),
+    decoStop: formatDecoStopDepth(lp.firstStopDepth),
+  };
+}
+
+function getDecoZoneExportVal(fromTotalsEl) {
+  return getPlanSummaryExport(fromTotalsEl).decozone;
+}
+
+function planInfoTipIconHtml() {
+  return `<span class="tip-icon" onclick="event.stopPropagation();showTip('Plan summary',PLAN_INFO_TIP)" style="vertical-align:middle;margin-right:12px;cursor:pointer;"><svg fill="none" height="11" viewBox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span>`;
+}
+
+function buildPlanInfoRowHtml(o) {
+  const decoColor = o.hasDeco ? 'var(--orange)' : 'var(--green)';
+  return `<tr style="background:rgba(0,200,255,0.04);border-top:2px solid var(--border-hi);" data-phase="totals">
+    <td colspan="20" style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;">
+      ${planInfoTipIconHtml()}
+      <span style="color:var(--muted);">Run time:</span> <span style="color:var(--text);font-weight:700;margin-right:12px;">${o.runTime}</span>
+      <span style="color:var(--muted);">TTS:</span> <span style="color:var(--text);font-weight:700;margin-right:12px;">${o.tts}</span>
+      <span style="color:var(--muted);">Deco time:</span> <span style="color:${decoColor};font-weight:700;margin-right:12px;">${o.decoTime}</span>
+      <span style="color:var(--muted);">CNS:</span> <span style="color:${o.cnsColor};font-weight:700;margin-right:12px;">${o.cns}</span>
+      <span style="color:var(--muted);">OTU:</span> <span style="color:${o.otuColor || 'var(--text)'};font-weight:700;margin-right:12px;">${o.otu}</span>
+      <span style="color:var(--muted);">PrT:</span> <span style="color:${o.prtColor};font-weight:700;margin-right:12px;" title="${o.prtTitle || ''}">${o.prt}</span>
+      <span style="color:var(--muted);">Decozone:</span> <span style="color:var(--text);font-weight:700;margin-right:12px;">${o.decozone}</span>
+      <span style="color:var(--muted);">Deco stop:</span> <span style="color:var(--text);font-weight:700;">${o.decoStop}</span>
+    </td>
+  </tr>`;
+}
+
+function formatPlanSummaryBlock(p, compact) {
+  if (compact) {
+    return `Run Time:${p.runTime} TTS:${p.tts} Deco:${p.decoTime}\nCNS:${p.cns} OTU:${p.otu} PrT:${p.prt} Decozone:${p.decozone} Deco stop:${p.decoStop}`;
+  }
+  return `Deco Time: ${p.decoTime}  Run Time: ${p.runTime}  TTS: ${p.tts}  CNS: ${p.cns}  OTU: ${p.otu}  PrT: ${p.prt}  Decozone: ${p.decozone}  Deco stop: ${p.decoStop}`;
+}
+
+function injectTtsCells(tbodyId, rtAtBottomEnd) {
+  const tbody = document.getElementById(tbodyId || 'decoTableBody');
+  if (!tbody) return;
+  let finalRun = 0;
+  tbody.querySelectorAll('tr[data-phase]').forEach(tr => {
+    const ph = tr.dataset.phase;
+    if (ph === 'totals' || ph === 'switch') return;
+    const runVal = parseRunMinutes(tr.querySelectorAll('td')[3]?.textContent);
+    if (runVal > finalRun) finalRun = runVal;
+  });
+  tbody.querySelectorAll('tr[data-phase]').forEach(tr => {
+    const ph = tr.dataset.phase;
+    if (ph === 'switch' || ph === 'totals') return;
+    const tds = tr.querySelectorAll('td');
+    if (tds.length < 4) return;
+    tr.querySelector('td[data-label="TTS"]')?.remove();
+    const runVal = parseRunMinutes(tds[3]?.textContent);
+    const cell = document.createElement('td');
+    cell.setAttribute('data-label', 'TTS');
+    cell.style.cssText = 'color:var(--muted);font-size:11px;text-align:right;';
+    cell.textContent = fmtRowTTS(runVal, rtAtBottomEnd, finalRun);
+    tds[3].insertAdjacentElement('afterend', cell);
+  });
 }
 
 function setUnits(u) {
@@ -5684,6 +5817,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
   let html = '';
   let prevGas = `${bottomO2pct}/${bottomHePct}`;
   let gasLabel = getGasLabel(bottomO2pct/100, bottomHePct/100);
+  let vpmRtAtBottomEnd = 0;
 
   plan.forEach(seg => {
     const segGas = seg.gas || prevGas;
@@ -5723,6 +5857,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
       </tr>`;
       prevGas = segGas;
     } else if (seg.type === 'bottom') {
+      vpmRtAtBottomEnd = seg.runtime;
       const rtDisp = fmtRT(seg.runtime);
       const pAmbB = surfP + seg.depth * BAR_PER_METRE;
       const ppO2b = (o2pct / 100 * pAmbB).toFixed(2);
@@ -5795,14 +5930,29 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
   const prtColorVPM = prtValVPM < 15 ? 'var(--green)' : prtValVPM < 25 ? 'var(--yellow)' : prtValVPM < 40 ? 'var(--orange)' : 'var(--red)';
   const cnsFootColor = result.totalCNS != null ? (result.totalCNS >= 100 ? 'var(--red)' : result.totalCNS >= 80 ? 'var(--orange)' : result.totalCNS >= 50 ? 'var(--yellow)' : 'var(--green)') : 'var(--muted)';
   const decoZoneDispVPM = formatDecoZoneStart(result.decoZoneStart);
-  tbody.innerHTML += `<tr style="background:rgba(0,200,255,0.04);border-top:2px solid var(--border-hi);" data-phase="totals">
-    <td colspan="20" style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;">
-      <span style="color:var(--muted);">Run time:</span> <span style="color:var(--text);font-weight:700;margin-right:16px;">${rt}'00"</span><span style="color:var(--muted);">Deco time:</span> <span style="color:${deco>0?'var(--orange)':'var(--green)'};font-weight:700;margin-right:16px;">${Math.round(deco)}'00"</span><span style="color:var(--muted);">CNS:</span> <span style="color:${cnsFootColor};font-weight:700;margin-right:16px;">${cnsDisp}%</span><span style="color:var(--muted);">OTU:</span> <span style="color:var(--text);font-weight:700;margin-right:16px;">${otuDisp}</span><span style="color:var(--muted);" title="PrT = gauge pressure (bar) × √bottom time (min)">PrT:</span> <span style="color:${prtColorVPM};font-weight:700;margin-right:16px;">${prtDispVPM}</span><span style="color:var(--muted);" title="Depth where the leading compartment enters the decompression zone during ascent">Deco zone:</span> <span style="color:var(--text);font-weight:700;">${decoZoneDispVPM}</span>
-    </td>
-  </tr>`;
+  const vpmFirstStop = result.stops?.length ? Math.max(...result.stops.map(s => s.depth)) : 0;
+  const decoStopDispVPM = formatDecoStopDepth(vpmFirstStop);
+  const vpmTtsMin = Math.max(0, rt - bt);
+  const vpmTtsMMSS = toMMSS(vpmTtsMin);
+  const otuFootColorVPM = (result.totalOTU ?? 0) >= 300 ? 'var(--red)' : (result.totalOTU ?? 0) >= 200 ? 'var(--orange)' : (result.totalOTU ?? 0) >= 100 ? 'var(--yellow)' : 'var(--green)';
+  tbody.innerHTML += buildPlanInfoRowHtml({
+    runTime: rt + "'00\"",
+    tts: vpmTtsMMSS,
+    decoTime: Math.round(deco) + "'00\"",
+    cns: cnsDisp !== '—' ? cnsDisp + '%' : '—',
+    otu: otuDisp,
+    prt: prtDispVPM,
+    prtColor: prtColorVPM,
+    cnsColor: cnsFootColor,
+    otuColor: otuFootColorVPM,
+    hasDeco: deco > 0,
+    decozone: decoZoneDispVPM,
+    decoStop: decoStopDispVPM,
+  });
 
   // ── END column (Feature): inject cells + apply toggle state ──
   applyEndColumn();
+  injectTtsCells('decoTableBody', vpmRtAtBottomEnd);
 
   // Surface Interval panel (collapsed) — pre-fill Dive 1 from this dive
   if (!_contingencyRunning) renderSurfIntPanel('tecSurfIntContainer', 'tecSi', depthM, bt);
@@ -5822,7 +5972,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
     const ph = tr.dataset.phase;
     if (ph === 'switch' || ph === 'totals') return;
     const tds = tr.querySelectorAll('td');
-    const mixRaw = tds[4]?.textContent?.trim() || '';
+    const mixRaw = tds[5]?.textContent?.trim() || '';
     const stopRaw = tds[2]?.textContent?.trim() || '';
     const depthRaw = tds[1]?.textContent?.trim() || '';
     const depthM2 = parseFloat(depthRaw) || 0;
@@ -6039,18 +6189,23 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
 
   window._lastPlan = {
     rt,
+    tts: Math.round(vpmTtsMin * 10) / 10,
     decoTime: Math.round(deco),
     stops: _vpmRawStops.map(s => ({ depth: s.depth, dur: s.dur, gas: s.gas })),
     steps: plan,
     decoZoneStart: result.decoZoneStart || 0,
+    firstStopDepth: vpmFirstStop,
   };
 
   // Store for TXT/copy export (stat card IDs may not exist in DOM)
   window._lastVPMExport = {
     rt, deco: Math.round(deco),
+    tts: vpmTtsMMSS,
     cns: result.totalCNS != null ? result.totalCNS.toFixed(1) + '%' : '-',
     otu: result.totalOTU != null ? String(result.totalOTU) : '-',
     prt: ((depthM * BAR_PER_METRE) * Math.sqrt(bt)).toFixed(1),
+    decozone: decoZoneDispVPM,
+    decoStop: decoStopDispVPM,
   };
 
   // Show results card
@@ -8416,6 +8571,7 @@ function runDecoSchedule() {
     stops: decoStops.map(s => ({ depth: s.depth, dur: s.dur, gas: s.gas })),
     steps: collapsed,
     decoZoneStart: trueDecoZoneStart,
+    firstStopDepth: firstStopDepth || 0,
     finalTissues: tissues.map(t => ({ pN2: t.pN2, pHe: t.pHe || 0 })),  // for ZHL repetitive dive carry
   };
 
@@ -8859,17 +9015,29 @@ function runDecoSchedule() {
   const prtGfHint = prtVal < 15 ? 'GF Hi ≤80' : prtVal < 25 ? 'GF Hi ≤75' : prtVal < 40 ? 'GF Hi ≤70' : 'GF Hi ≤60';
   const prtColor  = prtVal < 15 ? 'var(--green)' : prtVal < 25 ? 'var(--yellow)' : prtVal < 40 ? 'var(--orange)' : 'var(--red)';
   const decoZoneDisp = formatDecoZoneStart(trueDecoZoneStart);
-  tbody.innerHTML += `<tr style="background:rgba(0,200,255,0.04);border-top:2px solid var(--border-hi);" data-phase="totals">
-    <td colspan="20" style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;">
-      <span style="color:var(--muted);">Run time:</span> <span style="color:var(--text);font-weight:700;margin-right:16px;">${totalRunMMSS}</span><span style="color:var(--muted);" title="Time-to-surface: ascent + deco only, from leaving the bottom to reaching the surface. Excludes descent and bottom time.">TTS:</span> <span style="color:var(--text);font-weight:700;margin-right:16px;">${ttsMMSS}</span><span style="color:var(--muted);">Deco time:</span> <span style="color:${hasDeco ? 'var(--orange)' : 'var(--green)'};font-weight:700;margin-right:16px;">${decoTimeMMSS}</span><span style="color:var(--muted);">CNS:</span> <span style="color:${cnsFootColor};font-weight:700;margin-right:16px;">${totalCNSpct}%</span><span style="color:var(--muted);">OTU:</span> <span style="color:${otuFootColor};font-weight:700;margin-right:16px;">${totalOTUval}</span><span style="color:var(--muted);" title="PrT = gauge pressure (bar) × √bottom time (min). Fraedrich 2019 severity index for GF High selection.">PrT:</span> <span style="color:${prtColor};font-weight:700;margin-right:16px;" title="${prtGfHint} recommended (Fraedrich 2019)">${prtDisp}</span><span style="color:var(--muted);" title="Depth where the leading compartment's tissue tension first exceeds ambient pressure (GF-independent — does not change with GF Lo/Hi)">Deco zone:</span> <span style="color:var(--text);font-weight:700;">${decoZoneDisp}</span>
-    </td>
-  </tr>`;
+  const decoStopDisp = formatDecoStopDepth(firstStopDepth);
+  tbody.innerHTML += buildPlanInfoRowHtml({
+    runTime: totalRunMMSS,
+    tts: ttsMMSS,
+    decoTime: decoTimeMMSS,
+    cns: totalCNSpct + '%',
+    otu: totalOTUval,
+    prt: prtDisp,
+    prtColor,
+    prtTitle: prtGfHint + ' recommended (Fraedrich 2019)',
+    cnsColor: cnsFootColor,
+    otuColor: otuFootColor,
+    hasDeco,
+    decozone: decoZoneDisp,
+    decoStop: decoStopDisp,
+  });
 
   document.getElementById('decoResult').style.display = 'block';
   { const _tBtn=document.getElementById('tissueChartToggleBtn'); const _cBtn=document.getElementById('contingencyJumpBtn'); if(_tBtn)_tBtn.style.display='inline-block'; if(_cBtn)_cBtn.style.display='inline-block'; }
 
   // ── END column (Feature): inject cells + apply toggle state ──
   applyEndColumn();
+  injectTtsCells('decoTableBody', rtAtBottomEnd);
 
   // ── CNS% high warning (post-render, totalCNSfrac now known) ──
   const decoAlertsEl = document.getElementById('decoAlerts');
@@ -10464,9 +10632,9 @@ function drawDecoProfile() {
     const tds    = tr.querySelectorAll('td');
     const run    = parseRunMin(tds[3]?.textContent);
     const depthTxt = tds[1]?.textContent?.trim() || '';
-    const ppo2   = parseFloat(tds[6]?.textContent) || 0;  // c[6]=PPO2 (after EAD)
-    const gas    = tds[4]?.textContent?.trim() || null;    // c[4]=Mix
-    const cns    = tds[7]?.textContent?.trim() || null;    // c[7]=CNS%
+    const ppo2   = parseFloat(tds[8]?.textContent) || 0;  // PPO2 (after TTS, Mix, EAD, END)
+    const gas    = tds[5]?.textContent?.trim() || null;    // Mix
+    const cns    = tds[9]?.textContent?.trim() || null;    // CNS%
 
     if (phase === 'ascent') {
       const parts   = depthTxt.split('→');
@@ -12255,41 +12423,27 @@ function buildExportText(mode) {
     const decoModelSel = document.getElementById('algorithmSelect')?.value || 'ZHLC_GF';
     const isVPMExport  = decoModelSel === 'VPMB' || decoModelSel === 'VPMB_GFS';
 
-    let decoTimeVal = '-', runTimeVal = '-', cnsExpVal = '-', otuExpVal = '-', prtExpVal = '-', decoZoneExpVal = '-';
-
     const totalsRowEl = document.querySelector('#decoTableBody tr[data-phase="totals"] td');
-    if (totalsRowEl) {
-      const t = totalsRowEl.textContent.replace(/\s+/g, ' ');
-      const rM = t.match(/Run time:\s*([\d'":]+)/i);
-      const dM = t.match(/Deco time:\s*([\d'":]+)/i);
-      const cM = t.match(/CNS:\s*([\d.]+%)/i);
-      const oM = t.match(/OTU:\s*(\d+)/i);
-      const pM = t.match(/PrT:\s*([\d.]+)/i);
-      const dzM = t.match(/Deco zone:\s*([\d.]+ (?:m|ft)|—)/i);
-      if (rM) runTimeVal  = rM[1];
-      if (dM) decoTimeVal = dM[1];
-      if (cM) cnsExpVal   = cM[1];
-      if (oM) otuExpVal   = oM[1];
-      if (pM) prtExpVal   = pM[1];
-      if (dzM) decoZoneExpVal = dzM[1].trim();
-    }
-    if (decoZoneExpVal === '-') decoZoneExpVal = getDecoZoneExportVal(totalsRowEl);
+    let planSum = getPlanSummaryExport(totalsRowEl);
 
     // Fallback for VPM if totals row not yet rendered: use _lastVPMExport
-    if (isVPMExport && runTimeVal === '-' && window._lastVPMExport) {
+    if (isVPMExport && planSum.runTime === '-' && window._lastVPMExport) {
       const vx = window._lastVPMExport;
       const toMMSS = (n) => { const m = Math.floor(n), s = Math.round((n - m) * 60); return `${m}'${String(s).padStart(2,'0')}"`; };
-      runTimeVal  = toMMSS(vx.rt);
-      decoTimeVal = toMMSS(vx.deco);
-      cnsExpVal   = vx.cns;
-      otuExpVal   = vx.otu;
-      prtExpVal   = vx.prt;
+      planSum.runTime  = toMMSS(vx.rt);
+      planSum.decoTime = toMMSS(vx.deco);
+      planSum.tts      = vx.tts || toMMSS(Math.max(0, vx.rt - parseFloat(bt)));
+      planSum.cns      = vx.cns;
+      planSum.otu      = vx.otu;
+      planSum.prt      = vx.prt;
+      planSum.decozone = vx.decozone || planSum.decozone;
+      planSum.decoStop = vx.decoStop || planSum.decoStop;
     }
 
     // PrT fallback if not in totals row
-    if (prtExpVal === '-') {
+    if (planSum.prt === '-') {
       const prtN = (parseFloat(depth) * BAR_PER_METRE) * Math.sqrt(parseFloat(bt));
-      if (!isNaN(prtN)) prtExpVal = prtN.toFixed(1);
+      if (!isNaN(prtN)) planSum.prt = prtN.toFixed(1);
     }
 
     // Gas switch depths from rendered GSw rows
@@ -12368,16 +12522,16 @@ function buildExportText(mode) {
       const _dgLabel = _dgCard ? getGasLabel(_dgCard.fO2, _dgCard.fHe) : g.gas;
       lines.push(`Deco Gas ${i+1}  : ${_dgLabel} (switch @ ${g.depth})`);
     });
-    lines.push(`Deco Time   : ${decoTimeVal}  Run Time: ${runTimeVal}  CNS: ${cnsExpVal}  OTU: ${otuExpVal}  PrT: ${prtExpVal}  Deco zone: ${decoZoneExpVal}`);
+    lines.push(formatPlanSummaryBlock(planSum));
     lines.push('');
 
     // Ascent schedule table
     const rows = document.querySelectorAll('#decoTableBody tr[data-phase]');
     if (rows.length) {
-      const shr = '-'.repeat(49);  // matches header 'Phase Depth  Stop   Run   Mix   EAD    PPO2  CNS%'
+      const shr = '-'.repeat(56);
       lines.push('ASCENT SCHEDULE');
       lines.push(shr);
-      lines.push('Phase Depth  Stop   Run   Mix   EAD    PPO2  CNS%');
+      lines.push('Phase Depth  Stop   Run   TTS   Mix   EAD    PPO2  CNS%');
       lines.push(shr);
       const phaseLabel = { descent:'Des', bottom:'Lvl', ascent:'Asc', deco:'Stp', safety:'Stp', totals:'TOT' };
       rows.forEach(tr => {
@@ -12404,20 +12558,21 @@ function buildExportText(mode) {
         const stp  = (stpVal.length > 0 && stpVal.length <= 4 ? stpVal.padStart(5) : stpVal).padEnd(7);
         const runRaw = c[3] || '';
         const run  = (runRaw.length <= 4 ? runRaw.padStart(5) : runRaw).padEnd(6);
-        const mix  = shortMix(c[4]).padEnd(5);
-        // c[5]=EAD, c[6]=PPO2, c[7]=CNS%
-        const eadVal = (c[5] || '-').trim() || '-';
+        const ttsRaw = (c[4] || '').trim() || '-';
+        const tts  = (ttsRaw.length <= 4 ? ttsRaw.padStart(5) : ttsRaw).padEnd(6);
+        const mix  = shortMix(c[5]).padEnd(5);
+        // c[6]=EAD, c[7]=END, c[8]=PPO2, c[9]=CNS%
+        const eadVal = (c[6] || '-').trim() || '-';
         const ead  = (eadVal === '-' ? eadVal.padStart(2) : eadVal.padStart(3)).padEnd(6);
-        const ppo2  = (c[6] || '').padStart(4).padEnd(5);
-        const cnsRaw = (c[7] || '').trim() || '-';
+        const ppo2  = (c[8] || '').padStart(4).padEnd(5);
+        const cnsRaw = (c[9] || '').trim() || '-';
         const cns   = cnsRaw === '-' ? cnsRaw.padStart(4) : cnsRaw.padStart(5);
-        lines.push(`${lbl} ${dep}${stp}${run} ${mix} ${ead} ${ppo2}${cns}`);
+        lines.push(`${lbl} ${dep}${stp}${run}${tts} ${mix} ${ead} ${ppo2}${cns}`);
       });
 
       // Totals row — use values already read from table footer (runTimeVal etc.)
       lines.push(shr);
-      lines.push(`Run Time:${runTimeVal} Deco:${decoTimeVal}`);
-      lines.push(`CNS:${cnsExpVal} OTU:${otuExpVal} PrT:${prtExpVal} Deco zone:${decoZoneExpVal}`);
+      lines.push(formatPlanSummaryBlock(planSum, true));
       lines.push('');
     }
 
@@ -12558,9 +12713,9 @@ function buildExportText(mode) {
     const rows = document.querySelectorAll('#contingencyResult .deco-table tbody tr');
     if (rows.length) {
       lines.push('EMERGENCY ASCENT SCHEDULE');
-      lines.push('-'.repeat(49));
-      lines.push('Phase Depth  Stop   Run   Mix   EAD    PPO2  CNS%');
-      lines.push('-'.repeat(49));
+      lines.push('-'.repeat(56));
+      lines.push('Phase Depth  Stop   Run   TTS   Mix   EAD    PPO2  CNS%');
+      lines.push('-'.repeat(56));
       const phaseLabel = { descent:'Des', bottom:'Lvl', ascent:'Asc', deco:'Stp', safety:'Stp', switch:'>>' };
       rows.forEach(tr => {
         const ph  = tr.dataset.phase;
@@ -12586,29 +12741,21 @@ function buildExportText(mode) {
         const stp  = (stpVal.length > 0 && stpVal.length <= 4 ? stpVal.padStart(5) : stpVal).padEnd(7);
         const runRaw2 = c2[3]||'';
         const run  = (runRaw2.length <= 4 ? runRaw2.padStart(5) : runRaw2).padEnd(6);
-        const mix  = eShortMix(c2[4]||'').padEnd(5);
-        const eadVal = (c2[5]||'-').trim() || '-';
+        const ttsRaw = (c2[4] || '').trim() || '-';
+        const tts  = (ttsRaw.length <= 4 ? ttsRaw.padStart(5) : ttsRaw).padEnd(6);
+        const mix  = eShortMix(c2[5]||'').padEnd(5);
+        const eadVal = (c2[6]||'-').trim() || '-';
         const ead  = (eadVal === '-' ? eadVal.padStart(2) : eadVal.padStart(3)).padEnd(6);
-        const ppo2  = (c2[6]||'').padStart(4).padEnd(5);
-        const cnsRaw = (c2[7]||'').trim() || '-';
+        const ppo2  = (c2[8]||'').padStart(4).padEnd(5);
+        const cnsRaw = (c2[9]||'').trim() || '-';
         const cns   = cnsRaw === '-' ? cnsRaw.padStart(4) : cnsRaw.padStart(5);
-        lines.push(`${lbl} ${dep}${stp}${run} ${mix} ${ead} ${ppo2}${cns}`);
+        lines.push(`${lbl} ${dep}${stp}${run}${tts} ${mix} ${ead} ${ppo2}${cns}`);
       });
 
       // Totals line
-      const totRow = document.querySelector('#contingencyResult .deco-table tbody tr[data-phase="totals"] td');
-      if (totRow) {
-        const t    = totRow.textContent.replace(/\s+/g, ' ').trim();
-        const runM = t.match(/Run time:\s*([\d':"]+)/i);
-        const decM = t.match(/Deco time:\s*([\d':"]+)/i);
-        const cnsM = t.match(/CNS:\s*([\d.]+%)/i);
-        const otuM = t.match(/OTU:\s*(\d+)/i);
-        const prtM = t.match(/PrT:\s*([\d.]+)/i);
-        const dzM = t.match(/Deco zone:\s*([\d.]+ (?:m|ft)|—)/i);
-        lines.push('-'.repeat(49));
-        lines.push(`Run Time:${runM?.[1]||'-'} Deco:${decM?.[1]||'-'}`);
-        lines.push(`CNS:${cnsM?.[1]||'-'} OTU:${otuM?.[1]||'-'} PrT:${prtM?.[1]||'-'} Deco zone:${dzM?.[1]?.trim()||'-'}`);
-      }
+      const emSum = getContingencySummaryExport();
+      lines.push('-'.repeat(56));
+      lines.push(formatPlanSummaryBlock(emSum, true));
       lines.push('');
     }
     lines.push('!! SAFETY REMINDERS');
@@ -12793,41 +12940,32 @@ function buildSlateText() {
     const depRaw = clean(tds[1]?.textContent).replace(/(m|ft)$/i, '');
     const dep = (depRaw + du).padStart(5);
     const run = clean(tds[3]?.textContent).padStart(5);
-    const gas = shortMix(tds[4]?.textContent).padEnd(6);
-    const ppo2 = clean(tds[7]?.textContent).padStart(4);
+    const gas = shortMix(tds[5]?.textContent).padEnd(6);
+    const ppo2 = clean(tds[8]?.textContent).padStart(4);
     out.push(`${dep}  ${run}  ${gas} ${ppo2}`);
   });
 
-  // Footer: TRT/DECO/CNS/OTU/PrT — read from totals row
+  // Footer: TRT/TTS/DECO/CNS/OTU/PrT/Decozone/Deco stop — read from totals row
   const _stotRow = document.querySelector('#decoTableBody tr[data-phase="totals"] td');
-  let tbt = '-', decoDisp = '-', _sCNS = '-', _sOTU = '-', _sPrT = '-', _sDz = '-';
-  if (_stotRow) {
-    const _st = _stotRow.textContent.replace(/\s+/g,' ');
-    const _srM = _st.match(/Run time:\s*([\d'":\s]+)/i);
-    const _sdM = _st.match(/Deco time:\s*([\d'":\s]+)/i);
-    const _scM = _st.match(/CNS:\s*([\d.]+%)/i);
-    const _soM = _st.match(/OTU:\s*(\d+)/i);
-    const _spM = _st.match(/PrT:\s*([\d.]+)/i);
-    const _sdzM = _st.match(/Deco zone:\s*([\d.]+ (?:m|ft)|—)/i);
-    const _toMMSS = s => {
-      if (!s) return '-';
-      s = s.trim();
-      const mm = s.match(/(\d+)'(\d+)"/);
-      if (mm) return `${mm[1]}'${mm[2]}"`;
-      const colon = s.match(/(\d+):(\d+)/);
-      if (colon) return `${colon[1]}'${colon[2]}"`;
-      const plain = s.replace(/[^\d]/g,'');
-      return plain ? `${plain}'00"` : '-';
-    };
-    if (_srM) tbt = _toMMSS(_srM[1]);
-    if (_sdM) decoDisp = _toMMSS(_sdM[1]);
-    if (_scM) _sCNS = _scM[1];
-    if (_soM) _sOTU = _soM[1];
-    if (_spM) _sPrT = _spM[1];
-    if (_sdzM) _sDz = _sdzM[1].trim();
-  }
-  if (_sDz === '-') _sDz = getDecoZoneExportVal(_stotRow);
-  // Fallback: use input field for BT if totals row not available
+  const _slSum = getPlanSummaryExport(_stotRow);
+  const _toMMSS = s => {
+    if (!s || s === '-') return '-';
+    s = String(s).trim();
+    const mm = s.match(/(\d+)'(\d+)"/);
+    if (mm) return `${mm[1]}'${mm[2]}"`;
+    const colon = s.match(/(\d+):(\d+)/);
+    if (colon) return `${colon[1]}'${colon[2]}"`;
+    const plain = s.replace(/[^\d]/g,'');
+    return plain ? `${plain}'00"` : '-';
+  };
+  let tbt = _toMMSS(_slSum.runTime);
+  let ttsDisp = _slSum.tts;
+  let decoDisp = _toMMSS(_slSum.decoTime);
+  const _sCNS = _slSum.cns;
+  const _sOTU = _slSum.otu;
+  const _sPrT = _slSum.prt;
+  const _sDz = _slSum.decozone;
+  const _sDs = _slSum.decoStop;
   if (tbt === '-') tbt = `${document.getElementById('decoBT')?.value || '-'}'00"`;
 
   const bar = '========================';
@@ -12845,8 +12983,8 @@ function buildSlateText() {
     lines.push('  (no decompression stops)');
   }
   lines.push(bar);
-  lines.push(`TRT: ${tbt} | DECO: ${decoDisp}`);
-  lines.push(`CNS: ${_sCNS} OTU: ${_sOTU} PrT: ${_sPrT} Deco zone: ${_sDz}`);
+  lines.push(`TRT: ${tbt} | TTS: ${ttsDisp} | DECO: ${decoDisp}`);
+  lines.push(`CNS: ${_sCNS} OTU: ${_sOTU} PrT: ${_sPrT} Decozone: ${_sDz} Deco stop: ${_sDs}`);
   return lines.join('\n');
 }
 
@@ -12922,11 +13060,10 @@ function buildContingencySlateText() {
     const depRaw = clean(tds[1]?.textContent).replace(/(m|ft)$/i,'');
     const dep = (depRaw + du).padStart(5);
     const run = clean(tds[3]?.textContent).padStart(5);
-    const gas = shortMix(tds[4]?.textContent).padEnd(6);
-    const ppo2 = clean(tds[7]?.textContent).padStart(4);
+    const gas = shortMix(tds[5]?.textContent).padEnd(6);
+    const ppo2 = clean(tds[8]?.textContent).padStart(4);
     out.push(`${dep}  ${run}  ${gas} ${ppo2}`);
   });
-  // TRT = run time, DECO = deco time — from contingency data object
   const _ecToMMSS = s => {
     if (!s && s !== 0) return '-';
     if (typeof s === 'number') return `${s}'00"`;
@@ -12937,10 +13074,7 @@ function buildContingencySlateText() {
   };
   const tbt = _ecToMMSS(cc.lastRunFmt || cc.lastRun);
   const decoDisp = _ecToMMSS(cc.decoTimeFmt || cc.decoTime);
-  const _ecCNS = cc.totalCNS || '-';
-  const _ecOTU = cc.totalOTU || '-';
-  const _ecPrT = cc.totalPrT || '-';
-  const _ecDz = cc.decoZoneDisp || formatDecoZoneStart(cc.decoZoneStart);
+  const _ecSum = getContingencySummaryExport();
   const bar = '========================';
   const lines = ['EMERGENCY SLATE', ecStamp, bar,
     `Algo: ${algoLine}`, `Mix: ${mixLine}`, '',
@@ -12948,8 +13082,8 @@ function buildContingencySlateText() {
   if (out.length) out.forEach(l => lines.push(l));
   else lines.push('  (no decompression stops)');
   lines.push(bar);
-  lines.push(`TRT: ${tbt} | DECO: ${decoDisp}`);
-  lines.push(`CNS: ${_ecCNS} OTU: ${_ecOTU} PrT: ${_ecPrT} Deco zone: ${_ecDz}`);
+  lines.push(`TRT: ${tbt} | TTS: ${_ecSum.tts} | DECO: ${decoDisp}`);
+  lines.push(`CNS: ${_ecSum.cns} OTU: ${_ecSum.otu} PrT: ${_ecSum.prt} Decozone: ${_ecSum.decozone} Deco stop: ${_ecSum.decoStop}`);
   return lines.join('\n');
 }
 
@@ -13013,18 +13147,12 @@ function buildMessengerText(mode) {
       const cv  = Array.from(tds).map(td => clean(td.textContent));
       if (ph === 'switch') { const switchTxt = Array.from(tds).slice(1).map(t=>clean(t.textContent)).filter(Boolean).join(' '); result.push('>> ' + switchTxt); return; }
       if (ph === 'descent' || ph === 'ascent') return;
-      if (ph === 'bottom') { result.push(`Lvl  ${cv[1]}  ${cv[2]}  ${shortMix(cv[4])}`); return; }
+      if (ph === 'bottom') { result.push(`Lvl  ${cv[1]}  ${cv[2]}  ${shortMix(cv[5])}`); return; }
       const stop = /^\d+:\d+$/.test(cv[2]) ? cv[2] : '';
-      result.push(`Stp  ${cv[1]}  ${stop}  ${cv[3]}  ${shortMix(cv[4])}`);
+      result.push(`Stp  ${cv[1]}  ${stop}  ${cv[3]}  ${shortMix(cv[5])}`);
     });
     result.push('-'.repeat(28));
-    const runDisp  = c.lastRunFmt  || `${c.lastRun}'00"`;
-    const decoDisp = c.decoTimeFmt || `${c.decoTime}'00"`;
-    const cnsDisp  = c.totalCNS ? ` CNS:${c.totalCNS}` : '';
-    const otuDisp  = c.totalOTU && c.totalOTU !== '—' ? ` OTU:${c.totalOTU}` : '';
-    const prtDisp  = c.totalPrT ? ` PrT:${c.totalPrT}` : '';
-    const dzDisp   = c.decoZoneDisp || formatDecoZoneStart(c.decoZoneStart);
-    result.push(`Run Time:${runDisp} Deco:${decoDisp}${cnsDisp}${otuDisp}${prtDisp} Deco zone:${dzDisp}`);
+    result.push(formatPlanSummaryBlock(getContingencySummaryExport(), true));
     return result.join('\n');
   }
 
@@ -13141,7 +13269,7 @@ function buildMessengerText(mode) {
 
     // bottom level
     if (ph === 'bottom') {
-      result.push(`Lvl  ${c[1]}  ${c[2]}  ${shortMix(c[4])}`);
+      result.push(`Lvl  ${c[1]}  ${c[2]}  ${shortMix(c[5])}`);
       return;
     }
 
@@ -13149,7 +13277,7 @@ function buildMessengerText(mode) {
     const dep  = c[1] || '';
     const stop = /^\d+:\d+$/.test(c[2]) ? c[2] : '';
     const run  = c[3] || '';
-    const mix  = shortMix(c[4]);
+    const mix  = shortMix(c[5]);
     result.push(`Stp  ${dep}  ${stop}  ${run}  ${mix}`);
   });
 
@@ -13157,35 +13285,38 @@ function buildMessengerText(mode) {
   const _algoForCopy = document.getElementById('algorithmSelect')?.value || 'ZHLC_GF';
   const _isVPMCopy   = _algoForCopy === 'VPMB' || _algoForCopy === 'VPMB_GFS';
   const totRow = document.querySelector('#decoTableBody tr[data-phase="totals"] td');
-  let decoZoneCopyVal = getDecoZoneExportVal(totRow);
-  if (totRow) {
-    const t    = totRow.textContent.replace(/\s+/g, ' ').trim();
-    const runM = t.match(/Run time:\s*([\d':"]+)/i);
-    const decM = t.match(/Deco time:\s*([\d':"]+)/i);
-    const cnsM = t.match(/CNS:\s*([\d.]+%)/i);
-    const otuM = t.match(/OTU:\s*(\d+)/i);
-    const prtM = t.match(/PrT:\s*([\d.]+)/i);
-    result.push('-'.repeat(28));
-    result.push(`Run Time:${runM?.[1]||'-'} Deco:${decM?.[1]||'-'}`);
-    result.push(`CNS:${cnsM?.[1]||'-'} OTU:${otuM?.[1]||'-'} PrT:${prtM?.[1]||'-'} Deco zone:${decoZoneCopyVal}`);
-  } else if (_isVPMCopy) {
+  let planSumCopy = getPlanSummaryExport(totRow);
+  if (!totRow && _isVPMCopy && window._lastVPMExport) {
     const vx2 = window._lastVPMExport;
-    if (vx2) {
-      const toMMSS = (n) => { const m = Math.floor(n), s = Math.round((n - m) * 60); return `${m}'${String(s).padStart(2,'0')}"`; };
-      result.push('-'.repeat(28));
-      result.push(`Run Time:${toMMSS(vx2.rt)} Deco:${toMMSS(vx2.deco)}`);
-      result.push(`CNS:${vx2.cns} OTU:${vx2.otu} PrT:${vx2.prt} Deco zone:${decoZoneCopyVal}`);
-    } else {
-      const rtV  = document.getElementById('decoRunTimeDisplay')?.textContent?.trim().replace(/['\s]/g,'') || '-';
-      const dtV  = document.getElementById('decoDecoTimeDisplay')?.textContent?.trim().replace(/\s*min\s*/,'') || '-';
-      const cnsV = document.getElementById('decoCNSDisplay')?.textContent?.trim() || '-';
-      const otuV = document.getElementById('decoOTUDisplay')?.textContent?.trim() || '-';
-      const prtN = (parseFloat(document.getElementById('decoDepth')?.value||'0') * BAR_PER_METRE) * Math.sqrt(parseFloat(document.getElementById('decoBT')?.value||'0'));
-      result.push('-'.repeat(28));
-      result.push(`Run Time:${rtV}'00" Deco:${dtV}'00"`);
-      result.push(`CNS:${cnsV} OTU:${otuV} PrT:${isNaN(prtN)?'-':prtN.toFixed(1)} Deco zone:${decoZoneCopyVal}`);
-    }
+    const toMMSS = (n) => { const m = Math.floor(n), s = Math.round((n - m) * 60); return `${m}'${String(s).padStart(2,'0')}"`; };
+    planSumCopy = {
+      runTime: toMMSS(vx2.rt),
+      tts: vx2.tts || toMMSS(Math.max(0, vx2.rt - parseFloat(document.getElementById('decoBT')?.value || '0'))),
+      decoTime: toMMSS(vx2.deco),
+      cns: vx2.cns,
+      otu: vx2.otu,
+      prt: vx2.prt,
+      decozone: vx2.decozone || planSumCopy.decozone,
+      decoStop: vx2.decoStop || planSumCopy.decoStop,
+    };
+  } else if (!totRow && _isVPMCopy) {
+    const rtV  = document.getElementById('decoRunTimeDisplay')?.textContent?.trim().replace(/['\s]/g,'') || '-';
+    const dtV  = document.getElementById('decoDecoTimeDisplay')?.textContent?.trim().replace(/\s*min\s*/,'') || '-';
+    const cnsV = document.getElementById('decoCNSDisplay')?.textContent?.trim() || '-';
+    const otuV = document.getElementById('decoOTUDisplay')?.textContent?.trim() || '-';
+    const prtN = (parseFloat(document.getElementById('decoDepth')?.value||'0') * BAR_PER_METRE) * Math.sqrt(parseFloat(document.getElementById('decoBT')?.value||'0'));
+    planSumCopy.runTime = `${rtV}'00"`;
+    planSumCopy.decoTime = `${dtV}'00"`;
+    planSumCopy.cns = cnsV;
+    planSumCopy.otu = otuV;
+    planSumCopy.prt = isNaN(prtN) ? '-' : prtN.toFixed(1);
   }
+  if (planSumCopy.prt === '-') {
+    const prtN = (parseFloat(document.getElementById('decoDepth')?.value||'0') * BAR_PER_METRE) * Math.sqrt(parseFloat(document.getElementById('decoBT')?.value||'0'));
+    if (!isNaN(prtN)) planSumCopy.prt = prtN.toFixed(1);
+  }
+  result.push('-'.repeat(28));
+  result.push(formatPlanSummaryBlock(planSumCopy, true));
 
   return result.join('\n');
 }
@@ -13319,27 +13450,22 @@ function runContingencyScenario(modifyFn) {
 
   // Capture formatted totals from DOM totals row
   const totalsRow = document.querySelector('#decoTableBody tr[data-phase="totals"] td');
-  let lastRunFmt = null, decoTimeFmt = null, totalCNS = null, totalOTUc = null;
-  let decoZoneStart = window._lastPlan?.decoZoneStart ?? 0;
-  if (totalsRow) {
-    const t = totalsRow.textContent.replace(/\s+/g, ' ');
-    const rM = t.match(/Run time:\s*([\d'":]+)/i);
-    const dM = t.match(/Deco time:\s*([\d'":]+)/i);
-    const cM = t.match(/CNS:\s*([\d.]+%)/i);
-    const oM = t.match(/OTU:\s*(\d+)/i);
-    const dzM = t.match(/Deco zone:\s*([\d.]+)\s*m/i);
-    if (rM) lastRunFmt  = rM[1];
-    if (dM) decoTimeFmt = dM[1];
-    if (cM) totalCNS    = cM[1];
-    if (oM) totalOTUc   = oM[1];
-    if (dzM) decoZoneStart = parseFloat(dzM[1]);
-  }
+  const planSum = getPlanSummaryExport(totalsRow);
+  const lp = window._lastPlan || {};
+  let lastRunFmt = planSum.runTime !== '-' ? planSum.runTime : null;
+  let decoTimeFmt = planSum.decoTime !== '-' ? planSum.decoTime : null;
+  let totalCNS = planSum.cns !== '-' ? planSum.cns : null;
+  let totalOTUc = planSum.otu !== '-' ? planSum.otu : null;
+  let tts = planSum.tts;
+  let decoStop = planSum.decoStop;
+  let decozoneDisp = planSum.decozone;
+  let decoZoneStart = lp.decoZoneStart ?? 0;
 
   // Restore original DOM
   document.getElementById('decoTableBody').innerHTML = savedBody;
   document.getElementById('decoSummary').innerHTML   = savedSummary;
 
-  return { newRows, lastRun, decoTime: Math.round(decoTime), lastRunFmt, decoTimeFmt, totalCNS, totalOTUc, decoZoneStart };
+  return { newRows, lastRun, decoTime: Math.round(decoTime), lastRunFmt, decoTimeFmt, totalCNS, totalOTUc, decoZoneStart, decozoneDisp, decoStop, tts, planSum };
 }
 
 // Contingency state
@@ -13459,7 +13585,7 @@ function calcContingency() {
                    (contExtraBT > 0)        ? 'Carry extra gas reserve for this scenario.' :
                    'Showing standard plan.';
 
-  const { newRows, lastRun, decoTime, lastRunFmt, decoTimeFmt, totalCNS, totalOTUc, decoZoneStart } = runContingencyScenario(() => {
+  const { newRows, lastRun, decoTime, lastRunFmt, decoTimeFmt, totalCNS, totalOTUc, decoZoneStart, decozoneDisp, decoStop, tts, planSum } = runContingencyScenario(() => {
     if (contExtraBT > 0 && origBT)
       document.getElementById('decoBT').value = parseFloat(origBT) + contExtraBT;
     for (const idx of getAllDecoGasIds()) {
@@ -13486,7 +13612,23 @@ function calcContingency() {
   const _emOTU     = totalOTUc || '—';
   const cnsColor   = totalCNS && parseFloat(totalCNS) >= 100 ? 'var(--red)' : totalCNS && parseFloat(totalCNS) >= 80 ? 'var(--orange)' : 'var(--text)';
   const prtColorEm = parseFloat(_emPrT) < 15 ? 'var(--green)' : parseFloat(_emPrT) < 25 ? 'var(--yellow)' : parseFloat(_emPrT) < 40 ? 'var(--orange)' : 'var(--red)';
-  const decoZoneDispEm = formatDecoZoneStart(decoZoneStart);
+  const _emHasDeco = (decoTimeFmt && decoTimeFmt !== '0\'00"') || decoTime > 0;
+  const _emTts = tts || planSum?.tts || '—';
+  const _emDecozone = decozoneDisp || planSum?.decozone || formatDecoZoneStart(decoZoneStart);
+  const _emDecoStop = decoStop || planSum?.decoStop || '—';
+  const emInfoRow = buildPlanInfoRowHtml({
+    runTime: _emRunFmt,
+    tts: _emTts,
+    decoTime: _emDecoFmt,
+    cns: totalCNS || '—',
+    cnsColor,
+    otu: _emOTU,
+    prt: _emPrT,
+    prtColor: prtColorEm,
+    hasDeco: _emHasDeco,
+    decozone: _emDecozone,
+    decoStop: _emDecoStop,
+  });
   resultEl.innerHTML = `
     <div class="alert ${severity}" style="margin:0 0 10px;${contGasLose==='both'?'border-width:2px;':''}">
       <span>${icon}</span>
@@ -13495,12 +13637,8 @@ function calcContingency() {
     </div>
     <div style="overflow-x:auto;">
       <table class="deco-table table-view" style="font-size:10px;">
-        <thead><tr><th>Phase</th><th>Depth</th><th>Stop</th><th>Run</th><th>Mix</th><th>EAD</th><th class="end-col">END</th><th>PPO2</th><th>CNS%</th></tr></thead>
-        <tbody>${newRows.replace(/<tr[^>]*data-phase="totals"[^>]*>[\s\S]*?<\/tr>/, '')}<tr style="background:rgba(0,200,255,0.04);border-top:2px solid var(--border-hi);" data-phase="totals">
-          <td colspan="20" style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;">
-            <span style="color:var(--muted);">Run time:</span> <span style="color:var(--text);font-weight:700;margin-right:16px;">${_emRunFmt}</span><span style="color:var(--muted);">Deco time:</span> <span style="color:var(--orange);font-weight:700;margin-right:16px;">${_emDecoFmt}</span><span style="color:var(--muted);">CNS:</span> <span style="color:${cnsColor};font-weight:700;margin-right:16px;">${totalCNS || '—'}</span><span style="color:var(--muted);">OTU:</span> <span style="color:var(--text);font-weight:700;margin-right:16px;">${_emOTU}</span><span style="color:var(--muted);">PrT:</span> <span style="color:${prtColorEm};font-weight:700;margin-right:16px;">${_emPrT}</span><span style="color:var(--muted);" title="Depth where the leading compartment enters the decompression zone during ascent">Deco zone:</span> <span style="color:var(--text);font-weight:700;">${decoZoneDispEm}</span>
-          </td>
-        </tr></tbody>
+        <thead><tr><th>Phase</th><th>Depth</th><th>Stop</th><th>Run</th><th>TTS</th><th>Mix</th><th>EAD</th><th class="end-col">END</th><th>PPO2</th><th>CNS%</th></tr></thead>
+        <tbody id="contingencyTableBody">${newRows.replace(/<tr[^>]*data-phase="totals"[^>]*>[\s\S]*?<\/tr>/, '')}${emInfoRow}</tbody>
       </table>
     </div>
     <div id="decoAlertsEmergency" style="margin-top:4px;"></div>
@@ -13514,7 +13652,7 @@ function calcContingency() {
     </div>`;
 
   // Store for export
-  window._lastContingency = { label, lastRun, decoTime, lastRunFmt, decoTimeFmt, totalCNS, totalOTU: _emOTU, totalPrT: _emPrT, decoZoneStart, decoZoneDisp: decoZoneDispEm, newRows, severity, icon, msg };
+  window._lastContingency = { label, lastRun, decoTime, lastRunFmt, decoTimeFmt, totalCNS, totalOTU: _emOTU, totalPrT: _emPrT, decoZoneStart, decozoneDisp: _emDecozone, decoStop: _emDecoStop, tts: _emTts, newRows, severity, icon, msg };
 
   // CNS alert — goes into emergency card, NOT main decoAlerts
   const emAlerts = document.getElementById('decoAlertsEmergency');
@@ -13742,7 +13880,7 @@ async function exportContingencyPDF(opts) {
   doc.setFontSize(10); doc.setFont('DejaVuSans','bold'); doc.setTextColor(180,30,30);
   doc.text('⚠ ' + cleanPDF(c.label), ML+3, y+6);
   doc.setFontSize(8); doc.setFont('DejaVuSans','normal'); doc.setTextColor(100,0,0);
-  doc.text(`Run: ${c.lastRunFmt||c.lastRun+"'00\""} | Deco: ${c.decoTimeFmt||c.decoTime+"'00\""} | CNS: ${c.totalCNS||'--'} | OTU: ${c.totalOTU||'--'} | PrT: ${c.totalPrT||'--'} | Deco zone: ${c.decoZoneDisp||formatDecoZoneStart(c.decoZoneStart)}`, ML+3, y+10.5);
+  doc.text(`Run: ${c.lastRunFmt||c.lastRun+"'00\""} | TTS: ${c.tts||'--'} | Deco: ${c.decoTimeFmt||c.decoTime+"'00\""} | CNS: ${c.totalCNS||'--'} | OTU: ${c.totalOTU||'--'} | PrT: ${c.totalPrT||'--'} | Decozone: ${c.decozoneDisp||formatDecoZoneStart(c.decoZoneStart)} | Deco stop: ${c.decoStop||'--'}`, ML+3, y+10.5);
   doc.setTextColor(150,0,0); doc.text(cleanPDF(c.msg||''), ML+3, y+14.5);
   doc.setTextColor(0,0,0); y+=19;
 
@@ -13786,11 +13924,11 @@ async function exportContingencyPDF(opts) {
   // ── SECTION: Emergency Ascent Schedule ──────────────────────────────────
   if (_incSlate) {
     sectionTitle('EMERGENCY ASCENT SCHEDULE', cleanPDF(c.label));
-    const colW=[8,22,16,16,20,14,13,12,11];
+    const colW=[7,20,14,14,12,18,12,11,10,10];
     const colX=[ML]; colW.forEach((w,i)=>{ if(i<colW.length-1) colX.push(colX[i]+colW[i]); });
     doc.setFillColor(180,30,30); doc.rect(ML,y,CW,6,'F');
     doc.setFontSize(7); doc.setFont('DejaVuSans','bold'); doc.setTextColor(255,255,255);
-    ['Phase','Depth','Stop','Run','Mix','EAD','END','PPO2','CNS%'].forEach((h,i)=>doc.text(h,colX[i]+colW[i]/2,y+4,{align:'center'}));
+    ['Phase','Depth','Stop','Run','TTS','Mix','EAD','END','PPO2','CNS%'].forEach((h,i)=>doc.text(h,colX[i]+colW[i]/2,y+4,{align:'center'}));
     doc.setTextColor(0,0,0); y+=6;
 
     document.querySelectorAll('#contingencyResult .deco-table tbody tr').forEach((tr,rowI)=>{
@@ -13829,7 +13967,7 @@ async function exportContingencyPDF(opts) {
       const icon=isDeco?'Stp':isAsc?'Asc':isBtm?'Lvl':isSafe?'Stp':isDes?'Des':'---';
       doc.setFontSize(7); doc.setFont('DejaVuSans','normal');
       doc.setTextColor(...txC); doc.text(icon,colX[0]+colW[0]/2,y+3.5,{align:'center'});
-      [cv[1],cv[2],cv[3],cv[4],cv[5],cv[6],cv[7],cv[8]].forEach((v,i)=>{
+      [cv[1],cv[2],cv[3],cv[4],cv[5],cv[6],cv[7],cv[8],cv[9]].forEach((v,i)=>{
         const cv2=cleanPDF(v||''); if(cv2&&cv2!=='-') doc.text(cv2,colX[i+1]+colW[i+1]/2,y+3.5,{align:'center'});
       });
       doc.setTextColor(0,0,0); y+=5;
@@ -14797,16 +14935,15 @@ async function exportPDF(opts) {
     ? `${_pdfBotLabel} (O2:${_pdfBotO2}% He:${_pdfBotHe}% N2:${_pdfBotN2}%)`
     : _pdfBotLabel;
   const totalsRowEl = document.querySelector('#decoTableBody tr[data-phase="totals"] td');
-  let decoTimeVal='—', totalRTVal='—', cnsVal='—', otuVal='—', prtVal='—', decoZoneVal='—';
-  if (totalsRowEl) {
-    const t = totalsRowEl.textContent.replace(/\s+/g,' ');
-    const rM=t.match(/Run time:\s*([\d'":]+)/i), dM=t.match(/Deco time:\s*([\d'":]+)/i);
-    const cM=t.match(/CNS:\s*([\d.]+%)/i), oM=t.match(/OTU:\s*(\d+)/i), pM=t.match(/PrT:\s*([\d.]+)/i);
-    const dzM=t.match(/Deco zone:\s*([\d.]+ (?:m|ft)|—)/i);
-    if(rM) totalRTVal=rM[1]; if(dM) decoTimeVal=dM[1]; if(cM) cnsVal=cM[1]; if(oM) otuVal=oM[1]; if(pM) prtVal=pM[1];
-    if(dzM) decoZoneVal=dzM[1].trim();
-  }
-  if (decoZoneVal === '—') decoZoneVal = getDecoZoneExportVal(totalsRowEl);
+  const planSumPdf = getPlanSummaryExport(totalsRowEl);
+  let decoTimeVal = planSumPdf.decoTime;
+  let totalRTVal = planSumPdf.runTime;
+  let ttsVal = planSumPdf.tts;
+  let cnsVal = planSumPdf.cns;
+  let otuVal = planSumPdf.otu;
+  let prtVal = planSumPdf.prt;
+  let decoZoneVal = planSumPdf.decozone;
+  let decoStopVal = planSumPdf.decoStop;
   const algoTag = decoModelSel==='ZHLC_GF'?`GF${mGF.low}-${mGF.high}_Buhlmann`:decoModelSel==='VPMB'?`C${cons}_VPM-B`:`GFHi${mGF.high}_C${cons}_VPM-B_GFS`;
   const fileName = `LSP_${isoDate}_Deco_${depthVal}${du}_${btVal}min_${algoTag}.pdf`;
   const PW=210, PH=297, ML=14, MR=14, MT=10, MB=10, CW=182;
@@ -14867,10 +15004,10 @@ async function exportPDF(opts) {
   const _pdfEndStr = isVPM ? 'N/A' : `${_pdfEndM} ${du}  N2:Y ${_pdfO2Narc}`;
   const stats=[
     [`${depthVal} ${du}`,'Depth'],[`${btVal} min`,'BT Time'],[_pdfBotLabel,'Bottom Gas'],
-    [decoTimeVal,'Deco Time'],[totalRTVal,'Run Time'],[gfStr,isVPM?algo:'GF Low/High'],
+    [decoTimeVal,'Deco Time'],[totalRTVal,'Run Time'],[ttsVal,'TTS'],[gfStr,isVPM?algo:'GF Low/High'],
     [`${document.getElementById('lastDecoStop')?.value||'—'} ${du}`,'Last Stop'],
     [`${document.getElementById('decoStep')?.value||'—'} ${du}`,'Step Size'],
-    [cnsVal,'CNS%'],[otuVal,'OTU'],[prtVal,'PrT'],[decoZoneVal,'Deco Zone'],
+    [cnsVal,'CNS%'],[otuVal,'OTU'],[prtVal,'PrT'],[decoStopVal,'Deco Stop'],[decoZoneVal,'Decozone'],
     [_pdfEndStr,'END Narcotic']
   ];
   const sw=CW/6, sh=10;
@@ -14962,11 +15099,11 @@ async function exportPDF(opts) {
   const _pdfMdp6m  = document.getElementById('minDeco6m')?.value || '3';
   const _pdfMdpStr = _pdfMdpEn ? `  MinDeco:ON(9${du}:${_pdfMdp9m}' 6${du}:${_pdfMdp6m}')` : '';
   sectionTitle('DIVE PROFILE',`${depthVal}${du} / ${btVal}min / ${_pdfBotDetail} / ${gfStr}  |  Des:${_dRate} Asc:${_aRate} Deco:${_daRate} Sur:${_saRate} ${du}/min  |  Rounding:${_rnd}  WV:${_wv}(${_wvL})${_pdfTravelStr}${_pdfAltStr}${_pdfRepStr}${_pdfHeHtStr}${_pdfMdpStr}`);
-  const colW=[8,22,16,16,20,14,13,12,11];
+  const colW=[7,20,14,14,12,18,12,11,10,10];
   const colX=[ML]; colW.forEach((w,i)=>{if(i<colW.length-1)colX.push(colX[i]+colW[i]);});
   checkY(7); doc.setFillColor(0,85,170); doc.rect(ML,y,CW,6,'F');
   doc.setFontSize(7); doc.setFont('DejaVuSans','bold'); doc.setTextColor(255,255,255);
-  ['Phase','Depth','Stop','Run','Mix','EAD','END','PPO2','CNS%'].forEach((h,i)=>doc.text(h,colX[i]+colW[i]/2,y+4,{align:'center'}));
+  ['Phase','Depth','Stop','Run','TTS','Mix','EAD','END','PPO2','CNS%'].forEach((h,i)=>doc.text(h,colX[i]+colW[i]/2,y+4,{align:'center'}));
   doc.setTextColor(0,0,0); y+=6;
   document.querySelectorAll('#decoTableBody tr').forEach((tr,rowI)=>{
     const phase=tr.dataset.phase; if(!phase) return;
@@ -15004,7 +15141,7 @@ async function exportPDF(opts) {
     const icon=isDeco?'Stp':isAsc?'Asc':isBtm?'Lvl':isSafe?'Stp':isDes?'Des':'---';
     doc.setFontSize(7); doc.setFont('DejaVuSans','normal');
     doc.setTextColor(...txC); doc.text(icon,colX[0]+colW[0]/2,y+3.5,{align:'center'});
-    [c[1],c[2],c[3],c[4],c[5],c[6],c[7],c[8]].forEach((v,i)=>{const cv=cleanPDF(v||'');if(cv&&cv!=='-')doc.text(cv,colX[i+1]+colW[i+1]/2,y+3.5,{align:'center'});});
+    [c[1],c[2],c[3],c[4],c[5],c[6],c[7],c[8],c[9]].forEach((v,i)=>{const cv=cleanPDF(v||'');if(cv&&cv!=='-')doc.text(cv,colX[i+1]+colW[i+1]/2,y+3.5,{align:'center'});});
     doc.setTextColor(0,0,0); y+=5;
   });
   y+=3; checkY(7); doc.setFontSize(7); doc.setFont('DejaVuSans','normal');
@@ -15447,13 +15584,13 @@ async function exportPDF(opts) {
     doc.setFontSize(11);doc.setFont('DejaVuSans','bold');doc.setTextColor(180,30,30);
     doc.text('EMERGENCY PLAN: '+cc.label,ML+3,y+6);
     doc.setFontSize(8);doc.setFont('DejaVuSans','normal');doc.setTextColor(100,0,0);
-    doc.text(`Run: ${cc.lastRunFmt||cc.lastRun+"'00\""} | Deco: ${cc.decoTimeFmt||cc.decoTime+"'00\""} | CNS: ${cc.totalCNS||'—'} | OTU: ${cc.totalOTU||'—'} | PrT: ${cc.totalPrT||'—'}`,ML+3,y+11);
+    doc.text(`Run: ${cc.lastRunFmt||cc.lastRun+"'00\""} | TTS: ${cc.tts||'—'} | Deco: ${cc.decoTimeFmt||cc.decoTime+"'00\""} | CNS: ${cc.totalCNS||'—'} | OTU: ${cc.totalOTU||'—'} | PrT: ${cc.totalPrT||'—'} | Decozone: ${cc.decozoneDisp||formatDecoZoneStart(cc.decoZoneStart)} | Deco stop: ${cc.decoStop||'—'}`,ML+3,y+11);
     doc.setTextColor(150,0,0);doc.text(cc.msg||'',ML+3,y+15.5);
     doc.setTextColor(0,0,0);y+=22;
     sectionTitle('EMERGENCY ASCENT SCHEDULE', cc.label);
     doc.setFillColor(180,30,30);doc.rect(ML,y,CW,6,'F');
     doc.setFontSize(7);doc.setFont('DejaVuSans','bold');doc.setTextColor(255,255,255);
-    ['Phase','Depth','Stop','Run','Mix','EAD','END','PPO2','CNS%'].forEach((h,i)=>doc.text(h,colX[i]+colW[i]/2,y+4,{align:'center'}));
+    ['Phase','Depth','Stop','Run','TTS','Mix','EAD','END','PPO2','CNS%'].forEach((h,i)=>doc.text(h,colX[i]+colW[i]/2,y+4,{align:'center'}));
     doc.setTextColor(0,0,0);y+=6;
     document.querySelectorAll('#contingencyResult .deco-table tbody tr').forEach((tr,ri)=>{
       const ph=tr.dataset.phase; const tds2=Array.from(tr.querySelectorAll('td')); const cv=tds2.map(td=>td.textContent.trim());
@@ -15465,7 +15602,7 @@ async function exportPDF(opts) {
       const tc=id2?[180,0,0]:ia?[30,130,60]:ib?[0,60,160]:is2?[20,140,50]:[160,50,50];
       const ic=id2?'●':ia?'↑':ib?'●':is2?'●':id3?'↓':'·';
       doc.setFontSize(7);doc.setFont('DejaVuSans','normal');doc.setTextColor(...tc);doc.text(ic,colX[0]+colW[0]/2,y+3.5,{align:'center'});
-      [cv[1],cv[2],cv[3],cv[4],cv[5],cv[6],cv[7],cv[8]].forEach((v,i)=>{if(v&&v!=='-'&&v!=='—')doc.text(v,colX[i+1]+colW[i+1]/2,y+3.5,{align:'center'});});
+      [cv[1],cv[2],cv[3],cv[4],cv[5],cv[6],cv[7],cv[8],cv[9]].forEach((v,i)=>{if(v&&v!=='-'&&v!=='—')doc.text(v,colX[i+1]+colW[i+1]/2,y+3.5,{align:'center'});});
       doc.setTextColor(0,0,0);y+=5;
     });
   }
