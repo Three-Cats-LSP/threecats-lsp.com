@@ -869,7 +869,7 @@ body.light-theme .ok { background:#f0fff4; border-color:#116622; color:#116622; 
 
 /* ── DECO TABLE ── */
 .deco-table { width:auto; border-collapse:collapse; font-family:'JetBrains Mono',monospace; font-size:12px; margin-top:10px; }
-.deco-table th { padding:4px 6px; text-align:left; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); border-bottom:1px solid var(--border-hi); background:rgba(0,200,255,0.05); vertical-align:middle; white-space:nowrap; overflow:hidden; width:1px; }
+.deco-table th { padding:4px 6px; text-align:left; font-size:9px; letter-spacing:1px; text-transform:uppercase; color:var(--accent); border-bottom:1px solid var(--border-hi); background:rgba(0,200,255,0.05); vertical-align:middle; white-space:nowrap; overflow:hidden; width:1px; }
 .deco-table td { padding:4px 6px; border-bottom:1px solid var(--border); color:var(--text); vertical-align:middle; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:1px; }
 .deco-table th:first-child, .deco-table td:first-child { text-align:center; }
 /* Gas Plan table — standalone, no deco-table inheritance */
@@ -1021,7 +1021,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
  .deco-table.table-view td { display:table-cell !important;
  padding:5px 6px !important;
  font-size:10px !important;
- width:auto !important;
+ width:1px !important;
  border-bottom:1px solid var(--border) !important;
  }
  .deco-table.table-view td:first-child { display:table-cell !important;
@@ -1032,7 +1032,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
  font-size:10px !important;
  }
  .deco-table.table-view td::before { display:none !important; }
- .deco-table.table-view th { display:table-cell !important; padding:5px 6px !important; font-size:8px !important; }
+ .deco-table.table-view th { display:table-cell !important; padding:5px 6px !important; font-size:8px !important; width:1px !important; }
  .deco-table.table-view thead tr { display:table-row !important; background:none !important; }
  /* Gas plan table — responsive */
  .gas-plan-table { font-size:10px !important; }
@@ -3201,7 +3201,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.10.29';
+const APP_VERSION = '2.10.30';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
