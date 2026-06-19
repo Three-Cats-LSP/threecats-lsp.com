@@ -30,6 +30,9 @@
   --text: #d8eef8; --muted: #3e6882; --tip: #5ba4c2; --dim: #142535;
   --font-ui: 'Outfit', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-user: 'Noto Sans', 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --icon-btn-size: 32px;
+  --icon-btn-r: 6px;
+  --icon-btn-svg: 14px;
 }
 body.light-theme {
   --bg: #ffffff; --surface: #f8f9fa; --card: #eff3f8; --card2: #e8ecf1;
@@ -107,9 +110,9 @@ body.light-theme .brand-icon { background: #f5f7f9; }
 .hdr-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
 .theme-toggle {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 32px; height: 32px; border-radius: 6px;
+  width: var(--icon-btn-size); height: var(--icon-btn-size); border-radius: var(--icon-btn-r);
   border: 1px solid var(--border); background: var(--card);
-  color: var(--accent); font-size: 16px; cursor: pointer; transition: all 0.3s;
+  color: var(--accent); font-size: var(--icon-btn-svg); cursor: pointer; transition: all 0.3s;
 }
 .theme-toggle:hover { border-color: var(--accent); background: rgba(0,200,255,0.1); }
 .btn-back {
@@ -119,7 +122,7 @@ body.light-theme .brand-icon { background: #f5f7f9; }
 }
 .btn-back:hover { border-color: var(--accent); }
 .btn-back.btn-close {
-  width: 32px; height: 32px; padding: 0;
+  width: var(--icon-btn-size); height: var(--icon-btn-size); padding: 0;
   display: inline-flex; align-items: center; justify-content: center;
 }
 .card {
@@ -165,10 +168,7 @@ body.light-theme .brand-icon { background: #f5f7f9; }
   letter-spacing: normal;
   text-transform: none;
 }
-.card-title-actions { display: flex; gap: 3px; flex-shrink: 0; align-items: center; }
-.icon-btn-sm {
-  width: 26px; height: 26px; border-radius: 5px; font-size: 12px;
-}
+.card-title-actions { display: flex; gap: 4px; flex-shrink: 0; align-items: center; }
 .modal-field-row { display: flex; gap: 8px; }
 .modal-field-row .modal-field { flex: 1; }
 .card.collapsible.card-open .card-title .card-caret { transform: rotate(180deg); }
@@ -183,9 +183,9 @@ body.light-theme .brand-icon { background: #f5f7f9; }
 }
 .btn-primary:hover { background: rgba(0,200,255,0.25); }
 .btn-primary.btn-icon-only {
-  width: 40px; height: 40px; padding: 0; min-width: 0;
+  width: var(--icon-btn-size); height: var(--icon-btn-size); padding: 0; min-width: 0;
 }
-.btn-primary.btn-icon-only svg { width: 18px; height: 18px; }
+.btn-primary.btn-icon-only svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); }
 .btn-secondary {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 8px 14px; background: var(--surface); color: var(--text);
@@ -194,10 +194,10 @@ body.light-theme .brand-icon { background: #f5f7f9; }
 }
 .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
 .btn-secondary.btn-icon-only {
-  width: 40px; height: 40px; padding: 0; min-width: 0;
+  width: var(--icon-btn-size); height: var(--icon-btn-size); padding: 0; min-width: 0;
   display: inline-flex; align-items: center; justify-content: center;
 }
-.btn-secondary.btn-icon-only svg { width: 18px; height: 18px; }
+.btn-secondary.btn-icon-only svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); }
 .btn-export {
   padding: 7px 10px; background: var(--surface); color: var(--accent);
   border: 1px solid var(--accent); border-radius: 6px; cursor: pointer;
@@ -210,9 +210,10 @@ body.light-theme .brand-icon { background: #f5f7f9; }
 .btn-export:active { background: var(--accent); color: var(--bg); opacity: 1; }
 .btn-export:hover { background: rgba(0,200,255,0.1); }
 .btn-export.btn-icon-only {
-  width: 40px; height: 40px; padding: 0; min-width: 0;
+  width: var(--icon-btn-size); height: var(--icon-btn-size); padding: 0; min-width: 0;
+  border-radius: var(--icon-btn-r);
 }
-.btn-export.btn-icon-only svg { width: 18px; height: 18px; }
+.btn-export.btn-icon-only svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); }
 .btn-export.btn-reset-red { border-color: var(--red) !important; color: var(--red) !important; }
 .btn-export.btn-reset-red:hover { background: rgba(255,71,87,0.12) !important; }
 .btn-export.btn-reset-red:active { background: var(--red) !important; color: var(--bg) !important; opacity: 1; }
@@ -233,7 +234,7 @@ body.light-theme .btn-export.btn-reset-red:hover { background: rgba(255,49,49,0.
 .trip-card:hover { border-color: var(--accent); }
 .trip-card-head { display: flex; align-items: flex-start; gap: 8px; }
 .trip-card-main { flex: 1; min-width: 0; cursor: pointer; }
-.trip-card-actions { display: flex; gap: 3px; flex-shrink: 0; }
+.trip-card-actions { display: flex; gap: 4px; flex-shrink: 0; align-items: center; }
 .trip-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
 .trip-card .progress-bar { cursor: pointer; }
 .trip-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
@@ -270,20 +271,18 @@ body.light-theme .btn-export.btn-reset-red:hover { background: rgba(255,49,49,0.
 }
 .edit-row input:focus { outline: none; border-color: var(--accent); }
 .icon-btn {
-  width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border);
-  background: transparent; color: var(--muted); cursor: pointer; font-size: 14px;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  padding: 0;
+  width: var(--icon-btn-size); height: var(--icon-btn-size); border-radius: var(--icon-btn-r);
+  border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0;
 }
 .icon-btn svg, .btn-export svg, .card-caret svg, .check-box svg, .theme-toggle svg, .btn-back svg {
   display: block; flex-shrink: 0;
 }
-.icon-btn svg { width: 14px; height: 14px; }
-.icon-btn-sm svg { width: 13px; height: 13px; }
-.check-box svg { width: 14px; height: 14px; stroke-width: 2.5; }
-.btn-export svg { width: 16px; height: 16px; }
+.icon-btn svg, .icon-btn-sm svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); }
+.check-box svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); stroke-width: 2.5; }
+.btn-export:not(.btn-icon-only) svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); }
 .card-caret svg { width: 11px; height: 11px; color: var(--muted); }
-.theme-toggle svg { width: 16px; height: 16px; }
+.theme-toggle svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); }
 .btn-back svg { width: 12px; height: 12px; }
 .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
 .icon-btn.danger:hover { border-color: var(--red); color: var(--red); }
@@ -363,6 +362,15 @@ body.light-theme .about-tab-btn.active { color: #fff; }
   border-radius: 8px; padding: 8px 10px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 13px;
 }
 .home-toolbar label { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); white-space: nowrap; cursor: pointer; }
+.home-list-filters {
+  display: flex; flex-wrap: wrap; gap: 12px 16px;
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);
+}
+.home-list-filters label {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); cursor: pointer;
+}
+.home-list-filters input { width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; }
 .trip-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 .trip-tag {
   font-family: 'JetBrains Mono', monospace; font-size: 9px; padding: 2px 6px; border-radius: 4px;
@@ -417,7 +425,7 @@ body.light-theme .about-tab-btn.active { color: #fff; }
   display: flex; align-items: center; justify-content: center; padding: 0;
 }
 .qty-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; min-width: 28px; text-align: center; color: var(--tip); }
-.check-item .item-actions { display: flex; gap: 3px; flex-shrink: 0; align-items: flex-start; }
+.check-item .item-actions { display: flex; gap: 4px; flex-shrink: 0; align-items: flex-start; }
 .modal-box.modal-wide { max-width: 420px; }
 .modal-checklist { max-height: 220px; overflow-y: auto; margin: 8px 0; }
 .modal-check-row {
@@ -448,10 +456,8 @@ body.light-theme .about-tab-btn.active { color: #fff; }
 .celebrate-box h3 { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--green); margin-bottom: 8px; }
 @media (max-width: 600px) {
   .card { padding: 12px 10px; }
-  .icon-btn-sm { width: 24px; height: 24px; font-size: 11px; }
   .card-title input { font-size: 12px; }
   .card.collapsible .card-title { gap: 4px; }
-  .card-title-actions { gap: 2px; }
 }
 </style>
 </head>
@@ -1296,7 +1302,7 @@ function renderHeader(title, subtitle, showBack, tags) {
       </div>
       <div class="hdr-actions">
         <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"><span class="theme-icon" id="themeIcon">🌙</span></button>
-        ${screen === 'home' ? `<button class="btn-back" onclick="navigate('about')" title="About">?</button>` : ''}
+        ${screen === 'home' ? `<button class="btn-back btn-close" onclick="navigate('about')" title="About">?</button>` : ''}
       </div>
     </header>`;
 }
@@ -1336,17 +1342,6 @@ function renderHome() {
     ${renderHeader('GET IN WATER', 'Trip Packing Checklist', false)}
     <div class="action-row">
       <button class="btn-primary btn-icon-only" onclick="promptNewTrip()" title="New trip">${icon('plus', 18)}</button>
-      <div class="menu-dropdown">
-        <button class="btn-secondary btn-icon-only" onclick="toggleHomeMenu(event)" title="Filter trips">${icon('menu', 18)}</button>
-        <div class="menu-panel ${menuOpen ? 'open' : ''}" id="home-menu">
-          <label class="menu-panel-check" onclick="event.stopPropagation()">
-            <input type="checkbox" ${state.settings.hideCompleted ? 'checked' : ''} onchange="setHideCompleted(this.checked)"/> Hide completed
-          </label>
-          <label class="menu-panel-check" onclick="event.stopPropagation()">
-            <input type="checkbox" ${state.settings.showArchived ? 'checked' : ''} onchange="setShowArchived(this.checked)"/> Show archived
-          </label>
-        </div>
-      </div>
     </div>
     <div class="home-toolbar">
       <input type="search" id="home-search" placeholder="Search trips, tags, gear…" value="${esc(homeSearch)}" oninput="setHomeSearch(this.value)"/>
@@ -1360,6 +1355,10 @@ function renderHome() {
     <div class="card">
       <div class="card-title">Your Trips</div>
       <div id="home-trips">${renderHomeTripsHtml()}</div>
+      <div class="home-list-filters">
+        <label><input type="checkbox" ${state.settings.hideCompleted ? 'checked' : ''} onchange="setHideCompleted(this.checked)"/> Hide completed</label>
+        <label><input type="checkbox" ${state.settings.showArchived ? 'checked' : ''} onchange="setShowArchived(this.checked)"/> Show archived</label>
+      </div>
     </div>`;
 }
 
@@ -1850,13 +1849,6 @@ function render() {
   else if (screen === 'trip') root.innerHTML = renderTrip();
   else if (screen === 'about') root.innerHTML = renderAbout();
   applyTheme();
-}
-
-function toggleHomeMenu(e) {
-  e.stopPropagation();
-  menuOpen = !menuOpen;
-  exportMenuOpen = false;
-  render();
 }
 
 function toggleExportMenu(e) {
