@@ -3345,7 +3345,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.17';
+const APP_VERSION = '2.20.18';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
@@ -4655,7 +4655,9 @@ function buildDecoPlanHeaderData() {
   const _hh = String(now.getHours()).padStart(2, '0');
   const _min = String(now.getMinutes()).padStart(2, '0');
   const stamp = `${_yy}/${_mm}/${_dd} ${_hh}:${_min}`;
-  const density = densityMap[localStorage.getItem('waterDensity') || 'en13319'];
+  const _densityMap = { fresh: 'Fresh', en13319: 'EN13319', salt: 'Salt' };
+  const density = _densityMap[localStorage.getItem('waterDensity') || 'en13319'];
+  const du = units === 'imperial' ? 'ft' : 'm';
   const altM = typeof altitudeM !== 'undefined' ? altitudeM : 0;
   const altLabel = altM === 0 ? 'Sea level (0 m)' : `${altM} m`;
   const acclLabel = (typeof altAcclimatized !== 'undefined' ? altAcclimatized : true) ? 'Yes' : 'No';
@@ -13022,7 +13024,7 @@ function buildExportText(mode) {
   const _yy  = now.getFullYear();
   const _hh  = String(now.getHours()).padStart(2,'0');
   const _min = String(now.getMinutes()).padStart(2,'0');
-  const stamp = `${_yy}/${_dd}/${_mm} ${_hh}:${_min}`;
+  const stamp = `${_yy}/${_mm}/${_dd} ${_hh}:${_min}`;
   const densityMap = { fresh:'Fresh', en13319:'EN13319', salt:'Salt' };
   const density = densityMap[localStorage.getItem('waterDensity') || 'en13319'];
   const depthUnit = units === 'imperial' ? 'ft' : 'm';  // use live global
@@ -13529,7 +13531,7 @@ function buildSlateText() {
   const _sD = String(_sNow.getDate()).padStart(2,'0'), _sMo = String(_sNow.getMonth()+1).padStart(2,'0');
   const _sH = String(_sNow.getHours()).padStart(2,'0'), _sMi = String(_sNow.getMinutes()).padStart(2,'0');
   const dateStr = _sNow.toISOString().slice(0, 10);
-  const stamp = `${_sNow.getFullYear()}/${_sD}/${_sMo} ${_sH}:${_sMi}`;
+  const stamp = `${_sNow.getFullYear()}/${_sMo}/${_sD} ${_sH}:${_sMi}`;
   const algoSel = document.getElementById('algorithmSelect')?.value || 'ZHLC_GF';
   const algoNames = { ZHLC_GF: 'Buhlmann GF', VPMB: 'VPM-B', VPMB_GFS: 'VPM-B/GFS' };
   const algoName = algoNames[algoSel] || algoSel;
