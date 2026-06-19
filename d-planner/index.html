@@ -3246,7 +3246,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.14';
+const APP_VERSION = '2.20.15';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
@@ -4409,6 +4409,7 @@ function getContingencySummaryExport() {
       runTime: totRow.dataset.run||'-', tts: totRow.dataset.tts||'-', decoTime: totRow.dataset.deco||'-',
       cns: totRow.dataset.cns||'-', otu: totRow.dataset.otu||'-', prt: totRow.dataset.prt||'-',
       decozone: totRow.dataset.decozone||'-', decoStop: totRow.dataset.decostop||'-',
+      surfGF: totRow.dataset.surfgf||'-',
     } : parsePlanSummaryText(totRow.textContent);
     if (c) {
       if (p.runTime === '-') p.runTime = c.lastRunFmt || `${c.lastRun}'00"`;
@@ -4419,6 +4420,7 @@ function getContingencySummaryExport() {
       if (p.tts === '-') p.tts = c.tts || '-';
       if (p.decozone === '-') p.decozone = c.decozoneDisp || formatDecoZoneStart(c.decoZoneStart);
       if (p.decoStop === '-') p.decoStop = c.decoStop || '-';
+      if (!p.surfGF || p.surfGF === '-') p.surfGF = c.surfGF || '-';
     }
     return p;
   }
@@ -4432,6 +4434,7 @@ function getContingencySummaryExport() {
     prt: c.totalPrT || '-',
     decozone: c.decozoneDisp || formatDecoZoneStart(c.decoZoneStart),
     decoStop: c.decoStop || '-',
+    surfGF: c.surfGF || '-',
   };
 }
 
@@ -13898,7 +13901,7 @@ function calcContingency() {
     </div>`;
 
   // Store for export
-  window._lastContingency = { label, lastRun, decoTime, lastRunFmt, decoTimeFmt, totalCNS, totalOTU: _emOTU, totalPrT: _emPrT, decoZoneStart, decozoneDisp: _emDecozone, decoStop: _emDecoStop, tts: _emTts, newRows, severity, icon, msg };
+  window._lastContingency = { label, lastRun, decoTime, lastRunFmt, decoTimeFmt, totalCNS, totalOTU: _emOTU, totalPrT: _emPrT, decoZoneStart, decozoneDisp: _emDecozone, decoStop: _emDecoStop, tts: _emTts, newRows, severity, icon, msg, surfGF: contSurfaceGF != null ? Math.round(contSurfaceGF) + '%' : '-' };
 
   // CNS alert — goes into emergency card, NOT main decoAlerts
   const emAlerts = document.getElementById('decoAlertsEmergency');
@@ -14194,7 +14197,7 @@ async function exportContingencyPDF(opts) {
         doc.setLineWidth(0.2); y+=5; return;
       }
       if(phase==='totals'){
-        const t = `Run: ${emSumPdf.runTime}  TTS: ${emSumPdf.tts}  Deco: ${emSumPdf.decoTime}  CNS: ${emSumPdf.cns}  OTU: ${emSumPdf.otu}  PrT: ${emSumPdf.prt}  Decozone: ${emSumPdf.decozone}  First deco: ${emSumPdf.decoStop}`;
+        const t = `Run: ${emSumPdf.runTime}  TTS: ${emSumPdf.tts}  Deco: ${emSumPdf.decoTime}  CNS: ${emSumPdf.cns}  OTU: ${emSumPdf.otu}  PrT: ${emSumPdf.prt}  Surf GF: ${emSumPdf.surfGF||'-'}  Decozone: ${emSumPdf.decozone}  First deco: ${emSumPdf.decoStop}`;
         doc.setFillColor(255,240,240); doc.rect(ML,y,CW,5.5,'F');
         doc.setFontSize(7); doc.setFont('DejaVuSans','bold'); doc.setTextColor(150,0,0);
         doc.text(cleanPDF(t),ML+2,y+3.8); doc.setTextColor(0,0,0); y+=5.5; return;
