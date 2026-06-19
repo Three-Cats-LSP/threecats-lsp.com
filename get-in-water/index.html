@@ -454,6 +454,32 @@ body.light-theme .about-tab-btn.active { color: #fff; }
 @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .celebrate-box .emoji { font-size: 48px; margin-bottom: 12px; }
 .celebrate-box h3 { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--green); margin-bottom: 8px; }
+.app-footer {
+  text-align: center; padding: 14px 0 8px; margin-top: 4px;
+}
+.app-footer-icons {
+  display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 14px;
+}
+.app-footer-icon {
+  display: flex; align-items: center; opacity: 0.8;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.app-footer-icon:hover { transform: scale(1.15); opacity: 1; }
+.app-footer-icon img { width: 36px; height: 36px; display: block; object-fit: contain; border-radius: 4px; }
+.app-footer-donate-wrap { margin-top: 10px; display: flex; align-items: center; justify-content: center; }
+.app-footer-donate {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px;
+  background: transparent; border: 1px solid rgba(0,112,186,0.35); border-radius: 20px;
+  color: var(--muted); text-decoration: none;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.5px;
+  opacity: 0.7; transition: border-color 0.2s, color 0.2s, opacity 0.2s;
+}
+.app-footer-donate:hover { border-color: #0070ba; color: #0070ba; opacity: 1; }
+.app-footer-donate svg { flex-shrink: 0; }
+.app-footer-version {
+  color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; margin-top: 6px; letter-spacing: 1px; opacity: 0.5;
+}
 @media (max-width: 600px) {
   .card { padding: 12px 10px; }
   .card-title input { font-size: 12px; }
@@ -1307,6 +1333,66 @@ function renderHeader(title, subtitle, showBack, tags) {
     </header>`;
 }
 
+function renderAppFooter() {
+  const thingiverseIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHIAAAByCAMAAAC4A3VPAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABpUExURStS/gAAADBY/yhY/zBQ/yhQ/yxT/yxT/ipT/ipR/ixT/itT/ixS/itS/v////H1//L0/8rU/8rT/73J/73J/rzJ/6++/6++/qKz/pWp/5Wo/oid/nuT/nuS/m2I/mB9/lNz/kZo/jld/g0+l6gAAAAOdFJOU/8AICAgIK+vr7C/v+/vniJZ+QAAAKhJREFUeNrt2ckNwjAARNFxFpbENmELO4T0XyQV2DJI9gH938DTnEem6a3KtaqMGquiuUoLFa5X8ZyIiIjo26ZHht6KtfMZ2kJCQkJCQkJCQkLmJZ9jpP3Ghxpj3fR755B4UK6uIfIECQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQn5d6QrT3ZK7xi+ftNbq02fOflgL6Vma5l2qaTmyxAmh/ucBna1+QBeIOmb8eOcqAAAAABJRU5ErkJggg==';
+  return `
+    <footer class="app-footer">
+      <div class="app-footer-icons">
+        <a class="app-footer-icon" href="https://www.instagram.com/threecats_lsp" target="_blank" rel="noopener noreferrer" title="Follow @threecats_lsp on Instagram">
+          <svg fill="none" height="36" viewBox="0 0 50 50" width="36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="giwInstaGradient" x1="0%" x2="100%" y1="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#feda75"/>
+                <stop offset="5%" style="stop-color:#fa7e1e"/>
+                <stop offset="45%" style="stop-color:#d92e7f"/>
+                <stop offset="60%" style="stop-color:#9b36b7"/>
+                <stop offset="90%" style="stop-color:#515bd4"/>
+              </linearGradient>
+            </defs>
+            <rect fill="none" height="40" rx="10" ry="10" stroke="url(#giwInstaGradient)" stroke-width="2" width="40" x="5" y="5"/>
+            <circle cx="25" cy="25" fill="none" r="7" stroke="url(#giwInstaGradient)" stroke-width="1.2"/>
+            <circle cx="25" cy="25" fill="url(#giwInstaGradient)" r="2.5"/>
+            <circle cx="36" cy="12" fill="url(#giwInstaGradient)" r="1.8"/>
+          </svg>
+        </a>
+        <a class="app-footer-icon" href="https://github.com/Three-Cats-LSP/Get-In-Water" target="_blank" rel="noopener noreferrer" title="View source on GitHub">
+          <svg fill="var(--muted)" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        </a>
+        <a class="app-footer-icon" href="https://www.thingiverse.com/Roman_Markovtsev/designs" target="_blank" rel="noopener noreferrer" title="My designs on Thingiverse">
+          <img alt="Thingiverse" src="${thingiverseIcon}"/>
+        </a>
+        <a class="app-footer-icon" href="https://threecats-lsp.com/d-planner/" target="_blank" rel="noopener noreferrer" title="LSP D-Planner">
+          <img alt="LSP D-Planner" src="https://cdn-icons-png.magnific.com/512/9788/9788887.png"/>
+        </a>
+        <a class="app-footer-icon" href="https://threecats-lsp.com/t-viewer/" target="_blank" rel="noopener noreferrer" title="T-Viewer">
+          <svg fill="none" height="36" viewBox="0 0 500 500" width="36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect fill="#0a1628" height="500" width="500"/>
+            <path d="M 193 165 L 287 165 L 315 193 L 315 327 Q 315 335 307 335 L 193 335 Q 185 335 185 327 L 185 173 Q 185 165 193 165 Z" fill="#0a1a3a" stroke="#00c8ff" stroke-width="5"/>
+            <path d="M 287 165 L 315 193 L 287 193 Z" fill="#0a1628"/>
+            <line stroke="#00c8ff" stroke-width="5" x1="287" x2="287" y1="165" y2="193"/>
+            <line stroke="#00c8ff" stroke-width="5" x1="287" x2="315" y1="193" y2="193"/>
+            <line opacity="0.85" stroke="#00c8ff" stroke-linecap="round" stroke-width="4" x1="204" x2="296" y1="222" y2="222"/>
+            <line opacity="0.85" stroke="#00c8ff" stroke-linecap="round" stroke-width="4" x1="204" x2="296" y1="240" y2="240"/>
+            <line opacity="0.85" stroke="#00c8ff" stroke-linecap="round" stroke-width="4" x1="204" x2="296" y1="258" y2="258"/>
+            <line opacity="0.65" stroke="#00c8ff" stroke-linecap="round" stroke-width="4" x1="204" x2="272" y1="276" y2="276"/>
+            <line opacity="0.65" stroke="#00c8ff" stroke-linecap="round" stroke-width="4" x1="204" x2="284" y1="294" y2="294"/>
+            <line opacity="0.45" stroke="#00c8ff" stroke-linecap="round" stroke-width="4" x1="204" x2="260" y1="312" y2="312"/>
+          </svg>
+        </a>
+        <a class="app-footer-icon" href="https://threecats-lsp.com/get-in-water/download.html" target="_blank" rel="noopener noreferrer" title="Download Get In Water APK">
+          <img alt="Get In Water APK" src="${appLogoSrc()}" style="border-radius:8px;border:1px solid var(--border-hi)"/>
+        </a>
+      </div>
+      <div class="app-footer-donate-wrap">
+        <a class="app-footer-donate" href="https://paypal.me/ThreeCatsLSP" target="_blank" rel="noopener noreferrer">
+          <svg fill="none" height="13" viewBox="0 0 24 24" width="13" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828L8.293 21H12.5c.524 0 .968-.381 1.05-.9l.437-2.786h1.8c3.476 0 5.893-1.408 6.656-5.49.343-1.818.044-3.145-.22-4.907z" fill="currentColor" opacity="0.7"/></svg>
+          If you find this useful, consider a donation to support development
+        </a>
+      </div>
+      <p class="app-footer-version">Version ${APP_VERSION}</p>
+    </footer>`;
+}
+
 function renderHomeTripsHtml() {
   ensureSettings();
   const trips = getHomeTrips();
@@ -1359,7 +1445,8 @@ function renderHome() {
         <label><input type="checkbox" ${state.settings.hideCompleted ? 'checked' : ''} onchange="setHideCompleted(this.checked)"/> Hide completed</label>
         <label><input type="checkbox" ${state.settings.showArchived ? 'checked' : ''} onchange="setShowArchived(this.checked)"/> Show archived</label>
       </div>
-    </div>`;
+    </div>
+    ${renderAppFooter()}`;
 }
 
 function refreshHomeTrips() {
