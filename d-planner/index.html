@@ -3246,7 +3246,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.13';
+const APP_VERSION = '2.20.14';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
@@ -4073,9 +4073,14 @@ function setDecoAlgorithm(model, skipSave) {
           <option value="45/85">45/85</option>
           <option value="45/95">45/95</option>
           <option value="50/75">50/75</option>
+          <option value="50/80">50/80</option>
           <option value="55/80">55/80 ★</option>
+          <option value="60/70">60/70</option>
           <option value="100/75">100/75 ★</option>
           <option value="custom">Custom…</option>`;
+        // Restore current mGF selection into the freshly rebuilt dropdown
+        const _restoredOpt = Array.from(gfSel.options).find(o => o.value === `${mGF.low}/${mGF.high}`);
+        gfSel.value = _restoredOpt ? _restoredOpt.value : 'custom';
       }
     }
   }
