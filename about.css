@@ -80,7 +80,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.logo-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .header-actions { display: flex; gap: 10px; flex-shrink: 0; }

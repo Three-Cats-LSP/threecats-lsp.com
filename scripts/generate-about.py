@@ -14,7 +14,7 @@ APPS = [
     {
         "slug": "d-planner",
         "title": "LSP D-Planner",
-        "emoji": "🤿",
+        "icon_src": "/d-planner/icon-192.png",
         "app_url": "/d-planner/",
         "readme_names": ("d-planner.md",),
         "sibling_readme": ROOT.parent / "LSP_D-planner" / "README.md",
@@ -23,7 +23,7 @@ APPS = [
     {
         "slug": "t-viewer",
         "title": "T-Viewer",
-        "emoji": "📄",
+        "icon_src": "/t-viewer/icon-192.png",
         "app_url": "/t-viewer/",
         "readme_names": ("t-viewer.md",),
         "sibling_readme": ROOT.parent / "T-Viewer" / "README.md",
@@ -32,7 +32,7 @@ APPS = [
     {
         "slug": "get-in-water",
         "title": "Get In Water",
-        "emoji": "🧳",
+        "icon_src": "/get-in-water/icon-192.png",
         "app_url": "/get-in-water/",
         "readme_names": ("get-in-water.md",),
         "sibling_readme": ROOT.parent / "Get-In-Water" / "README.md",
@@ -208,7 +208,7 @@ def page_html(app: dict, body: str) -> str:
   <div class="page-dots" aria-hidden="true"></div>
   <header class="site-header">
     <a class="logo-link" href="/">
-      <span class="logo-mark" aria-hidden="true">{app["emoji"]}</span>
+      <span class="logo-mark"><img src="{app["icon_src"]}" alt="{html.escape(title)}" width="40" height="40"/></span>
       <span>Diver's Toolkit</span>
     </a>
     <div class="header-actions">
