@@ -2289,8 +2289,7 @@ function buildTripText(trip, mode) {
 
   if (mode === 'bag') {
     const groups = {};
-    let items = trip.items;
-    if (mode === 'remaining') items = items.filter(i => !isItemPacked(i, trip));
+    const items = trip.items;
     items.forEach(it => {
       ensureItem(it);
       const key = it.bag || '_none';
@@ -2624,7 +2623,7 @@ function importBackupJSON(input) {
       const parsed = JSON.parse(reader.result);
       const data = parsed.data || parsed;
       if (!data.masterTemplate || !data.trips) throw new Error('Invalid backup');
-      if (!confirm('Replace all current data with this backup?')) return;
+      if (!confirm('Replace all current data with this backup?')) { input.value = ''; return; }
       migrateState(data);
       state = data;
       ensureSettings();
