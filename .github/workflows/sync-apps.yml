@@ -19,25 +19,33 @@ jobs:
       - name: Pull latest D-Planner files
         if: github.event.action == 'sync-d-planner' || github.event_name == 'workflow_dispatch'
         run: |
-          mkdir -p d-planner
+          mkdir -p d-planner scripts/readmes
           for f in index.html download.html manifest.json sw.js capacitor-bridge.js tests.html tests-extended.html tests-massive.html tests-massive-main.html tests-verify.html; do
             curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                  -H "Accept: application/vnd.github.v3.raw" \
                  "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner/contents/${f}" \
                  -o "d-planner/${f}" || echo "skip ${f}"
           done
+          curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner/contents/README.md" \
+               -o "scripts/readmes/d-planner.md" || echo "skip README"
           echo "D-Planner synced"
 
       - name: Pull latest T-Viewer files
         if: github.event.action == 'sync-t-viewer' || github.event_name == 'workflow_dispatch'
         run: |
-          mkdir -p t-viewer
+          mkdir -p t-viewer scripts/readmes
           for f in index.html download.html manifest.json icon-192.png icon-512.png; do
             curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                  -H "Accept: application/vnd.github.v3.raw" \
                  "https://api.github.com/repos/Three-Cats-LSP/T-Viewer/contents/${f}" \
                  -o "t-viewer/${f}" || echo "skip ${f}"
           done
+          curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               "https://api.github.com/repos/Three-Cats-LSP/T-Viewer/contents/README.md" \
+               -o "scripts/readmes/t-viewer.md" || echo "skip README"
           echo "T-Viewer synced"
 
       - name: Pull latest D-Planner APK
@@ -63,13 +71,17 @@ jobs:
       - name: Pull latest Get In Water files
         if: github.event.action == 'sync-get-in-water' || github.event_name == 'workflow_dispatch'
         run: |
-          mkdir -p get-in-water
+          mkdir -p get-in-water scripts/readmes
           for f in index.html download.html manifest.json sw.js capacitor-bridge.js icon-192.png icon-512.png icon-192-light.png icon-512-light.png; do
             curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                  -H "Accept: application/vnd.github.v3.raw" \
                  "https://api.github.com/repos/Three-Cats-LSP/Get-In-Water/contents/${f}" \
                  -o "get-in-water/${f}" || echo "skip ${f}"
           done
+          curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               "https://api.github.com/repos/Three-Cats-LSP/Get-In-Water/contents/README.md" \
+               -o "scripts/readmes/get-in-water.md" || echo "skip README"
           echo "Get In Water synced"
 
       - name: Pull latest Get In Water APK
@@ -82,9 +94,14 @@ jobs:
                -o get-in-water/Get-In-Water.apk
           echo "Get In Water APK synced"
 
+      - name: Regenerate about pages
+        if: github.event_name == 'workflow_dispatch' || startsWith(github.event.action, 'sync-')
+        run: |
+          python3 scripts/generate-about.py
+
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add d-planner/ t-viewer/ get-in-water/
+          git add d-planner/ t-viewer/ get-in-water/ scripts/readmes/ about.css
           git diff --staged --quiet || (git commit -m "Sync apps from upstream repos" && git pull --rebase && git push)
