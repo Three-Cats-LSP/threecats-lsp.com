@@ -3246,7 +3246,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.2';
+const APP_VERSION = '2.20.3';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
@@ -16342,6 +16342,8 @@ function loadAppPreset(idx) {
   if (p.values.n2NarcSel) setNarcosis?.('n2', p.values.n2NarcSel === 'yes');
   if (p.values.o2NarcSel) setNarcosis?.('o2', p.values.o2NarcSel === 'yes');
   if (p.values.minDecoProfileEnable) toggleMinDecoProfile?.();
+  // Commit GF values into runtime mGF state — setting the DOM alone is not enough
+  if (p.values.gfLowInput || p.values.gfHighInput) setCustomGF?.();
   closeAdvConfigPresets();
   showToast(`Loaded preset: ${p.name}`, 'preset');
 }
@@ -16412,6 +16414,8 @@ function loadConfigPreset(idx) {
   if (p.values.n2NarcSel) setNarcosis?.('n2', p.values.n2NarcSel === 'yes');
   if (p.values.o2NarcSel) setNarcosis?.('o2', p.values.o2NarcSel === 'yes');
   if (p.values.minDecoProfileEnable) toggleMinDecoProfile?.();
+  // Commit GF values into runtime mGF state — setting the DOM alone is not enough
+  if (p.values.gfLowInput || p.values.gfHighInput) setCustomGF?.();
   closeAdvConfigPresets();
   showToast(`Config loaded: ${p.name}`, 'preset');
 }
