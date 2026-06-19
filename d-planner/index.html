@@ -3244,7 +3244,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.10';
+const APP_VERSION = '2.20.11';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
@@ -12840,11 +12840,11 @@ function buildExportText(mode) {
     lines.push('- Carry 3+ min of reserve gas');
     lines.push('- Use your dive computer for backup');
     // CNS toxicity warning
-    const cnsNumExport = parseFloat((cnsExpVal || '0').replace('%', ''));
+    const cnsNumExport = parseFloat((planSum.cns || '0').replace('%', ''));
     if (!isNaN(cnsNumExport) && cnsNumExport >= 80) {
       lines.push('');
       lines.push('!! CNS OXYGEN TOXICITY WARNING');
-      lines.push(`!! CNS% = ${cnsExpVal} — exceeds 80% threshold.`);
+      lines.push(`!! CNS% = ${planSum.cns} — exceeds 80% threshold.`);
       if (cnsNumExport >= 100) {
         lines.push('!! DANGER: CNS >= 100% — oxygen convulsion risk. Reduce O2 exposure.');
       } else {
@@ -14170,6 +14170,7 @@ async function exportContingencyPDF(opts) {
     ['Phase','Depth','Stop','Mix','Run','TTS','PPO2','END','EAD','CNS%'].forEach((h,i)=>doc.text(h,colX[i]+colW[i]/2,y+4,{align:'center'}));
     doc.setTextColor(0,0,0); y+=6;
 
+    const emSumPdf = getContingencySummaryExport();
     document.querySelectorAll('#contingencyResult .deco-table tbody tr').forEach((tr,rowI)=>{
       const phase=tr.dataset.phase;
       const tds=Array.from(tr.querySelectorAll('td'));
@@ -14186,9 +14187,7 @@ async function exportContingencyPDF(opts) {
         doc.setLineWidth(0.2); y+=5; return;
       }
       if(phase==='totals'){
-        const spans=tds[0]?.querySelectorAll('span')||[]; let t='';
-        spans.forEach(s=>{const v=s.textContent.trim();if(v)t+=(t?'  ':'')+v;});
-        if(!t&&tds[0]) t=tds[0].textContent.replace(/\s+/g,' ').trim();
+        const t = `Run: ${emSumPdf.runTime}  TTS: ${emSumPdf.tts}  Deco: ${emSumPdf.decoTime}  CNS: ${emSumPdf.cns}  OTU: ${emSumPdf.otu}  PrT: ${emSumPdf.prt}  Decozone: ${emSumPdf.decozone}  First deco: ${emSumPdf.decoStop}`;
         doc.setFillColor(255,240,240); doc.rect(ML,y,CW,5.5,'F');
         doc.setFontSize(7); doc.setFont('DejaVuSans','bold'); doc.setTextColor(150,0,0);
         doc.text(cleanPDF(t),ML+2,y+3.8); doc.setTextColor(0,0,0); y+=5.5; return;
@@ -15397,9 +15396,7 @@ async function exportPDF(opts) {
       doc.setLineWidth(0.2); y+=5; return;
     }
     if(phase==='totals'){
-      const spans=tds[0]?.querySelectorAll('span')||[]; let t='';
-      spans.forEach(s=>{const v=s.textContent.trim();if(v)t+=(t?'  ':'')+v;});
-      if(!t&&tds[0])t=tds[0].textContent.replace(/\s+/g,' ').trim();
+      const t = `Run: ${planSumPdf.runTime}  TTS: ${planSumPdf.tts}  Deco: ${planSumPdf.decoTime}  CNS: ${planSumPdf.cns}  OTU: ${planSumPdf.otu}  PrT: ${planSumPdf.prt}  Surf GF: ${planSumPdf.surfGF||'-'}  Decozone: ${planSumPdf.decozone}  First deco: ${planSumPdf.decoStop}`;
       doc.setFillColor(240,244,255); doc.rect(ML,y,CW,5.5,'F');
       doc.setFontSize(7); doc.setFont('DejaVuSans','bold'); doc.setTextColor(0,60,130);
       doc.text(t,ML+2,y+3.8); doc.setTextColor(0,0,0); y+=5.5; return;
