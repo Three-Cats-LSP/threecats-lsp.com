@@ -1379,7 +1379,7 @@ function renderAppFooter() {
             <line opacity="0.45" stroke="#00c8ff" stroke-linecap="round" stroke-width="4" x1="204" x2="260" y1="312" y2="312"/>
           </svg>
         </a>
-        <a class="app-footer-icon" href="https://threecats-lsp.com/get-in-water/download.html" target="_blank" rel="noopener noreferrer" title="Download Get In Water APK">
+        <a class="app-footer-icon" id="giwApkDownloadIcon" href="https://threecats-lsp.com/get-in-water/download.html" target="_blank" rel="noopener noreferrer" title="Download Get In Water APK">
           <img alt="Get In Water APK" src="${appLogoSrc()}" style="border-radius:8px;border:1px solid var(--border-hi)"/>
         </a>
       </div>
@@ -1634,7 +1634,7 @@ function renderAboutTab() {
     </div>
     <a class="link-card" href="https://threecats-lsp.com" target="_blank" rel="noopener">🏠 Three Cats LSP · Diver's Toolkit</a>
     <a class="link-card" href="https://github.com/Three-Cats-LSP/Get-In-Water" target="_blank" rel="noopener">GitHub · Get In Water</a>
-    <a class="link-card" href="https://threecats-lsp.com/get-in-water/download.html" target="_blank" rel="noopener">⬇ Get In Water · Download APK</a>
+    <a class="link-card" id="giwApkAboutLink" href="https://threecats-lsp.com/get-in-water/download.html" target="_blank" rel="noopener">⬇ Get In Water · Download APK</a>
     <a class="link-card" href="https://www.thingiverse.com/Roman_Markovtsev/designs" target="_blank" rel="noopener">My Designs · Thingiverse</a>
     <a class="link-card" href="https://www.instagram.com/threecats_lsp" target="_blank" rel="noopener">Follow @threecats_lsp on Instagram</a>
     <a class="link-card" href="https://paypal.me/ThreeCatsLSP" target="_blank" rel="noopener">💙 Support Development · PayPal</a>
@@ -2926,6 +2926,16 @@ if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !navigator.standalone) {
     document.body.appendChild(b);
   }, 2500);
 }
+
+(function() {
+  function hideApkIcons() {
+    ['giwApkDownloadIcon', 'giwApkAboutLink'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+  }
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) hideApkIcons();
+})();
 </script>
 </body>
 </html>
