@@ -3244,7 +3244,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.9';
+const APP_VERSION = '2.20.10';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
@@ -5568,7 +5568,7 @@ function _updateAdvancedSummary() {
 // The ADVANCED settings that "Set as My Default" persists.
 // Factory defaults are used as fallback when no user defaults are saved.
 const _ADV_FIELDS = [
-  'gfLowInput','gfHighInput',
+  'gfPresetSelect','gfLowInput','gfHighInput',
   'descentRate','ascentRate','decoAscentRate','surfaceAscentRate',
   'decoStep','lastDecoStop','minStopTime','stopRounding','decoTransitMode','shallowGradient',
   'waterVapor','heHalfTimeMode','sacBottom','sacDeco',
@@ -16358,6 +16358,8 @@ function loadAppPreset(idx) {
     if (typeof setGF === 'function') setGF(_gfLow, _gfHigh);
     else if (typeof setCustomGF === 'function') setCustomGF();
   }
+  // Flush to localStorage immediately so deferred appSettings.load() doesn't overwrite
+  if (typeof appSettings !== 'undefined' && appSettings.save) appSettings.save(false);
   closeAdvConfigPresets();
   showToast(`Loaded preset: ${p.name}`, 'preset');
 }
@@ -16435,6 +16437,8 @@ function loadConfigPreset(idx) {
     if (typeof setGF === 'function') setGF(_gfLow, _gfHigh);
     else if (typeof setCustomGF === 'function') setCustomGF();
   }
+  // Flush to localStorage immediately so deferred appSettings.load() doesn't overwrite
+  if (typeof appSettings !== 'undefined' && appSettings.save) appSettings.save(false);
   closeAdvConfigPresets();
   showToast(`Config loaded: ${p.name}`, 'preset');
 }
