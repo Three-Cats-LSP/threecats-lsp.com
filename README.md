@@ -18,7 +18,12 @@ Homepage and deployment hub for the **Three Cats LSP Diver's Toolkit** — free,
 ### LSP D-Planner
 Technical and recreational decompression planner. Bühlmann ZHL-16C + GF, VPM-B, VPM-B/GFS, trimix, multi-gas, Rec/Tec modes. Export dive plans as TXT or PDF.
 
-**Current version: 2.10.1**
+**Current version: 2.20.21**
+
+### LSP D-Planner + CCR
+Rebreather edition — CCR, passive SCR (pSCR), bailout, and descent setpoint. Separate app from open-circuit D-Planner.
+
+**Current version: 2.30.0**
 
 ### T-Viewer
 Companion for LSP D-Planner exports. Open, read, edit, and share dive plan TXT/PDF files on Android or in the browser — syntax highlighting for deco schedules, gas labels, and warnings.
