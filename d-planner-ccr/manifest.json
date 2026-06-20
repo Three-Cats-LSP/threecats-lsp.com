@@ -1,0 +1,26 @@
+{
+  "name": "LSP D-Planner + CCR",
+  "short_name": "D-Planner+CCR",
+  "description": "Rebreather decompression planner — CCR, pSCR, bailout on Bühlmann + VPM-B",
+  "start_url": "/d-planner-ccr/",
+  "scope": "/d-planner-ccr/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#030c18",
+  "theme_color": "#030c18",
+  "categories": ["sports", "utilities"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

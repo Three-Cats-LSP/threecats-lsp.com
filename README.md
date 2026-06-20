@@ -11,6 +11,7 @@ Homepage and deployment hub for the **Three Cats LSP Diver's Toolkit** — free,
 | App | Web | APK | GitHub |
 |-----|-----|-----|--------|
 | **[LSP D-Planner](https://threecats-lsp.com/d-planner/)** | [Open](https://threecats-lsp.com/d-planner/) | [Download](https://threecats-lsp.com/d-planner/download.html) | [LSP_D-planner](https://github.com/Three-Cats-LSP/LSP_D-planner) |
+| **[LSP D-Planner + CCR](https://threecats-lsp.com/d-planner-ccr/)** | [Open](https://threecats-lsp.com/d-planner-ccr/) | [Download](https://threecats-lsp.com/d-planner-ccr/download.html) | [LSP_D-planner-CCR](https://github.com/Three-Cats-LSP/LSP_D-planner-CCR) |
 | **[T-Viewer](https://threecats-lsp.com/t-viewer/)** | [Open](https://threecats-lsp.com/t-viewer/) | [Download](https://threecats-lsp.com/t-viewer/download.html) | [T-Viewer](https://github.com/Three-Cats-LSP/T-Viewer) |
 | **[Get In Water](https://threecats-lsp.com/get-in-water/)** | [Open](https://threecats-lsp.com/get-in-water/) | [Download](https://threecats-lsp.com/get-in-water/download.html) | [Get-In-Water](https://github.com/Three-Cats-LSP/Get-In-Water) |
 
@@ -31,7 +32,7 @@ Dive trip packing checklist. Master gear list, starter templates, per-trip check
 
 ## Typical workflow
 
-1. **Plan** — build a dive profile in LSP D-Planner
+1. **Plan** — build a dive profile in LSP D-Planner (or **LSP D-Planner + CCR** for rebreather dives)
 2. **Export** — save the plan as TXT or PDF
 3. **Review** — open the file in T-Viewer on your phone
 4. **Pack** — use Get In Water to checklist your gear for the trip
@@ -45,11 +46,12 @@ Dive trip packing checklist. Master gear list, starter templates, per-trip check
 | `index.html` | Diver's Toolkit homepage |
 | `gadgets.html` | 3D-printed dive gadgets |
 | `d-planner/` | Synced LSP D-Planner web app + APK |
+| `d-planner-ccr/` | Synced LSP D-Planner + CCR web app + APK |
 | `t-viewer/` | Synced T-Viewer web app + APK |
 | `get-in-water/` | Synced Get In Water web app + APK |
 | `.github/workflows/sync-apps.yml` | Pulls latest apps from upstream repos |
 
-App folders are updated automatically when upstream repositories push to `main`. The workflow can also be triggered manually from the Actions tab (`sync-d-planner`, `sync-t-viewer`, `sync-get-in-water`, and APK sync jobs).
+App folders are updated automatically when upstream repositories push to `main`. The workflow can also be triggered manually from the Actions tab (`sync-d-planner`, `sync-d-planner-ccr`, `sync-t-viewer`, `sync-get-in-water`, and APK sync jobs).
 
 ---
 
@@ -67,7 +69,7 @@ Or install the Android APK from each app's download page for native features (fi
 
 ## Support
 
-LSP D-Planner, T-Viewer, and Get In Water are free and open-source. If they help your diving, consider [supporting development via PayPal](https://paypal.me/ThreeCatsLSP).
+LSP D-Planner, LSP D-Planner + CCR, T-Viewer, and Get In Water are free and open-source. If they help your diving, consider [supporting development via PayPal](https://paypal.me/ThreeCatsLSP).
 
 Follow [@threecats_lsp](https://www.instagram.com/threecats_lsp) on Instagram for updates.
 

@@ -21,6 +21,15 @@ APPS = [
         "out": ROOT / "d-planner" / "about.html",
     },
     {
+        "slug": "d-planner-ccr",
+        "title": "LSP D-Planner + CCR",
+        "icon_src": "/d-planner-ccr/icon-192.png",
+        "app_url": "/d-planner-ccr/",
+        "readme_names": ("d-planner-ccr.md",),
+        "sibling_readme": ROOT.parent / "LSP_D-planner-CCR" / "README.md",
+        "out": ROOT / "d-planner-ccr" / "about.html",
+    },
+    {
         "slug": "t-viewer",
         "title": "T-Viewer",
         "icon_src": "/t-viewer/icon-192.png",

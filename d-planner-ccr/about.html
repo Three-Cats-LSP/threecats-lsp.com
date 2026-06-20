@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>About · LSP D-Planner + CCR · Three Cats LSP</title>
+  <meta name="description" content="About LSP D-Planner + CCR — part of the Three Cats LSP Diver's Toolkit."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/about.css"/>
+</head>
+<body>
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="page-dots" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="logo-link" href="/">
+      <span class="logo-mark"><img src="/d-planner-ccr/icon-192.png" alt="LSP D-Planner + CCR" width="40" height="40"/></span>
+      <span>Diver's Toolkit</span>
+    </a>
+    <div class="header-actions">
+      <a class="btn btn-ghost" href="/">All apps</a>
+      <a class="btn btn-primary" href="/d-planner-ccr/">Open App</a>
+    </div>
+  </header>
+  <main class="about-main">
+    <div class="about-card">
+      <p class="about-eyebrow">About LSP D-Planner + CCR</p>
+      <article class="prose">
+<h1>LSP D-Planner + CCR</h1>
+<p><strong>Rebreather edition</strong> of <a href="https://github.com/Three-Cats-LSP/LSP_D-planner">LSP D-Planner</a> — full closed-circuit (CCR), passive SCR (pSCR), bailout, and descent setpoint planning on top of the v2.20.x open-circuit foundation.</p>
+<p>This is a <strong>separate product and repository</strong>. The main <a href="https://github.com/Three-Cats-LSP/LSP_D-planner">LSP D-Planner</a> stays on the stable open-circuit release line (v2.20.x) without rebreather code.</p>
+<p>Part of the <a href="https://threecats-lsp.com">Three Cats LSP</a> <strong>Diver&#x27;s Toolkit</strong>.</p>
+<p>🌐 <strong>Live App (GitHub Pages)</strong>: https://three-cats-lsp.github.io/LSP_D-planner-CCR/</p>
+<p><strong>Current version: 2.30.0</strong></p>
+<hr>
+<h2>Diver&#x27;s Toolkit</h2>
+<hr>
+<h2>What&#x27;s different from LSP D-Planner?</h2>
+<p>Built from LSP D-Planner <strong>v2.20.21</strong> with rebreather-specific additions only in this repo:</p>
+<ul>
+<li><strong>CCR (closed circuit)</strong> — diluent-aware tissue loading, setpoint crossing, loop vs OC deco gas logic</li>
+<li><strong>pSCR (passive SCR)</strong> — GUE-style O₂ drop model</li>
+<li><strong>Bailout mode</strong> — OC ascent with GF 90/90 (Bühlmann)</li>
+<li><strong>Descent setpoint</strong> — default 0.7 bar until high setpoint depth</li>
+<li>Both <strong>Bühlmann ZH-L16C + GF</strong> and <strong>VPM-B / VPM-B/GFS</strong> engines</li>
+</ul>
+<p>All other features (Surf GF, prior-dive O₂ carry, shallow gradient, export/banner, presets, etc.) match the v2.20.x base.</p>
+<hr>
+<h2>Web App</h2>
+<p>Open https://three-cats-lsp.github.io/LSP_D-planner-CCR/ in any modern browser — no install required.</p>
+<p><strong>Installation:</strong> Add to home screen from your browser (Safari → Share → Add to Home Screen; Chrome → Install app).</p>
+<hr>
+<h2>Android APK</h2>
+<p>Separate Android package (<code>com.threecats.lsp.dplannerccr</code>) so it can be installed <strong>alongside</strong> the standard LSP D-Planner APK.</p>
+<p>Build: <code>npm run cap:sync</code> then open the <code>android/</code> project in Android Studio.</p>
+<hr>
+<h2>Development</h2>
+<p>Same single-file architecture as LSP D-Planner — primary code in <code>index.html</code>.</p>
+<pre><code>python audit.py index.html    # 271 checks (includes GROUP 41 CCR)</code></pre>
+<p>Test suites: <code>tests-verify.html</code> (Section I · CCR), <code>tests-massive.html</code> (T3-CCR MultiDeco cross-val).</p>
+<hr>
+<h2>License &amp; disclaimer</h2>
+<p>Same terms as <a href="https://github.com/Three-Cats-LSP/LSP_D-planner">LSP D-Planner</a>. For <strong>trained mixed-gas and rebreather divers only</strong>. Not a substitute for proper certification, equipment checks, or dive planning discipline.</p>
+      </article>
+    </div>
+  </main>
+  <footer class="site-footer">Three Cats LSP · Diver's Toolkit</footer>
+</body>
+</html>
