@@ -227,7 +227,12 @@ header { display: flex;
  border: 1px solid var(--accent);
  transition: all 0.4s ease;
  animation: iconGlow 4s ease-in-out infinite;
+ overflow: hidden;
 }
+.brand-icon img { width: 32px; height: 32px; border-radius: 6px; object-fit: contain; display: block; }
+
+.algo-btn-icon { display: inline-flex; align-items: center; margin-right: 4px; vertical-align: middle; }
+.algo-btn-icon svg { width: 12px; height: 12px; flex-shrink: 0; }
 @keyframes iconGlow { 0%,100% { box-shadow: 0 0 12px rgba(0,200,255,0.15); }
  50% { box-shadow: 0 0 24px rgba(0,200,255,0.3); }
 }
@@ -277,6 +282,24 @@ header { display: flex;
  transition: all 0.2s;
  cursor: pointer;
 }
+
+#ccrBailoutGfLow, #ccrBailoutGfHigh { background: var(--bg-alt) !important;
+ border: 1px solid var(--border) !important;
+ color: var(--text) !important;
+ transition: all 0.2s;
+ cursor: pointer;
+ min-width: 58px;
+ max-width: 64px;
+ width: 64px;
+}
+
+.adv-stack { display: flex; flex-direction: column; gap: 10px; max-width: 560px; margin-top: 8px; }
+.adv-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+.adv-row > label { flex: 1 1 auto; min-width: 0; margin: 0; font-size: 13px; line-height: 1.35; }
+.adv-row > input[type="number"] { flex: 0 0 88px; width: 88px; max-width: 88px; font-size: 13px; }
+.adv-row > select:not(.ccr-bo-gf-select) { flex: 0 0 auto; min-width: 130px; max-width: 220px; font-size: 13px; }
+.ccr-adv-gf-pair { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.ccr-adv-gf-pair .algo-label-text { font-size: 12px; }
 
 #gfLowInput:focus, #gfHighInput:focus { border-color: var(--accent) !important;
  background: var(--card) !important;
@@ -1287,7 +1310,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <div id="headerTopRow" style="display:flex;flex-wrap:wrap;align-items:center;width:100%;padding:2px 0;border-bottom:1px solid var(--border);">
 <!-- Logo — left, fixed size -->
 <div style="display:flex;align-items:center;gap:12px;padding-left:14px;flex-shrink:0;flex-grow:0;">
-<div class="brand-icon" id="brandIcon">🤿</div>
+<div class="brand-icon" id="brandIcon"><img alt="" draggable="false" src="icon-192.png"/></div>
 <div class="brand-text">
 <h1>LSP D-PLANNER · <span class="algo-label" id="algoLabel">Rec</span></h1>
 <p id="algoSubtitle">Recreational Dive Tables · RDP Reference</p>
@@ -1306,10 +1329,10 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <!-- Mode buttons — right, never shrinks -->
 <div style="display:flex;align-items:center;gap:8px;padding-right:14px;flex-shrink:0;justify-content:flex-end;">
 <div class="algo-toggle" style="display:flex;align-items:center;gap:4px;">
-<button class="algo-btn" id="algoPADI" onclick="setAlgo('padi')">Rec</button>
-<button class="algo-btn active" id="algoBUH" onclick="setAlgo('buh')">Tec</button>
+<button class="algo-btn" id="algoPADI" onclick="setAlgo('padi')"><span class="algo-btn-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="8" cy="5.5" rx="5" ry="3.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 9.5c0 2.5 2.2 4.5 5 4.5s5-2 5-4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M6 5.5h4M8 5.5v-1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>Rec</button>
+<button class="algo-btn active" id="algoBUH" onclick="setAlgo('buh')"><span class="algo-btn-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="9" r="2" stroke="currentColor" stroke-width="1.1"/><circle cx="8.5" cy="6.5" r="1.6" stroke="currentColor" stroke-width="1.1"/><circle cx="11.5" cy="10" r="1.3" stroke="currentColor" stroke-width="1.1"/></svg></span>Tec</button>
 <div style="width:1px;height:18px;background:var(--border-hi);margin:0 2px;"></div>
-<button class="algo-btn u6" id="algoTools" onclick="setAlgo('tools')">🔧 Tools</button>
+<button class="algo-btn u6" id="algoTools" onclick="setAlgo('tools')"><span class="algo-btn-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 12.5l7-7 1.5 1.5-7 7H3.5v-1.5z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M9.5 4.5l2-2 1 1-2 2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>Tools</button>
 <div style="width:1px;height:18px;background:var(--border-hi);margin:0 2px;"></div>
 <button class="algo-btn" onclick="toggleReference()" title="Reference &amp; Info">?</button>
 </div>
@@ -1677,7 +1700,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <div style="border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:8px;">
 <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:var(--accent);margin-bottom:10px;">🔵 BOTTOM GAS CYLINDER</div>
 <div class="form-grid u0">
-<div class="field"><label id="gpBot_size_lbl">Cyl. Size (L)</label><input id="gpBot_size" max="30" min="1" oninput="calcGasPlan()" placeholder="12" step="0.5" type="number" value="12"/></div>
+<div class="field"><label id="gpBot_size_lbl">Size (L)</label><input id="gpBot_size" max="30" min="1" oninput="calcGasPlan()" placeholder="12" step="0.5" type="number" value="12"/></div>
 <div class="field"><label id="gpBot_fill_lbl">Fill bar</label><input id="gpBot_fill" max="300" min="0" oninput="calcGasPlan()" placeholder="200" step="10" type="number" value="200"/></div>
 <div class="field"><label id="gpBot_reserve_lbl">Reserve bar</label><input id="gpBot_reserve" max="300" min="0" oninput="calcGasPlan()" placeholder="50" step="10" type="number" value="50"/></div>
 </div>
@@ -1686,7 +1709,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <div id="gpTravelRow" style="border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:8px;display:none;">
 <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:#ff9f43;margin-bottom:10px;">🟠 TRAVEL GAS CYLINDER</div>
 <div class="form-grid u0">
-<div class="field"><label id="gpTravel_size_lbl">Cyl. Size (L)</label><input id="gpTravel_size" max="30" min="1" oninput="calcGasPlan()" placeholder="11" step="0.5" type="number" value="11"/></div>
+<div class="field"><label id="gpTravel_size_lbl">Size (L)</label><input id="gpTravel_size" max="30" min="1" oninput="calcGasPlan()" placeholder="11" step="0.5" type="number" value="11"/></div>
 <div class="field"><label id="gpTravel_fill_lbl">Fill bar</label><input id="gpTravel_fill" max="300" min="0" oninput="calcGasPlan()" placeholder="200" step="10" type="number" value="200"/></div>
 <div class="field"><label id="gpTravel_reserve_lbl">Reserve bar</label><input id="gpTravel_reserve" max="300" min="0" oninput="calcGasPlan()" placeholder="50" step="10" type="number" value="50"/></div>
 </div>
@@ -1695,7 +1718,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <div id="gpDg1Row" style="border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:8px;display:none;">
 <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:var(--green);margin-bottom:10px;">🟢 DECO GAS 1 CYLINDER</div>
 <div class="form-grid u0">
-<div class="field"><label id="gpDg1_size_lbl">Cyl. Size (L)</label><input id="gpDg1_size" max="30" min="1" oninput="calcGasPlan()" placeholder="11" step="0.5" type="number" value="11"/></div>
+<div class="field"><label id="gpDg1_size_lbl">Size (L)</label><input id="gpDg1_size" max="30" min="1" oninput="calcGasPlan()" placeholder="11" step="0.5" type="number" value="11"/></div>
 <div class="field"><label id="gpDg1_fill_lbl">Fill bar</label><input id="gpDg1_fill" max="300" min="0" oninput="calcGasPlan()" placeholder="200" step="10" type="number" value="200"/></div>
 <div class="field"><label id="gpDg1_reserve_lbl">Reserve bar</label><input id="gpDg1_reserve" max="300" min="0" oninput="calcGasPlan()" placeholder="50" step="10" type="number" value="50"/></div>
 </div>
@@ -1704,7 +1727,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <div id="gpDg2Row" style="border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:8px;display:none;">
 <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:var(--green);margin-bottom:10px;">🟢 DECO GAS 2 CYLINDER</div>
 <div class="form-grid u0">
-<div class="field"><label id="gpDg2_size_lbl">Cyl. Size (L)</label><input id="gpDg2_size" max="30" min="1" oninput="calcGasPlan()" placeholder="11" step="0.5" type="number" value="11"/></div>
+<div class="field"><label id="gpDg2_size_lbl">Size (L)</label><input id="gpDg2_size" max="30" min="1" oninput="calcGasPlan()" placeholder="11" step="0.5" type="number" value="11"/></div>
 <div class="field"><label id="gpDg2_fill_lbl">Fill bar</label><input id="gpDg2_fill" max="300" min="0" oninput="calcGasPlan()" placeholder="200" step="10" type="number" value="200"/></div>
 <div class="field"><label id="gpDg2_reserve_lbl">Reserve bar</label><input id="gpDg2_reserve" max="300" min="0" oninput="calcGasPlan()" placeholder="50" step="10" type="number" value="50"/></div>
 </div>
@@ -1804,11 +1827,11 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <select class="u7" id="gfLowInput" onchange="setCustomGF(true)">
 <option value="10">10</option>
 <option value="15">15</option>
-<option value="20">20</option>
+<option value="20" selected="">20</option>
 <option value="25">25</option>
 <option value="30">30</option>
 <option value="35">35</option>
-<option selected="" value="40">40</option>
+<option value="40">40</option>
 <option value="45">45</option>
 <option value="50">50</option>
 <option value="55">55</option>
@@ -1830,8 +1853,8 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <option value="65">65</option>
 <option value="70">70</option>
 <option value="75">75</option>
-<option selected="" value="80">80</option>
-<option value="85">85</option>
+<option value="80">80</option>
+<option value="85" selected="">85</option>
 <option value="90">90</option>
 <option value="95">95</option>
 <option value="100">100</option>
@@ -1840,7 +1863,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 </div>
 <div style="display:flex;align-items:center;gap:5px;margin-bottom:8px;"><div id="decoCardSubtitle" style="font-size:10px;color:var(--muted);letter-spacing:.5px;"></div><span class="tip-icon" onclick="showTip('Decompression Schedule','Generates a full ascent profile with deco stops using Bühlmann ZH-L16C + Gradient Factors. Configure up to two decompression gases below — they switch automatically at the specified depths during ascent and are factored into tissue off-gassing.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></div>
 <div class="form-grid">
-<div class="field"><label id="decoDepthLbl">Depth (m)</label><input id="decoDepth" max="120" min="1" oninput="if(window._lastContingency) calcContingency()" step="1" type="number" value="40"/></div>
+<div class="field"><label id="decoDepthLbl">Depth (m)</label><input id="decoDepth" max="120" min="1" oninput="updateCcrGasValidation();updateGasMODDisplays();if(window._lastContingency) calcContingency()" step="1" type="number" value="40"/></div>
 <div class="field"><label>BT Time (min)</label><input id="decoBT" max="300" min="1" oninput="if(window._lastContingency) calcContingency()" step="1" type="number" value="30"/></div>
 <div class="field" style="display:flex;align-items:flex-end;gap:8px;">
 <button class="btn-export" id="presetsHeaderBtn" onclick="openDiveProfilePresets()" title="Save / load dive profile (depth &amp; BT)"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg></button>
@@ -1858,7 +1881,8 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <span id="advancedSettingsSummary" style="margin-left:auto;font-size:10px;font-weight:400;letter-spacing:0;text-transform:none;opacity:.7;"></span>
 </button>
 <div id="advancedSettingsBody" style="display:none;">
-<div class="form-grid" style="margin-top:8px;"><div class="field"><label>Descent Rate</label>
+<div class="adv-stack">
+<div class="adv-row"><label>Descent Rate</label>
 <select id="descentRate">
 <option value="10">10 m/min</option>
 <option value="15">15 m/min</option>
@@ -1869,7 +1893,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <option value="30">30 m/min</option>
 </select>
 </div>
-<div class="field"><label>Ascent Rate</label>
+<div class="adv-row"><label>Ascent Rate</label>
 <select id="ascentRate">
 <option value="3">3 m/min</option>
 <option value="6">6 m/min</option>
@@ -1880,7 +1904,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <option value="18">18 m/min</option>
 </select>
 </div>
-<div class="field"><label>Deco Ascent Rate</label>
+<div class="adv-row"><label>Deco Ascent Rate</label>
 <select id="decoAscentRate">
 <option selected="" value="3">3 m/min</option>
 <option value="6">6 m/min</option>
@@ -1889,30 +1913,28 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <option value="12">12 m/min</option>
 </select>
 </div>
-<div class="field"><label>Surf Ascent Rate</label>
+<div class="adv-row"><label>Surf Ascent Rate</label>
 <select id="surfaceAscentRate">
 <option selected="" value="3">3 m/min</option>
 <option value="6">6 m/min</option>
 <option value="9">9 m/min</option>
 </select>
 </div>
-<div class="field">
-<label>Deco Step Size</label>
+<div class="adv-row"><label>Deco Step Size</label>
 <select id="decoStep">
 <option value="1">1 m</option>
 <option selected="" value="3">3 m</option>
 <option value="5">5 m</option>
 </select>
 </div>
-<div class="field">
-<label>Last Deco Stop</label>
+<div class="adv-row"><label>Last Deco Stop</label>
 <select id="lastDecoStop">
 <option value="6">6 m</option>
 <option selected="" value="3">3 m</option>
 <option value="1">1 m</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>Minimum Stop <span class="tip-icon" onclick="showTip('Minimum Stop','Minimum time spent at any deco stop, regardless of ceiling clearance.\n1:00 = standard. Smaller values give precise plans but are harder to execute.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="minStopTime">
 <option selected="" value="2">2:00</option>
@@ -1922,84 +1944,79 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <option value="0.0167">0:01</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>Min Deco <span class="tip-icon" onclick="showTip('Minimum Decompression Profile','Enforces minimum stop times at 9 m (30 ft) and 6 m (20 ft) on every dive, regardless of algorithm output.\nStandard DIR/GUE practice. If the algorithm already schedules more time at those depths, the longer time is kept.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="minDecoProfileEnable" onchange="toggleMinDecoProfile()">
 <option selected="" value="no">Off</option>
 <option value="yes">On</option>
 </select>
 </div>
-<div class="field-row-inline" id="minDecoProfileFields" style="display:none;gap:12px;">
-<div class="field">
+<div id="minDecoProfileFields" style="display:none;">
+<div class="adv-row">
 <label id="minDeco9mLabel">9m (min)</label>
 <input id="minDeco9m" max="10" min="1" step="1" type="number" value="1"/>
 </div>
-<div class="field">
+<div class="adv-row">
 <label id="minDeco6mLabel">6m (min)</label>
 <input id="minDeco6m" max="10" min="1" step="1" type="number" value="3"/>
 </div>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>Stop Rounding <span class="tip-icon" onclick="showTip('Stop Rounding','Whether stop times are rounded to whole minutes.\nNo = fractional (Buhlmann default).\nYes (MultiDeco) = whole-minute rounding, matching MultiDeco output.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="stopRounding">
 <option value="fractional">No</option>
 <option selected="" value="wholeminute">Yes (MultiDeco)</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>Transit Mode <span class="tip-icon" onclick="showTip('Transit Mode','How deco-zone ascent transits between stops are modelled.\n\nSchreiner (accurate): tissues off-gas via Schreiner equation during each ascent segment. Most physically correct. Stop durations reflect actual hold time at depth only.\n\nMultiDeco compatible: ascent between stops is treated as instantaneous for tissue loading (matches MultiDeco 4.x). Transit time is added to the displayed stop duration, so stop times and run times match MultiDeco output exactly. Slightly more conservative.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="decoTransitMode">
 <option value="schreiner">Schreiner (accurate)</option>
 <option selected="" value="multideco">MultiDeco compatible</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>Shallow GF <span class="tip-icon" onclick="showTip('Shallow GF','Modifies the GF slope so GF High is reached at the last deco stop rather than at the surface.\n\nOff (default, standard): GF interpolates from GF Low at the first stop to GF High at the surface. The last stop is cleared at a GF slightly below GF High.\n\nOn (MultiDeco-compatible): GF High is applied from the last stop onward. The last stop is held until tissues clear at the full GF High limit, not an intermediate value. This is more conservative at the final stop and produces slightly longer last-stop times.\n\nUse On to match MultiDeco shallow gradient conservatism mode. Keep Off for standard Bühlmann GF behaviour.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="shallowGradient">
 <option selected="" value="off">Off (standard GF)</option>
 <option value="on">On (MultiDeco-compatible)</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>Water Vapor <span class="tip-icon" onclick="showTip('Water Vapor','Alveolar water vapor pressure used in tissue loading calculations.\n0.0627 bar = Buhlmann standard.\n0.0577 bar = MultiDeco standard.\nPair with Stop Rounding to match target tool.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="waterVapor" onchange="updateWaterVapor()">
 <option value="0.0627">0.0627 bar (Bühlmann)</option>
 <option selected="" value="0.0577">0.0577 bar (MultiDeco)</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>He HT Comp 1 <span class="tip-icon" onclick="showTip('He Half-Time','Helium half-time for the fastest (compartment 1) tissue.\n\nBaker 1.88 min — canonical VPM-B value (Baker FORTRAN 1998, ApexDeco, MultiDeco).\nBühlmann 1.51 min — Bühlmann 2003 textbook value (Subsurface, Shearwater, DivePro).\n\nRatio to N2 comp 1 (4.0 min):\n Baker: 4.0 / 1.88 = 2.13\n Bühlmann: 4.0 / 1.51 = 2.65 (≈ √(28/4), physical diffusion ratio)\n\nPractical difference: negligible for dives &gt;15 min. Only measurable on very short deep bounce dives where fast-compartment He loading is significant.\n\nDefault: Baker 1.88 (matches VPM-B and ApexDeco).')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="heHalfTimeMode" onchange="updateHeHalfTime()">
 <option selected="" value="baker">1.88 min (Baker / VPM-B)</option>
 <option value="buhl2003">1.51 min (Bühlmann 2003)</option>
 </select>
 </div>
-<div class="field">
-<label>BT SAC (L/min)</label>
+<div class="adv-row"><label>BT SAC (L/min)</label>
 <input id="sacBottom" max="60" min="5" step="1" type="number" value="22"/>
 </div>
-<div class="field">
-<label>Deco SAC (L/min)</label>
+<div class="adv-row"><label>Deco SAC (L/min)</label>
 <input id="sacDeco" max="40" min="5" step="1" type="number" value="20"/>
 </div>
-</div>
-<div class="form-grid" style="margin-top:10px;">
-<div class="field">
+<div class="adv-row">
 <label>N₂ Narcotic <span class="tip-icon" onclick="showTip('N2 Narcotic','Whether N2 is counted as narcotic when calculating Equivalent Narcotic Depth (END).\nYes = NOAA/IANTD standard.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="n2NarcSel" onchange="setNarcosis('n2', this.value==='yes')">
 <option selected="" value="yes">Yes</option>
 <option value="no">No</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>O₂ Narcotic <span class="tip-icon" onclick="showTip('O2 Narcotic','Whether O2 is counted as narcotic when calculating Equivalent Narcotic Depth (END).\nYes = NOAA/IANTD standard.\nNo = some technical agencies exclude O2.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="o2NarcSel" onchange="setNarcosis('o2', this.value==='yes')">
 <option selected="" value="yes">Yes</option>
 <option value="no">No</option>
 </select>
 </div>
-<div class="field">
-<label>Max Bottom ppO₂</label>
+<div class="adv-row"><label>Max Bottom ppO₂</label>
 <select id="ppo2Bottom" onchange="updateGasMODDisplays()">
 <option value="1.6">1.6 bar</option>
 <option value="1.5">1.5 bar</option>
@@ -2007,8 +2024,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <option value="1.2">1.2 bar</option>
 </select>
 </div>
-<div class="field">
-<label>Max Deco ppO₂</label>
+<div class="adv-row"><label>Max Deco ppO₂</label>
 <select id="ppo2Deco" onchange="updateGasMODDisplays()">
 <option selected="" value="1.6">1.6 bar</option>
 <option value="1.5">1.5 bar</option>
@@ -2016,14 +2032,14 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <option value="1.2">1.2 bar</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>O₂ @ MOD <span class="tip-icon" onclick="showTip('O2 @ MOD','Controls how pure O2 (100%) MOD is calculated.\n\n• Allow at MOD: O2 is always usable at 6m — real-world standard (Shearwater, V-Planner).\n• Strict ppO2: O2 subject to the ppO2 limit check; at 1.6 bar limit it still yields 6m, but at 1.5 bar it gives 5m.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="o2AtMODSelect" onchange="setAllowO2AtMOD(this.value === 'on');updateGasMODDisplays()">
 <option selected="" value="on">Allow at MOD</option>
 <option value="off">Strict ppO₂</option>
 </select>
 </div>
-</div><!-- end form-grid inside advanced -->
+</div>
 </div><!-- end advancedSettingsBody -->
 </div><!-- end advancedSettingsSection -->
 <!-- Gas Mix 1 — Bottom Gas -->
@@ -2032,42 +2048,101 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <div class="form-grid u0">
 <div class="field">
 <label>Circuit</label>
-<select id="circuitSelect" onchange="toggleCircuitFields();if(window._lastContingency) calcContingency();">
+<select id="circuitSelect" onchange="toggleCircuitFields();if(window._lastContingency) calcContingency();if(typeof calcCNS==='function') calcCNS();">
 <option selected="" value="OC">Open Circuit (OC)</option>
 <option value="CCR">Closed Circuit (CCR)</option>
 <option value="pSCR">Passive SCR (pSCR)</option>
 </select>
 </div>
-<div class="field" id="ccrSetpointRow" style="display:none;">
-<label>High Setpoint (bar)</label>
-<input id="ccrSetpoint" max="1.6" min="0.7" step="0.1" type="number" value="1.3"/>
-</div>
-<div class="field" id="ccrDescentSetpointRow" style="display:none;">
-<label>Descent Setpoint (bar)</label>
-<input id="ccrDescentSetpoint" max="1.0" min="0.5" step="0.1" type="number" value="0.7"/>
-</div>
 <div class="field" id="ccrBailoutRow" style="display:none;">
-<label>Bailout (OC + GF 90/90)</label>
+<label>Bailout mode</label>
 <select id="ccrBailoutToggle">
 <option selected="" value="off">Off — on loop</option>
 <option value="on">On — open circuit bailout</option>
 </select>
 </div>
-<div class="field" id="scrFieldsRow" style="display:none;">
-<label>pSCR Loop Volume (L)</label>
-<input id="scrLoopVolume" max="15" min="3" step="0.5" type="number" value="7"/>
 </div>
-<div class="field" id="scrFieldsRow2" style="display:none;">
-<label>pSCR Metabolic O₂ (L/min)</label>
-<input id="scrMetabolicO2" max="2" min="0.5" step="0.05" type="number" value="0.85"/>
+<!-- ── Rebreather Adv. Settings (collapsible, inside REBREATHER card) ── -->
+<div id="ccrAdvSettingsSection" style="display:none;margin-top:10px;">
+<button id="ccrAdvSettingsToggle" onclick="toggleCcrAdvSettings()" onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'" style="display:flex;align-items:center;gap:7px;width:100%;background:none;border:1px solid var(--border);border-radius:6px;padding:7px 12px;cursor:pointer;color:var(--muted);font-family:inherit;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-align:left;transition:all .2s;">
+<span id="ccrAdvSettingsChevron" style="transition:transform .25s;display:inline-block;">▶</span>
+<span>Adv. Settings</span>
+<span id="ccrAdvSettingsSummary" style="margin-left:auto;font-size:10px;font-weight:400;letter-spacing:0;text-transform:none;opacity:.7;"></span>
+</button>
+<div id="ccrAdvSettingsBody" style="display:none;margin-top:8px;">
+<div id="ccrSettingsGroup" style="display:none;">
+<div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">CCR Settings</div>
+<div class="adv-stack">
+<div class="adv-row" id="ccrSpDescentRow" style="display:none;">
+<label>SP descent (bar) <span class="tip-icon" onclick="showTip('SP Descent','Partial pressure of O₂ maintained in the loop during descent. A lower setpoint reduces O₂ uptake before reaching bottom depth.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
+<input id="ccrDescentSetpoint" max="1.0" min="0.5" step="0.1" type="number" value="0.7"/>
+</div>
+<div class="adv-row" id="ccrSpBottomRow" style="display:none;">
+<label>Active ppO₂ / SP bottom (bar) <span class="tip-icon" onclick="showTip('Active ppO₂','Constant partial pressure of O₂ maintained on-loop during the bottom phase. Also used for diluent MOD checks on CCR.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
+<input id="ccrBottomSetpoint" max="1.6" min="0.7" oninput="updateGasMODDisplays();updateCcrGasValidation()" step="0.1" type="number" value="1.2"/>
+</div>
+<div class="adv-row" id="ccrSpDecoRow" style="display:none;">
+<label>Decompression ppO₂ / SP deco (bar) <span class="tip-icon" onclick="showTip('Decompression ppO₂','Setpoint used on-loop during decompression stops and ascent after the bottom phase.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
+<input id="ccrDecoSetpoint" max="1.6" min="0.7" step="0.1" type="number" value="1.3"/>
+</div>
+<div class="adv-row" id="ccrLoopVolRow">
+<label>Loop volume (L) <span class="tip-icon" onclick="showTip('Loop Volume','Internal loop volume in litres. Used for pSCR inspired-gas calculations and loop O₂ fraction modelling.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
+<input id="ccrLoopVolume" max="15" min="3" step="0.5" type="number" value="10"/>
+</div>
+<div class="adv-row" id="ccrMetabolicRow">
+<label>Metabolic O₂ (L/min) <span class="tip-icon" onclick="showTip('Metabolic O₂','Diver O₂ consumption rate at the surface (L/min). Drives estimated diluent consumption for on-loop CCR/pSCR gas planning.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
+<input id="ccrMetabolicO2" max="2.5" min="0.5" step="0.05" type="number" value="1.5"/>
+</div>
+<div class="adv-row">
+<label>SAC stress (L/min) <span class="tip-icon" onclick="showTip('SAC Stress','Open-circuit SAC assumed during a stressed bailout at depth. Used with Stress time and Problem solving to reserve bailout cylinder volume.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
+<input id="ccrSacStress" max="80" min="10" step="1" type="number" value="50"/>
+</div>
+<div class="adv-row">
+<label>SAC deco (L/min) <span class="tip-icon" onclick="showTip('SAC Deco (Bailout)','Open-circuit SAC used for bailout/deco cylinder consumption estimates when breathing OC bailout mixes on a rebreather dive plan.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
+<input id="ccrSacDeco" max="40" min="5" step="1" type="number" value="25"/>
+</div>
+<div class="adv-row">
+<label>Stress time (min) <span class="tip-icon" onclick="showTip('Stress Time','Minutes of stressed open-circuit breathing at bottom depth reserved against bailout cylinders in the gas consumption estimate.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
+<input id="ccrStressTime" max="30" min="1" step="1" type="number" value="10"/>
+</div>
+<div class="adv-row">
+<label>Problem solving (min) <span class="tip-icon" onclick="showTip('Problem Solving','Additional minutes at depth for problem-solving before ascending on bailout. Added to Stress time for bailout gas reserve calculations.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
+<input id="ccrProblemSolve" max="15" min="1" step="1" type="number" value="3"/>
 </div>
 </div>
 </div>
-<div style="border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:10px;">
-<div style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:var(--accent);margin-bottom:10px;">🔵 GAS MIX 1 — BOTTOM GAS</div>
+<div id="ccrBailoutSettingsGroup" style="display:none;margin-top:12px;">
+<div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">Bailout Settings <span class="tip-icon" onclick="showTip('Bailout Gradient Factors','Gradient factors applied when Bailout mode is ON — the planner switches to open-circuit deco using these GF values instead of the main plan GF.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></div>
+<div class="ccr-adv-gf-pair">
+<span class="algo-label-text u1">Low:</span>
+<select class="u7 ccr-bo-gf-select" id="ccrBailoutGfLow">
+<option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50" selected="">50</option><option value="55">55</option><option value="60">60</option><option value="65">65</option><option value="70">70</option><option value="75">75</option><option value="80">80</option><option value="85">85</option><option value="90">90</option><option value="95">95</option><option value="100">100</option>
+</select>
+<span class="algo-label-text u1">High:</span>
+<select class="u7 ccr-bo-gf-select" id="ccrBailoutGfHigh">
+<option value="50">50</option><option value="55">55</option><option value="60">60</option><option value="65">65</option><option value="70">70</option><option value="75">75</option><option value="80">80</option><option value="85" selected="">85</option><option value="90">90</option><option value="95">95</option><option value="100">100</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- legacy ids kept for saved-settings compat (hidden) -->
+<input id="ccrSetpoint" type="hidden" value="1.3"/>
+<input id="scrLoopVolume" type="hidden" value="10"/>
+<input id="scrMetabolicO2" type="hidden" value="1.5"/>
+</div>
+<div id="diluentGasCard" style="border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:10px;">
+<div id="diluentCardTitle" style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:var(--accent);margin-bottom:10px;">🔵 GAS MIX 1 — BOTTOM GAS</div>
 <div class="form-grid u0">
+<div class="field" id="diluentUseAsBailoutRow" style="display:none;">
+<label>Use as bailout</label>
+<select id="diluentUseAsBailout" onchange="updateCcrGasValidation();updateGasMODDisplays()">
+<option selected="" value="off">Off</option>
+<option value="on">On — diluent cylinder is bailout</option>
+</select>
+</div>
 <div class="field">
-<label>Gas Mix</label>
+<label id="diluentMixLabel">Gas Mix</label>
 <select id="decoGas" onchange="toggleDecoCustomO2('decoGas','decoCustomO2Field');toggleBottomTrimix();updateGasMODDisplays();if(window._lastContingency) calcContingency()">
 <option value="air">Air (21%)</option>
 <option value="ean32">EAN32 (32%)</option>
@@ -2092,8 +2167,8 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <label>MOD <span class="tip-icon" onclick="showTip('MOD','Maximum Operating Depth — calculated from the selected gas O2 fraction and current ppO2 limit. Not table-based.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <input id="botMODDisplay" placeholder="Enter depth &amp; gas" readonly="" style="cursor:default;" title="Calculated MOD using selected Bottom Gas and Max Bottom ppO₂" type="text"/>
 </div>
-<div class="field"><label>Cyl. Size (L)</label><input id="cylBot_size" max="30" min="1" placeholder="12" step="0.5" type="number" value="12"/></div>
-<div class="field"><label id="cylBot_pres_lbl">Cyl. bar</label><input id="cylBot_pres" max="300" min="0" placeholder="200" step="10" type="number" value="200"/></div>
+<div class="field"><label>Size (L)</label><input id="cylBot_size" max="30" min="1" placeholder="12" step="0.5" type="number" value="12"/></div>
+<div class="field"><label id="cylBot_pres_lbl">Bar</label><input id="cylBot_pres" max="300" min="0" placeholder="200" step="10" type="number" value="200"/></div>
 <div class="field"><label id="cylBot_reserve_lbl">Reserve bar</label><input id="cylBot_reserve" max="300" min="0" placeholder="50" step="10" title="Reserve pressure — gas kept in the cylinder as a safety margin. Used by the Gas Plan tab for rule-of-thirds / turn-pressure calculations." type="number" value="50"/></div>
 </div>
 </div>
@@ -2133,11 +2208,11 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <input id="travelGasMODDisplay" placeholder="Select gas" readonly="" style="cursor:default;" title="Auto mode: shows travel gas MOD — deepest depth where travel gas ppO₂ stays within the Bottom ppO₂ limit. Manual mode: shows what the auto depth would be for reference." type="text"/>
 </div>
 <div class="field">
-<label>Cyl. Size (L)</label>
+<label>Size (L)</label>
 <input id="cylTravelGas_size" max="30" min="1" placeholder="12" step="0.5" title="Travel gas cylinder volume in litres. Used to calculate gas consumption and remaining pressure." type="number" value="12"/>
 </div>
 <div class="field">
-<label id="cylTravelGas_pres_lbl">Cyl. bar</label>
+<label id="cylTravelGas_pres_lbl">Bar</label>
 <input id="cylTravelGas_pres" max="300" min="0" placeholder="200" step="10" title="Travel gas cylinder fill pressure in bar. Together with cylinder size, used to estimate gas consumption as a % of fill." type="number" value="200"/>
 </div>
 <div class="field">
@@ -2153,9 +2228,10 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <button id="addTravelGasBtn" onclick="addTravelGas()" onmouseout="this.style.opacity='0.7'" onmouseover="this.style.opacity='1'" style="margin-top:8px;width:100%;padding:9px;background:none;border:1px dashed #ff9f43;border-radius:8px;color:#ff9f43;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;cursor:pointer;transition:all 0.2s;opacity:0.7;" title="Add a travel gas — breathed from surface to switch depth on descent, and above bottom gas MOD on ascent. Prevents O₂ toxicity in shallow water with high-O₂ bottom mixes.">
       + ADD TRAVEL GAS
     </button>
-<!-- Dynamic deco gas cards container -->
+<!-- Dynamic deco / bailout gas cards container -->
+<div id="bailoutMixesSection">
 <div id="decoGasCards">
-<!-- Gas Mix 2 — Deco Gas 1 -->
+<!-- Gas Mix 2 — Deco Gas 1 / Bailout Mix 1 -->
 <div class="deco-gas-card" id="dgCard_1" style="border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:8px;">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
 <div class="dg-card-title" style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:var(--accent);">🟢 GAS MIX 2 — DECO GAS 1 (optional)</div>
@@ -2185,15 +2261,15 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <input id="dg1TrimixHe" max="90" min="0" oninput="updateGasMODDisplays()" placeholder="35" step="1" type="number" value="35"/>
 </div>
 <div class="field">
-<label>Optimal Switch Depth</label>
+<label>Switch Depth <span class="tip-icon" onclick="showTip('Switch Depth','Depth at which this gas becomes optimal to breathe during ascent (or the recommended OC bailout depth). Calculated from O₂ fraction and ppO₂ limits when you generate a schedule; manual override available in Auto/Manual mode.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <input class="switch-depth-display" id="dg1SwitchDepthDisplay" placeholder="Calculate to see" readonly="" style="cursor:default;" type="text"/>
 </div>
 <div class="field">
 <label>MOD <span class="tip-icon" onclick="showTip('MOD','Maximum Operating Depth — calculated from the selected gas O2 fraction and current ppO2 limit. Not table-based.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <input id="dg1MODDisplay" placeholder="Select gas" readonly="" style="cursor:default;" title="Calculated MOD using selected gas and Max Deco ppO₂" type="text"/>
 </div>
-<div class="field"><label>Cyl. Size (L)</label><input id="cylDg1_size" max="30" min="1" placeholder="11" step="0.5" type="number" value="11"/></div>
-<div class="field"><label id="cylDg1_pres_lbl">Cyl. bar</label><input id="cylDg1_pres" max="300" min="0" placeholder="200" step="10" type="number" value="200"/></div>
+<div class="field"><label>Size (L)</label><input id="cylDg1_size" max="30" min="1" placeholder="11" step="0.5" type="number" value="11"/></div>
+<div class="field"><label id="cylDg1_pres_lbl">Bar</label><input id="cylDg1_pres" max="300" min="0" placeholder="200" step="10" type="number" value="200"/></div>
 <div class="field"><label id="cylDg1_reserve_lbl">Reserve bar</label><input id="cylDg1_reserve" max="300" min="0" placeholder="50" step="10" title="Reserve pressure kept in this deco cylinder. Used by the Gas Plan tab." type="number" value="50"/></div>
 </div>
 </div>
@@ -2227,24 +2303,25 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <input id="dg2TrimixHe" max="90" min="0" oninput="updateGasMODDisplays()" placeholder="35" step="1" type="number" value="35"/>
 </div>
 <div class="field">
-<label>Optimal Switch Depth</label>
+<label>Switch Depth <span class="tip-icon" onclick="showTip('Switch Depth','Depth at which this gas becomes optimal to breathe during ascent (or the recommended OC bailout depth). Calculated from O₂ fraction and ppO₂ limits when you generate a schedule; manual override available in Auto/Manual mode.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <input class="switch-depth-display" id="dg2SwitchDepthDisplay" placeholder="Calculate to see" readonly="" style="cursor:default;" type="text"/>
 </div>
 <div class="field">
 <label>MOD <span class="tip-icon" onclick="showTip('MOD','Maximum Operating Depth — calculated from the selected gas O2 fraction and current ppO2 limit. Not table-based.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <input id="dg2MODDisplay" placeholder="Select gas" readonly="" style="cursor:default;" title="Calculated MOD using selected gas and Max Deco ppO₂" type="text"/>
 </div>
-<div class="field"><label>Cyl. Size (L)</label><input id="cylDg2_size" max="30" min="1" placeholder="11" step="0.5" type="number" value="11"/></div>
-<div class="field"><label id="cylDg2_pres_lbl">Cyl. bar</label><input id="cylDg2_pres" max="300" min="0" placeholder="200" step="10" type="number" value="200"/></div>
+<div class="field"><label>Size (L)</label><input id="cylDg2_size" max="30" min="1" placeholder="11" step="0.5" type="number" value="11"/></div>
+<div class="field"><label id="cylDg2_pres_lbl">Bar</label><input id="cylDg2_pres" max="300" min="0" placeholder="200" step="10" type="number" value="200"/></div>
 <div class="field"><label id="cylDg2_reserve_lbl">Reserve bar</label><input id="cylDg2_reserve" max="300" min="0" placeholder="50" step="10" title="Reserve pressure kept in this deco cylinder. Used by the Gas Plan tab." type="number" value="50"/></div>
 </div>
 </div>
 </div>
-<!-- Add Gas Mix button -->
+<!-- Add Gas Mix / Bailout Mix button -->
 <button id="addDecoGasBtn" onclick="addDecoGasCard()" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" style="margin-top:10px;width:100%;padding:9px;background:none;border:1px dashed var(--border);border-radius:8px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;cursor:pointer;transition:all 0.2s;">
       + ADD GAS MIX
     </button>
 </div>
+<div id="ccrGasValidation" style="display:none;margin-top:10px;"></div>
 <button class="btn-calc" onclick="runDecoSchedule()" style="margin-top:8px;margin-bottom:0;">▶ GENERATE SCHEDULE</button>
 <!-- Feature B: VPM Repetitive Dive panel — hidden until first VPM result available -->
 <div id="vpmRepRow" style="display:none;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;">
@@ -2823,7 +2900,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 </div>
 <!-- ── LSP Documentation ─────────────────────────────────── -->
 <div class="u21">
-<div class="u18">LSP D-Planner Documentation</div>
+<div class="u18">LSP D-Planner + CCR Documentation</div>
 <div style="font-size:12px;line-height:1.8;color:var(--text);">
 <div style="margin-bottom:10px;">Full technical documentation, algorithm notes, and knowledge base PDF available in the open-source repository.</div>
 <a href="https://github.com/Three-Cats-LSP/LSP_D-planner-CCR" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank">
@@ -2835,7 +2912,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <!-- ── Support Development ─────────────────────────────────── -->
 <div class="u21">
 <div class="u18">Support Development</div>
-<div style="font-size:12px;line-height:1.8;color:var(--text);margin-bottom:12px;">LSP D-Planner is free and open-source. If it helps your diving, consider supporting its continued development.</div>
+<div style="font-size:12px;line-height:1.8;color:var(--text);margin-bottom:12px;">LSP D-Planner + CCR is free and open-source. If it helps your diving, consider supporting its continued development.</div>
 <a href="https://paypal.me/ThreeCatsLSP" onmouseout="this.style.borderColor='rgba(0,112,186,0.4)';this.style.background='linear-gradient(135deg,rgba(0,112,186,0.12),rgba(0,145,220,0.16))'" onmouseover="this.style.borderColor='#0070ba';this.style.background='rgba(0,112,186,0.22)'" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:9px 16px;background:linear-gradient(135deg,rgba(0,112,186,0.12),rgba(0,145,220,0.16));border:1px solid rgba(0,112,186,0.4);border-radius:8px;color:var(--text);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,background 0.2s;" target="_blank">
 <svg fill="none" height="16" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828L8.293 21H12.5c.524 0 .968-.381 1.05-.9l.437-2.786h1.8c3.476 0 5.893-1.408 6.656-5.49.343-1.818.044-3.145-.22-4.907z" fill="#009cde"></path><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z" fill="#003087" opacity="0.8"></path></svg>
           Donate via PayPal
@@ -3232,7 +3309,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <div style="background:rgba(204,0,0,0.05);border:1px solid #cc0000;border-radius:8px;padding:16px 18px;font-size:12px;line-height:1.75;color:var(--text);">
 <p style="margin:0 0 12px 0;">The program authors do not warrant that this program accurately reflects the Varying Permeability Model or ZHL-16 algorithms, <strong>that it won't get you bent or dead</strong>, or that it will produce safe, reliable results.</p>
 <p style="margin:0 0 12px 0;">This dive schedule is <strong>experimental</strong> and you use it <strong>at your own risk</strong>. Diving in general is fraught with risk, and decompression diving adds significantly more risk. Deep diving utilizing multiple gases, including helium, or rebreathers is about as risky as it gets.</p>
-<p style="margin:0 0 12px 0;">LSP D-Planner and the decompression schedules it produces are tools for <strong>experienced mixed-gas decompression divers ONLY</strong>. If you have not been properly trained in mixed-gas decompression diving by an internationally recognized technical certification agency and/or don't have a firm handle on decompression planning and mixed-gas diving, then <strong>DO NOT use this software</strong>.</p>
+<p style="margin:0 0 12px 0;">LSP D-Planner + CCR and the decompression schedules it produces are tools for <strong>experienced mixed-gas decompression divers ONLY</strong>. If you have not been properly trained in mixed-gas decompression diving by an internationally recognized technical certification agency and/or don't have a firm handle on decompression planning and mixed-gas diving, then <strong>DO NOT use this software</strong>.</p>
 <p style="margin:0;color:rgba(255,150,80,0.85);font-size:11px;">In no event will the program authors be liable for any indirect, punitive, special, incidental or consequential damages however they may arise and even if program authors have been previously advised of the possibility of such damages.</p>
 </div>
 <div style="text-align:center;margin-top:18px;">
@@ -3287,9 +3364,9 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <a href="https://threecats-lsp.com" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Three Cats LSP · Diver's Toolkit</span></a>
 <a href="https://github.com/Three-Cats-LSP/LSP_D-planner-CCR" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank">
 <svg fill="currentColor" height="16" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"></path></svg>
-          LSP D-Planner · Open Source on GitHub
+          LSP D-Planner + CCR · Open Source on GitHub
         </a>
-<a href="https://threecats-lsp.com/d-planner/download.html" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">LSP D-Planner · Download Android APK</span></a>
+<a href="https://threecats-lsp.com/d-planner-ccr/download.html" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">LSP D-Planner + CCR · Download Android APK</span></a>
 <a href="https://www.thingiverse.com/Roman_Markovtsev/designs" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank"><img alt="Thingiverse" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHIAAAByCAMAAAC4A3VPAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABpUExURStS/gAAADBY/yhY/zBQ/yhQ/yxT/yxT/ipT/ipR/ixT/itT/ixS/itS/v////H1//L0/8rU/8rT/73J/73J/rzJ/6++/6++/qKz/pWp/5Wo/oid/nuT/nuS/m2I/mB9/lNz/kZo/jld/g0+l6gAAAAOdFJOU/8AICAgIK+vr7C/v+/vniJZ+QAAAKhJREFUeNrt2ckNwjAARNFxFpbENmELO4T0XyQV2DJI9gH938DTnEem6a3KtaqMGquiuUoLFa5X8ZyIiIjo26ZHht6KtfMZ2kJCQkJCQkJCQkLmJZ9jpP3Ghxpj3fR755B4UK6uIfIECQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQn5d6QrT3ZK7xi+ftNbq02fOflgL6Vma5l2qaTmyxAmh/ucBna1+QBeIOmb8eOcqAAAAABJRU5ErkJggg==" style="width:16px;height:16px;object-fit:contain;border-radius:2px;flex-shrink:0;"/><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">My Designs · Thingiverse</span></a>
 <a href="https://www.instagram.com/threecats_lsp" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='#d92e7f';this.style.color='#d92e7f'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank">
 <svg fill="none" height="16" viewbox="0 0 50 50" width="16" xmlns="http://www.w3.org/2000/svg"><defs><lineargradient id="igAbout" x1="0%" x2="100%" y1="100%" y2="0%"><stop offset="0%" style="stop-color:#feda75"></stop><stop offset="5%" style="stop-color:#fa7e1e"></stop><stop offset="45%" style="stop-color:#d92e7f"></stop><stop offset="60%" style="stop-color:#9b36b7"></stop><stop offset="90%" style="stop-color:#515bd4"></stop></lineargradient></defs><rect fill="none" height="40" rx="10" stroke="url(#igAbout)" stroke-width="2.5" width="40" x="5" y="5"></rect><circle cx="25" cy="25" fill="none" r="8" stroke="url(#igAbout)" stroke-width="2"></circle><circle cx="36" cy="13" fill="url(#igAbout)" r="2"></circle></svg>
@@ -3298,7 +3375,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <svg fill="none" height="16" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828L8.293 21H12.5c.524 0 .968-.381 1.05-.9l.437-2.786h1.8c3.476 0 5.893-1.408 6.656-5.49.343-1.818.044-3.145-.22-4.907z" fill="#009cde"></path><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z" fill="#003087" opacity="0.8"></path></svg>
           Support Development · Donate via PayPal
         </a></div>
-<p id="appVersionLabel" style="color: var(--muted); font-size:10px; margin-top:12px; letter-spacing:1px; opacity:0.6;">Version 2.10.12</p>
+<p id="appVersionLabel" style="color: var(--muted); font-size:10px; margin-top:12px; letter-spacing:1px; opacity:0.6;">Version 2.30.0</p>
 </div>
 </div>
 </div>
@@ -3326,8 +3403,8 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <a href="https://github.com/Three-Cats-LSP/LSP_D-planner-CCR" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'" onmouseover="this.style.opacity='1';this.style.transform='scale(1.15)'" rel="noopener noreferrer" style="display:flex;align-items:center;opacity:0.7;transition:opacity 0.2s,transform 0.2s;" target="_blank" title="View source on GitHub">
 <svg fill="var(--muted)" height="36" viewbox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"></path></svg>
 </a><a href="https://www.thingiverse.com/Roman_Markovtsev/designs" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'" onmouseover="this.style.opacity='1';this.style.transform='scale(1.15)'" rel="noopener noreferrer" style="display:flex;align-items:center;opacity:0.7;transition:opacity 0.2s,transform 0.2s;" target="_blank" title="My designs on Thingiverse"><img alt="Thingiverse" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHIAAAByCAMAAAC4A3VPAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABpUExURStS/gAAADBY/yhY/zBQ/yhQ/yxT/yxT/ipT/ipR/ixT/itT/ixS/itS/v////H1//L0/8rU/8rT/73J/73J/rzJ/6++/6++/qKz/pWp/5Wo/oid/nuT/nuS/m2I/mB9/lNz/kZo/jld/g0+l6gAAAAOdFJOU/8AICAgIK+vr7C/v+/vniJZ+QAAAKhJREFUeNrt2ckNwjAARNFxFpbENmELO4T0XyQV2DJI9gH938DTnEem6a3KtaqMGquiuUoLFa5X8ZyIiIjo26ZHht6KtfMZ2kJCQkJCQkJCQkLmJZ9jpP3Ghxpj3fR755B4UK6uIfIECQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQn5d6QrT3ZK7xi+ftNbq02fOflgL6Vma5l2qaTmyxAmh/ucBna1+QBeIOmb8eOcqAAAAABJRU5ErkJggg==" style="width:36px;height:36px;object-fit:contain;border-radius:4px;flex-shrink:0;"/></a>
-<a href="https://threecats-lsp.com/d-planner/download.html" id="apkDownloadIcon" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'" onmouseover="this.style.opacity='1';this.style.transform='scale(1.15)'" style="display:flex;align-items:center;opacity:0.7;transition:opacity 0.2s,transform 0.2s;" title="Download LSP D-Planner APK">
-<img alt="LSP D-Planner" height="36" src="icon-192.png" style="display:block;width:36px;height:36px;border-radius:8px;border:1px solid var(--border-hi);object-fit:contain;" width="36"/>
+<a href="https://threecats-lsp.com/d-planner-ccr/download.html" id="apkDownloadIcon" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'" onmouseover="this.style.opacity='1';this.style.transform='scale(1.15)'" style="display:flex;align-items:center;opacity:0.7;transition:opacity 0.2s,transform 0.2s;" title="Download LSP D-Planner + CCR APK">
+<img alt="LSP D-Planner + CCR" height="36" src="icon-192.png" style="display:block;width:36px;height:36px;border-radius:8px;border:1px solid var(--border-hi);object-fit:contain;" width="36"/>
 </a>
 <a href="https://threecats-lsp.com/t-viewer/" id="tvAppIcon" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'" onmouseover="this.style.opacity='1';this.style.transform='scale(1.15)'" rel="noopener noreferrer" style="display:flex;align-items:center;opacity:0.7;transition:opacity 0.2s,transform 0.2s;" target="_blank" title="T-Viewer">
 <svg fill="none" height="36" viewbox="0 0 500 500" width="36" xmlns="http://www.w3.org/2000/svg">
@@ -3381,7 +3458,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.30.0';
+const APP_VERSION = '2.30.3';
 window.APP_VERSION = APP_VERSION;
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
@@ -3892,6 +3969,12 @@ let lastTissues = null;
 // ═══════════════════════════════════════════════
 // ALGO SWITCH
 // ═══════════════════════════════════════════════
+function setBrandIcon() {
+  const el = document.getElementById('brandIcon');
+  if (!el) return;
+  el.innerHTML = '<img src="icon-192.png" alt="" draggable="false">';
+}
+
 function setAlgo(a) {
   algo = a;
   const isBuh   = a === 'buh';
@@ -3921,7 +4004,7 @@ function setAlgo(a) {
   if (isTools) {
     document.getElementById('algoLabel').textContent    = 'TOOLS';
     document.getElementById('algoSubtitle').textContent = 'Dive Planning Tools & Calculators';
-    document.getElementById('brandIcon').textContent    = '🔧';
+    setBrandIcon();
     document.querySelector('.tabs-nav').style.display = 'none';
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.getElementById('tools').classList.add('active');
@@ -3938,7 +4021,7 @@ function setAlgo(a) {
   if (isBuh) {
     document.getElementById('algoLabel').textContent    = 'TEC';
     document.getElementById('algoSubtitle').textContent = 'Bühlmann ZH-L16C · Gradient Factors';
-    document.getElementById('brandIcon').textContent    = '🫧';
+    setBrandIcon();
     document.getElementById('plannerTitle').textContent = 'Bühlmann Dive Plan';
     document.getElementById('algoRow').style.display         = 'flex';
     document.getElementById('envRow').style.display           = 'flex';
@@ -3947,7 +4030,7 @@ function setAlgo(a) {
   } else {
     document.getElementById('algoLabel').textContent    = 'Rec';
     document.getElementById('algoSubtitle').textContent = 'Recreational Dive Planner';
-    document.getElementById('brandIcon').textContent    = '🤿';
+    setBrandIcon();
     document.getElementById('plannerTitle').textContent = 'Single Dive Plan';
     // Rec mode: hide TEC rows, show REC water/units row
     document.getElementById('algoRow').style.display          = 'none';
@@ -4216,7 +4299,7 @@ function setDecoAlgorithm(model, skipSave) {
           <option value="custom">Custom…</option>`;
         // Restore current mGF selection into the freshly rebuilt dropdown
         const _restoredOpt = Array.from(gfSel.options).find(o => o.value === `${mGF.low}/${mGF.high}`);
-        gfSel.value = _restoredOpt ? _restoredOpt.value : 'custom';
+        gfSel.value = _restoredOpt ? _restoredOpt.value : '20/85';
       }
     }
   }
@@ -4682,7 +4765,9 @@ function getDecoGasSwitches() {
 }
 
 function getDecoGasSwitchLines() {
-  return getDecoGasSwitches().map((g, i) => `Deco Gas ${i + 1}  : ${g.gas} (switch @ ${g.depth})`);
+  const ccrUi = typeof isCcrGasUiMode === 'function' && isCcrGasUiMode();
+  const prefix = ccrUi ? 'Bailout mix' : 'Deco Gas';
+  return getDecoGasSwitches().map((g, i) => `${prefix} ${i + 1}  : ${g.gas} (switch @ ${g.depth})`);
 }
 
 /** Structured dive plan header — shared by text export and on-screen banner. */
@@ -4754,8 +4839,10 @@ function buildDecoPlanHeaderData() {
   const _expMdp6m = document.getElementById('minDeco6m')?.value || '3';
   const _depthUnit = units === 'imperial' ? 'ft' : 'm';
   const _ccrHdr = getCCRSettingsFromDOM();
-  const _ccrLabel = _ccrHdr.bailout ? 'BAILOUT OC'
-    : _ccrHdr.circuit === 'CCR' ? `CCR SP ${_ccrHdr.setpoint}`
+  const _ccrLabel = _ccrHdr.bailout
+    ? `BAILOUT OC GF ${_ccrHdr.bailoutGfLow}/${_ccrHdr.bailoutGfHigh}`
+    : _ccrHdr.circuit === 'CCR'
+      ? `CCR SP ${_ccrHdr.descentSetpoint}/${_ccrHdr.bottomSetpoint}/${_ccrHdr.decoSetpoint}`
     : _ccrHdr.circuit === 'pSCR' ? 'pSCR'
     : 'OC';
 
@@ -4770,7 +4857,7 @@ function buildDecoPlanHeaderData() {
     lastStop, decoStep, stopRounding: rndTxt, wvTxt, wvLblTxt,
     altRadii: _expAltRadii, minDecoEn: _expMdpEn, minDeco9m: _expMdp9m, minDeco6m: _expMdp6m,
     depthUnit: _depthUnit, vpmRepActive: _vpmRepActive, vpmSI: _vpmSI,
-    decoGases: getDecoGasSwitches(),
+    decoGases: isCcrOnLoopProfile(_ccrHdr) ? [] : getDecoGasSwitches(),
   };
 }
 
@@ -4782,7 +4869,12 @@ function buildDecoPlanHeaderLines() {
   if (d.circuit && d.circuit !== 'OC') lines.push(`Circuit     : ${d.ccrLabel}${d.ccrBailout ? ' (bailout)' : ''}`);
   if (d.isVPMExport) lines.push(`He Half-Time: ${d.heHtLabel}`);
   lines.push(`Depth       : ${d.depth}${d.du}    BT: ${d.bt} min`);
-  lines.push(`Bottom Gas  : ${d.bottomGas}    Water: ${d.density}`);
+  if (isCcrOnLoopProfile({ circuit: d.circuit, bailout: d.ccrBailout })) {
+    lines.push(`Loop gas    : ${loopMixLabelFor(d.bottomGasShort, { circuit: d.circuit, bailout: d.ccrBailout })} (on-loop from surface)    Water: ${d.density}`);
+  } else {
+    const botPrefix = (d.circuit === 'CCR' || d.circuit === 'pSCR') ? 'Diluent     ' : 'Bottom Gas  ';
+    lines.push(`${botPrefix}: ${d.bottomGas}    Water: ${d.density}`);
+  }
   if (d.travelGas) lines.push(`Travel Gas  : ${d.travelGas.gas} (switch @ ${d.travelGas.depth})`);
   lines.push(`Descent     : ${d.descentRate}${d.du}/min  Ascent: ${d.ascentRate}${d.du}/min  Deco: ${d.decoAscentRate}${d.du}/min  Surface: ${d.surfAscentRate}${d.du}/min`);
   lines.push(`Last Stop   : ${d.lastStop}${d.du}  Step: ${d.decoStep}${d.du}`);
@@ -4790,7 +4882,10 @@ function buildDecoPlanHeaderLines() {
   lines.push(`Altitude     : ${d.altLabel}  Acclimatized: ${d.acclLabel}${d.altRadii}`);
   if (d.minDecoEn) lines.push(`Min Deco Profile: ON  (9${d.depthUnit}: ${d.minDeco9m} min  6${d.depthUnit}: ${d.minDeco6m} min)`);
   if (d.vpmRepActive) lines.push(`Repetitive   : Yes  Surface Interval: ${d.vpmSI} min  (bubble state + tissue loading carried)`);
-  d.decoGases.forEach((g, i) => lines.push(`Deco Gas ${i + 1}  : ${g.gas} (switch @ ${g.depth})`));
+  if (!isCcrOnLoopProfile({ circuit: d.circuit, bailout: d.ccrBailout })) {
+    const gasPrefix = (d.circuit === 'CCR' || d.circuit === 'pSCR') ? 'Bailout mix' : 'Deco Gas';
+    d.decoGases.forEach((g, i) => lines.push(`${gasPrefix} ${i + 1}  : ${g.gas} (switch @ ${g.depth})`));
+  }
   return lines;
 }
 
@@ -4811,13 +4906,21 @@ function renderDecoPlanHeaderHtml(data, opts) {
   if (data.travelGas) {
     chips.push(`<span class="dpb-chip dpb-chip--travel"><span class="dpb-chip-lbl">Travel</span>${_escHtmlPre(data.travelGas.gas)} @ ${_escHtmlPre(data.travelGas.depth)}</span>`);
   }
-  chips.push(`<span class="dpb-chip dpb-chip--bottom"><span class="dpb-chip-lbl">Bottom</span>${_escHtmlPre(data.bottomGasShort)}</span>`);
+  if (isCcrOnLoopProfile({ circuit: data.circuit, bailout: data.ccrBailout })) {
+    chips.push(`<span class="dpb-chip dpb-chip--bottom"><span class="dpb-chip-lbl">Loop</span>${_escHtmlPre(loopMixLabelFor(data.bottomGasShort, { circuit: data.circuit, bailout: data.ccrBailout }))} on-loop</span>`);
+  } else {
+    const botLbl = (data.circuit === 'CCR' || data.circuit === 'pSCR') ? 'Diluent' : 'Bottom';
+    chips.push(`<span class="dpb-chip dpb-chip--bottom"><span class="dpb-chip-lbl">${botLbl}</span>${_escHtmlPre(data.bottomGasShort)}</span>`);
+  }
   if (data.circuit && data.circuit !== 'OC') {
     chips.unshift(`<span class="dpb-chip dpb-chip--travel"><span class="dpb-chip-lbl">Circuit</span>${_escHtmlPre(data.ccrLabel || data.circuit)}</span>`);
   }
-  data.decoGases.forEach((g, i) => {
-    chips.push(`<span class="dpb-chip ${_dpbGasChipClass(g.gas)}"><span class="dpb-chip-lbl">Deco ${i + 1}</span>${_escHtmlPre(g.gas)} @ ${_escHtmlPre(g.depth)}</span>`);
-  });
+  if (!isCcrOnLoopProfile({ circuit: data.circuit, bailout: data.ccrBailout })) {
+    const chipPrefix = (data.circuit === 'CCR' || data.circuit === 'pSCR') ? 'Bailout' : 'Deco';
+    data.decoGases.forEach((g, i) => {
+      chips.push(`<span class="dpb-chip ${_dpbGasChipClass(g.gas)}"><span class="dpb-chip-lbl">${chipPrefix} ${i + 1}</span>${_escHtmlPre(g.gas)} @ ${_escHtmlPre(g.depth)}</span>`);
+    });
+  }
 
   const rates = `Descent <b>${_escHtmlPre(data.descentRate + data.du)}/min</b> · Ascent <b>${_escHtmlPre(data.ascentRate + data.du)}/min</b> · Deco <b>${_escHtmlPre(data.decoAscentRate + data.du)}/min</b> · Surface <b>${_escHtmlPre(data.surfAscentRate + data.du)}/min</b>`;
   const stops = `Last stop <b>${_escHtmlPre(data.lastStop + data.du)}</b> · Step <b>${_escHtmlPre(data.decoStep + data.du)}</b> · Rounding <b>${_escHtmlPre(data.stopRounding)}</b> · WV <b>${_escHtmlPre(String(data.wvTxt) + '(' + data.wvLblTxt + ')')}</b>`;
@@ -4864,13 +4967,29 @@ function drawDecoPlanBannerPdf(doc, y, layout, data, planSum, hasDeco) {
   const boxBorder = hasDeco ? [204, 68, 51] : [34, 136, 85];
 
   const chips = [];
+  const isCcr = data.circuit === 'CCR' || data.circuit === 'pSCR';
+  const onLoop = typeof isCcrOnLoopProfile === 'function'
+    && isCcrOnLoopProfile({ circuit: data.circuit, bailout: data.ccrBailout });
   if (data.travelGas) chips.push({ kind: 'travel', lbl: 'TRAVEL', val: `${data.travelGas.gas} @ ${data.travelGas.depth}` });
-  chips.push({ kind: 'bottom', lbl: 'BOTTOM', val: cleanPDF(data.bottomGasShort) });
-  data.decoGases.forEach((g, i) => chips.push({
-    kind: /^100/i.test(g.gas) ? 'o2' : 'deco',
-    lbl: `DECO ${i + 1}`,
-    val: `${g.gas} @ ${g.depth}`,
-  }));
+  if (onLoop) {
+    chips.push({
+      kind: 'bottom',
+      lbl: 'LOOP',
+      val: cleanPDF(typeof loopMixLabelFor === 'function'
+        ? loopMixLabelFor(data.bottomGasShort, { circuit: data.circuit, bailout: data.ccrBailout })
+        : data.bottomGasShort),
+    });
+  } else {
+    chips.push({ kind: 'bottom', lbl: isCcr ? 'DILUENT' : 'BOTTOM', val: cleanPDF(data.bottomGasShort) });
+  }
+  if (!onLoop) {
+    const decoLbl = isCcr ? 'BAILOUT' : 'DECO';
+    data.decoGases.forEach((g, i) => chips.push({
+      kind: /^100/i.test(g.gas) ? 'o2' : 'deco',
+      lbl: `${decoLbl} ${i + 1}`,
+      val: `${g.gas} @ ${g.depth}`,
+    }));
+  }
 
   const metaLines = [
     cleanPDF(`Descent ${data.descentRate}${data.du}/min · Ascent ${data.ascentRate}${data.du}/min · Deco ${data.decoAscentRate}${data.du}/min · Surface ${data.surfAscentRate}${data.du}/min`),
@@ -5273,7 +5392,7 @@ function setUnits(u) {
     convertNumericInput(id, v => Math.round(v * PSI_PER_BAR), v => Math.round(v / PSI_PER_BAR), 300, 4351);
   });
   ['gpBot_size_lbl','gpTravel_size_lbl','gpDg1_size_lbl','gpDg2_size_lbl'].forEach(id =>
-    setTxt(id, u === 'imperial' ? 'Cyl. Size (cu ft)' : 'Cyl. Size (L)'));
+    setTxt(id, u === 'imperial' ? 'Size (cu ft)' : 'Size (L)'));
   ['gpBot_fill_lbl','gpTravel_fill_lbl','gpDg1_fill_lbl','gpDg2_fill_lbl'].forEach(id =>
     setTxt(id, u === 'imperial' ? 'Fill psi' : 'Fill bar'));
   ['gpBot_reserve_lbl','gpTravel_reserve_lbl','gpDg1_reserve_lbl','gpDg2_reserve_lbl',
@@ -5316,17 +5435,22 @@ function setUnits(u) {
   }
 
   // ── Cylinder label updates (fixed IDs with underscores) ──
-  setTxt('cylBot_pres_lbl',       u === 'imperial' ? 'Cyl. psi'    : 'Cyl. bar');
-  setTxt('cylTravelGas_pres_lbl', u === 'imperial' ? 'Cyl. psi'    : 'Cyl. bar');
-  setTxt('cylDg1_pres_lbl',       u === 'imperial' ? 'Cyl. psi'    : 'Cyl. bar');
-  setTxt('cylDg2_pres_lbl',       u === 'imperial' ? 'Cyl. psi'    : 'Cyl. bar');
+  setTxt('cylBot_pres_lbl',       u === 'imperial' ? 'PSI' : 'Bar');
+  setTxt('cylTravelGas_pres_lbl', u === 'imperial' ? 'PSI' : 'Bar');
+  setTxt('cylDg1_pres_lbl',       u === 'imperial' ? 'PSI' : 'Bar');
+  setTxt('cylDg2_pres_lbl',       u === 'imperial' ? 'PSI' : 'Bar');
   // Dynamic deco gas card labels
-  document.querySelectorAll('[id^="cylDg"][id$="_pres_lbl"]').forEach(el => { el.textContent = u === 'imperial' ? 'Cyl. psi' : 'Cyl. bar'; });
-  document.querySelectorAll('[id^="cylDg"][id$="_size"] ~ * label, label[id$="_size_lbl"]').forEach(el => { el.textContent = u === 'imperial' ? 'Cyl. Size (cu ft)' : 'Cyl. Size (L)'; });
+  document.querySelectorAll('[id^="cylDg"][id$="_pres_lbl"]').forEach(el => { el.textContent = u === 'imperial' ? 'PSI' : 'Bar'; });
+  document.querySelectorAll('[id^="cylDg"][id$="_size"] ~ * label, label[id$="_size_lbl"]').forEach(el => { el.textContent = u === 'imperial' ? 'Size (cu ft)' : 'Size (L)'; });
   // Cyl size labels (static)
   document.querySelectorAll('.field label').forEach(lbl => {
     const t = lbl.textContent.trim();
-    if (t === 'Cyl. Size (L)' || t === 'Cyl. Size (cu ft)') lbl.textContent = u === 'imperial' ? 'Cyl. Size (cu ft)' : 'Cyl. Size (L)';
+    if (/^Cyl\. Size/i.test(t) || t === 'Size' || t === 'Cyl. Size (L)' || t === 'Cyl. Size (cu ft)' || /^Size \(/.test(t)) {
+      lbl.textContent = u === 'imperial' ? 'Size (cu ft)' : 'Size (L)';
+    }
+    if (/^Cyl\. bar/i.test(t) || /^Cyl\. psi/i.test(t) || t === 'Bar' || t === 'PSI') {
+      lbl.textContent = u === 'imperial' ? 'PSI' : 'Bar';
+    }
   });
   ['cylSizeUnit','cylinderSizeUnit','tankSizeUnit'].forEach(id => setTxt(id, u === 'imperial' ? 'cu ft' : 'L'));
   ['cylPressureUnit','tankPressureUnit'].forEach(id => setTxt(id, u === 'imperial' ? 'psi' : 'bar'));
@@ -5511,13 +5635,35 @@ function getCCRSettingsFromDOM() {
   const circuit = document.getElementById('circuitSelect')?.value || 'OC';
   const bailoutEl = document.getElementById('ccrBailoutToggle');
   const bailout = bailoutEl ? (bailoutEl.type === 'checkbox' ? bailoutEl.checked : bailoutEl.value === 'on') : false;
+  const decoSP = parseFloat(document.getElementById('ccrDecoSetpoint')?.value)
+    || parseFloat(document.getElementById('ccrSetpoint')?.value) || 1.3;
+  const loopVol = parseFloat(document.getElementById('ccrLoopVolume')?.value)
+    || parseFloat(document.getElementById('scrLoopVolume')?.value) || 10;
+  const metO2 = parseFloat(document.getElementById('ccrMetabolicO2')?.value)
+    || parseFloat(document.getElementById('scrMetabolicO2')?.value) || 1.5;
+  // Keep hidden legacy fields in sync for saved presets / exports
+  const legSp = document.getElementById('ccrSetpoint');
+  const legVol = document.getElementById('scrLoopVolume');
+  const legMet = document.getElementById('scrMetabolicO2');
+  if (legSp) legSp.value = String(decoSP);
+  if (legVol) legVol.value = String(loopVol);
+  if (legMet) legMet.value = String(metO2);
   return {
     circuit,
-    setpoint: parseFloat(document.getElementById('ccrSetpoint')?.value) || 1.3,
+    setpoint: decoSP,
+    decoSetpoint: decoSP,
+    bottomSetpoint: parseFloat(document.getElementById('ccrBottomSetpoint')?.value) || 1.2,
     descentSetpoint: parseFloat(document.getElementById('ccrDescentSetpoint')?.value) || 0.7,
     bailout,
-    scrLoopVolume: parseFloat(document.getElementById('scrLoopVolume')?.value) || 7.0,
-    scrMetabolicO2: parseFloat(document.getElementById('scrMetabolicO2')?.value) || 0.85,
+    bailoutGfLow: parseInt(document.getElementById('ccrBailoutGfLow')?.value, 10) || 50,
+    bailoutGfHigh: parseInt(document.getElementById('ccrBailoutGfHigh')?.value, 10) || 85,
+    scrLoopVolume: loopVol,
+    scrMetabolicO2: metO2,
+    sacStress: parseFloat(document.getElementById('ccrSacStress')?.value) || 50,
+    sacDecoCcr: parseFloat(document.getElementById('ccrSacDeco')?.value) || 25,
+    stressTimeMin: parseFloat(document.getElementById('ccrStressTime')?.value) || 10,
+    problemSolveMin: parseFloat(document.getElementById('ccrProblemSolve')?.value) || 3,
+    diluentUseAsBailout: document.getElementById('diluentUseAsBailout')?.value === 'on',
   };
 }
 
@@ -5526,11 +5672,20 @@ function mergeCCRSettings(settings) {
   const s = settings || {};
   return {
     circuit: s.circuit || dom.circuit || 'OC',
-    setpoint: s.setpoint != null ? s.setpoint : dom.setpoint,
+    setpoint: s.setpoint != null ? s.setpoint : (s.decoSetpoint != null ? s.decoSetpoint : dom.setpoint),
+    decoSetpoint: s.decoSetpoint != null ? s.decoSetpoint : (s.setpoint != null ? s.setpoint : dom.decoSetpoint),
+    bottomSetpoint: s.bottomSetpoint != null ? s.bottomSetpoint : dom.bottomSetpoint,
     descentSetpoint: s.descentSetpoint != null ? s.descentSetpoint : dom.descentSetpoint,
     bailout: s.bailout != null ? s.bailout : dom.bailout,
+    bailoutGfLow: s.bailoutGfLow != null ? s.bailoutGfLow : dom.bailoutGfLow,
+    bailoutGfHigh: s.bailoutGfHigh != null ? s.bailoutGfHigh : dom.bailoutGfHigh,
     scrLoopVolume: s.scrLoopVolume != null ? s.scrLoopVolume : dom.scrLoopVolume,
     scrMetabolicO2: s.scrMetabolicO2 != null ? s.scrMetabolicO2 : dom.scrMetabolicO2,
+    sacStress: s.sacStress != null ? s.sacStress : dom.sacStress,
+    sacDecoCcr: s.sacDecoCcr != null ? s.sacDecoCcr : dom.sacDecoCcr,
+    stressTimeMin: s.stressTimeMin != null ? s.stressTimeMin : dom.stressTimeMin,
+    problemSolveMin: s.problemSolveMin != null ? s.problemSolveMin : dom.problemSolveMin,
+    ccrPhase: s.ccrPhase || dom.ccrPhase || null,
     scrRuntimeMin: s.scrRuntimeMin || 0,
   };
 }
@@ -5544,14 +5699,19 @@ function depthAtSetpointCrossing(setpoint, surfP) {
   return Math.max(0, (setpoint + WATER_VAPOR - (surfP || altSurfaceP)) / BAR_PER_METRE);
 }
 
-function getEffectiveSetpointAtDepth(depthM, ccr, surfP) {
+function getEffectiveSetpointAtDepth(depthM, ccr, surfP, phase) {
   if (!ccr || ccr.bailout || !isRebreatherCircuit(ccr.circuit)) return 0;
   if (ccr.circuit === 'pSCR') return 0;
-  const highSP = ccr.setpoint != null ? ccr.setpoint : 1.3;
   const descSP = ccr.descentSetpoint != null ? ccr.descentSetpoint : 0.7;
+  const bottomSP = ccr.bottomSetpoint != null ? ccr.bottomSetpoint : 1.2;
+  const decoSP = ccr.decoSetpoint != null ? ccr.decoSetpoint : (ccr.setpoint != null ? ccr.setpoint : 1.3);
+  if (phase === 'descent') return descSP;
+  if (phase === 'bottom') return bottomSP;
+  if (phase === 'deco' || phase === 'ascent') return decoSP;
   const pAmb = (surfP || altSurfaceP) + depthM * BAR_PER_METRE;
-  if (pAmb <= highSP + WATER_VAPOR) return descSP;
-  return highSP;
+  if (pAmb <= descSP + WATER_VAPOR) return descSP;
+  if (pAmb <= bottomSP + WATER_VAPOR) return bottomSP;
+  return decoSP;
 }
 
 function computePSCRFractions(pAmb, fO2, fHe, runtimeMin, ccr) {
@@ -5661,14 +5821,16 @@ function splitSegmentAtSetpoint(fromDepth, toDepth, setpoint, surfP) {
   return [{ fromDepth, toDepth }];
 }
 
-function getEffectivePpo2(pAmb, setpoint, fO2, ccr, depthM) {
+function getEffectivePpo2(pAmb, setpoint, fO2, ccr, depthM, fHe) {
   const cfg = mergeCCRSettings(ccr);
   if (cfg.bailout || !isRebreatherCircuit(cfg.circuit)) return fO2 * pAmb;
   if (cfg.circuit === 'pSCR') {
-    const fr = computePSCRFractions(pAmb, fO2, 1 - fO2 - (ccr.fHe || 0), cfg.scrRuntimeMin, cfg);
+    const fHeVal = fHe != null ? fHe : 0;
+    const fr = computePSCRFractions(pAmb, fO2, fHeVal, cfg.scrRuntimeMin, cfg);
     return Math.max(PSCR_MIN_PPO2, fr.fO2 * pAmb);
   }
-  const sp = setpoint != null ? setpoint : getEffectiveSetpointAtDepth(depthM != null ? depthM : (pAmb - altSurfaceP) / BAR_PER_METRE, cfg);
+  const depthFromAmb = depthM != null ? depthM : (pAmb - altSurfaceP) / BAR_PER_METRE;
+  const sp = setpoint != null ? setpoint : getEffectiveSetpointAtDepth(depthFromAmb, cfg, altSurfaceP);
   const dilPpo2 = fO2 * pAmb;
   return Math.min(pAmb, Math.max(sp, dilPpo2));
 }
@@ -5685,7 +5847,8 @@ function saturateLinearCCR(tissues, fromDepth, toDepth, t, fO2, fHe, ccr) {
   if (t <= 0) return tissues;
   const cfg = mergeCCRSettings(ccr);
   const surfP = altSurfaceP;
-  const sp = getEffectiveSetpointAtDepth((fromDepth + toDepth) / 2, cfg, surfP);
+  const phase = cfg.ccrPhase || null;
+  const sp = getEffectiveSetpointAtDepth((fromDepth + toDepth) / 2, cfg, surfP, phase);
   const segments = splitSegmentAtSetpoint(fromDepth, toDepth, sp, surfP);
   let out = tissues;
   const totalTime = t;
@@ -5696,7 +5859,7 @@ function saturateLinearCCR(tissues, fromDepth, toDepth, t, fO2, fHe, ccr) {
     const pEndAmb = depthBar(seg.toDepth);
     const R = (pEndAmb - p0Amb) / segTime;
     const midDepth = (seg.fromDepth + seg.toDepth) / 2;
-    const segSP = getEffectiveSetpointAtDepth(midDepth, cfg, surfP);
+    const segSP = getEffectiveSetpointAtDepth(midDepth, cfg, surfP, phase);
     const segCcr = { ...cfg, setpoint: segSP };
     out = out.map((t0, i) => ({
       pN2: schreinerLinearCCR(t0.pN2, ZHL16C[i][0], segTime, p0Amb, R, segSP, fO2, fHe, segCcr, false),
@@ -5710,7 +5873,8 @@ function saturateCCR(tissues, depthM, t, fO2, fHe, ccr) {
   if (t <= 0) return tissues;
   const cfg = mergeCCRSettings(ccr);
   const pAmb = depthBar(depthM);
-  const sp = getEffectiveSetpointAtDepth(depthM, cfg);
+  const phase = cfg.ccrPhase || null;
+  const sp = getEffectiveSetpointAtDepth(depthM, cfg, altSurfaceP, phase);
   const segCcr = { ...cfg, setpoint: sp };
   const insp = getInspiredInertPressures(pAmb, sp, fO2, fHe, segCcr);
   return tissues.map((t0, i) => ({
@@ -5734,18 +5898,241 @@ function loadTissuesWithCCR(tissues, fromDepth, toDepth, time, fO2, fHe, ccr, co
   return saturateLinearCCR(tissues, fromDepth, toDepth, time, fO2, fHe, cfg);
 }
 
+function isCcrOnLoopGasLabel(label) {
+  return typeof label === 'string' && label.toUpperCase().startsWith('CCR ');
+}
+function ccrDiluentSurfaceLpm() {
+  const ccr = getCCRSettingsFromDOM();
+  const metRate = ccr.scrMetabolicO2 || 0.85;
+  const bot = getBottomGasFractions();
+  return metRate / Math.max(0.01, bot.fO2 || 0.21);
+}
+function isCcrDiluentGasLabel(label) {
+  if (!label) return false;
+  if (isCcrOnLoopGasLabel(label)) return true;
+  const ccr = getCCRSettingsFromDOM();
+  if (!isRebreatherCircuit(ccr.circuit) || ccr.bailout) return false;
+  const bot = getBottomGasFractions();
+  return label.toUpperCase() === getGasLabel(bot.fO2, bot.fHe).toUpperCase();
+}
+function isCcrOnLoopProfile(ccr) {
+  const cfg = ccr || getCCRSettingsFromDOM();
+  return isRebreatherCircuit(cfg.circuit) && !cfg.bailout;
+}
+/** Display label for on-loop rebreather gas (CCR Air / pSCR Air). OC/bailout → diluent unchanged. */
+function loopMixLabelFor(diluentLabel, ccr) {
+  const cfg = ccr || getCCRSettingsFromDOM();
+  if (!isRebreatherCircuit(cfg.circuit) || cfg.bailout) return diluentLabel;
+  if (typeof diluentLabel === 'string' && /^(CCR|pSCR)\s/i.test(diluentLabel)) return diluentLabel;
+  const prefix = cfg.circuit === 'pSCR' ? 'pSCR' : 'CCR';
+  return `${prefix} ${diluentLabel}`;
+}
+function ccrGasLitres(label, depthM, durMin, sac) {
+  if (isCcrDiluentGasLabel(label)) return ccrDiluentSurfaceLpm() * durMin;
+  const absP = altSurfaceP + depthM * BAR_PER_METRE;
+  return sac * absP * durMin;
+}
+
 function toggleCircuitFields() {
   const circuit = document.getElementById('circuitSelect')?.value || 'OC';
   const isRB = circuit !== 'OC';
+  const isCCR = circuit === 'CCR';
   const isPSCR = circuit === 'pSCR';
-  ['ccrSetpointRow', 'ccrDescentSetpointRow', 'ccrBailoutRow'].forEach(id => {
+  const advSec = document.getElementById('ccrAdvSettingsSection');
+  if (advSec) advSec.style.display = isRB ? '' : 'none';
+  const ccrGrp = document.getElementById('ccrSettingsGroup');
+  if (ccrGrp) ccrGrp.style.display = isRB ? '' : 'none';
+  const boGrp = document.getElementById('ccrBailoutSettingsGroup');
+  if (boGrp) boGrp.style.display = isRB ? '' : 'none';
+  ['ccrSpDescentRow', 'ccrSpBottomRow', 'ccrSpDecoRow'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.style.display = isRB ? '' : 'none';
+    if (el) el.style.display = isCCR ? '' : 'none';
   });
-  ['scrFieldsRow', 'scrFieldsRow2'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = isPSCR ? '' : 'none';
+  const bailoutEl = document.getElementById('ccrBailoutRow');
+  if (bailoutEl) bailoutEl.style.display = isRB ? '' : 'none';
+  if (isRB) _updateCcrAdvSummary();
+  updateCcrGasCardLabels();
+  updateCcrGasValidation();
+}
+
+function isCcrGasUiMode() {
+  const c = document.getElementById('circuitSelect')?.value || 'OC';
+  return c === 'CCR' || c === 'pSCR';
+}
+
+function updateCcrGasCardLabels() {
+  const ccrUi = isCcrGasUiMode();
+  const isCCR = (document.getElementById('circuitSelect')?.value || 'OC') === 'CCR';
+  const titleEl = document.getElementById('diluentCardTitle');
+  if (titleEl) {
+    titleEl.textContent = ccrUi ? '🔵 DILUENT' : '🔵 GAS MIX 1 — BOTTOM GAS';
+  }
+  const dilBailoutRow = document.getElementById('diluentUseAsBailoutRow');
+  if (dilBailoutRow) dilBailoutRow.style.display = isCCR ? '' : 'none';
+  const mixLbl = document.getElementById('diluentMixLabel');
+  if (mixLbl) mixLbl.textContent = ccrUi ? 'Diluent mix' : 'Gas Mix';
+  const botModLbl = document.querySelector('#diluentGasCard label[for="botMODDisplay"]');
+  const travelBtn = document.getElementById('addTravelGasBtn');
+  const travelCard = document.getElementById('travelGasCard');
+  if (ccrUi) {
+    if (travelBtn) travelBtn.style.display = 'none';
+    if (travelCard) travelCard.style.display = 'none';
+  } else if (travelBtn && (!travelCard || travelCard.style.display === 'none')) {
+    travelBtn.style.display = '';
+  }
+  const addBtn = document.getElementById('addDecoGasBtn');
+  if (addBtn) addBtn.textContent = ccrUi ? '+ ADD BAILOUT MIX' : '+ ADD GAS MIX';
+  if (typeof renumberDecoGasCards === 'function') renumberDecoGasCards();
+}
+
+function calcGasMODm(fO2, ppO2Limit) {
+  const o2AtMOD = typeof allowO2AtMOD !== 'undefined' ? allowO2AtMOD : true;
+  const lastStop = parseInt(document.getElementById('lastDecoStop')?.value, 10) || 3;
+  const o2MODm = Math.max(lastStop, 6);
+  if (fO2 >= 0.995 && o2AtMOD) return o2MODm;
+  if (fO2 <= 0) return 0;
+  return Math.floor((ppO2Limit / fO2 - 1) / BAR_PER_METRE);
+}
+
+function getBailoutPpo2Limit() {
+  return parseFloat(document.getElementById('ppo2Bottom')?.value) || 1.4;
+}
+
+function getConfiguredBailoutMixes() {
+  const ocPpo2 = getBailoutPpo2Limit();
+  const mixes = [];
+  const ids = typeof getAllDecoGasIds === 'function' ? getAllDecoGasIds() : [1, 2];
+  ids.forEach(cidx => {
+    const sel = document.getElementById(`dg${cidx}Mix`);
+    if (!sel || sel.value === 'none' || !sel.value) return;
+    const fracs = typeof getDecoCardFractions === 'function' ? getDecoCardFractions(cidx) : null;
+    if (!fracs) return;
+    mixes.push({
+      cidx,
+      label: getGasLabel(fracs.fO2, fracs.fHe),
+      fO2: fracs.fO2,
+      modM: calcGasMODm(fracs.fO2, ocPpo2),
+    });
   });
+  return mixes;
+}
+
+function resolveCcrSacForGas(label, phaseSac, ccr) {
+  const cfg = ccr || (typeof getCCRSettingsFromDOM === 'function' ? getCCRSettingsFromDOM() : null);
+  if (!cfg || !isRebreatherCircuit(cfg.circuit)) return phaseSac;
+  if (typeof isCcrDiluentGasLabel === 'function' && isCcrDiluentGasLabel(label)) return phaseSac;
+  return cfg.sacDecoCcr || phaseSac;
+}
+
+/** Deepest-capable bailout mix label for stress/problem-solve reserve at depth. */
+function getBailoutReserveMixLabel(depthM, fO2Bot, fHeBot) {
+  const mixes = getConfiguredBailoutMixes();
+  const atDepth = mixes.filter(m => m.modM >= depthM - 0.01);
+  if (atDepth.length) {
+    return atDepth.reduce((best, m) => (!best || m.modM > best.modM) ? m : best).label;
+  }
+  const useDil = document.getElementById('diluentUseAsBailout')?.value === 'on';
+  if (useDil) {
+    const bailoutPpo2 = getBailoutPpo2Limit();
+    if (calcGasMODm(fO2Bot, bailoutPpo2) >= depthM - 0.01) {
+      return getGasLabel(fO2Bot, fHeBot);
+    }
+  }
+  return null;
+}
+
+function validateCcrGasConfiguration() {
+  if (!isCcrGasUiMode()) return { ok: true, errors: [], warnings: [] };
+  const rawD = parseFloat(document.getElementById('decoDepth')?.value) || 0;
+  const depthM = units === 'metric' ? rawD : rawD / 3.28084;
+  if (depthM <= 0) return { ok: true, errors: [], warnings: [] };
+  const activePpo2 = parseFloat(document.getElementById('ccrBottomSetpoint')?.value)
+    || parseFloat(document.getElementById('ppo2Bottom')?.value) || 1.4;
+  const bot = getBottomGasFractions();
+  const diluentMod = calcGasMODm(bot.fO2, activePpo2);
+  const du = units === 'imperial' ? 'ft' : 'm';
+  const depthDisp = units === 'imperial' ? Math.round(depthM * 3.28084) : Math.round(depthM);
+  const modDisp = units === 'imperial' ? Math.round(diluentMod * 3.28084) : diluentMod;
+  const errors = [];
+  const warnings = [];
+  if (depthM > diluentMod + 0.01) {
+    errors.push(`Diluent MOD (${modDisp}${du}) is shallower than dive depth (${depthDisp}${du}). Use a richer diluent or reduce depth.`);
+  }
+  const useDiluentBailout = document.getElementById('diluentUseAsBailout')?.value === 'on';
+  const bailoutMixes = getConfiguredBailoutMixes();
+  const bailoutAtDepth = bailoutMixes.filter(m => m.modM >= depthM - 0.01);
+  if (useDiluentBailout && diluentMod >= depthM - 0.01) {
+    // diluent cylinder counts as bailout at depth
+  } else if (bailoutAtDepth.length === 0) {
+    if (bailoutMixes.length === 0 && !useDiluentBailout) {
+      errors.push('Add at least one bailout mix with sufficient MOD, or enable "Use diluent as bailout".');
+    } else {
+      errors.push(`No bailout mix with enough MOD for ${depthDisp}${du}. Add or correct bailout mixtures.`);
+    }
+  }
+  if (bailoutMixes.length === 0 && !useDiluentBailout && errors.length === 0) {
+    warnings.push('No bailout mixes configured — add OC bailout cylinders for emergency open-circuit use.');
+  }
+  return { ok: errors.length === 0, errors, warnings };
+}
+
+function updateCcrGasValidation() {
+  const box = document.getElementById('ccrGasValidation');
+  if (!box) return;
+  if (!isCcrGasUiMode()) { box.style.display = 'none'; box.innerHTML = ''; return; }
+  const v = validateCcrGasConfiguration();
+  box.style.display = '';
+  let html = '';
+  v.errors.forEach(msg => {
+    html += `<div class="alert dang" style="margin-top:0;"><span>⚠</span><div><strong>Validation error.</strong> ${msg}</div></div>`;
+  });
+  v.warnings.forEach(msg => {
+    html += `<div class="alert" style="margin-top:6px;background:var(--card2);"><span>ℹ</span><div>${msg}</div></div>`;
+  });
+  if (v.ok && v.warnings.length === 0) {
+    html = `<div class="alert" style="margin-top:0;background:rgba(38,208,124,0.08);border-color:var(--green);"><span>✓</span><div>Diluent and bailout MOD check passed for planned depth.</div></div>`;
+  }
+  box.innerHTML = html;
+}
+
+function toggleCcrAdvSettings(forceOpen) {
+  const body = document.getElementById('ccrAdvSettingsBody');
+  const chevron = document.getElementById('ccrAdvSettingsChevron');
+  const btn = document.getElementById('ccrAdvSettingsToggle');
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  const open = forceOpen !== undefined ? forceOpen : !isOpen;
+  body.style.display = open ? '' : 'none';
+  if (chevron) chevron.style.transform = open ? 'rotate(90deg)' : '';
+  if (btn) {
+    btn.style.borderColor = open ? 'var(--accent)' : 'var(--border)';
+    btn.style.color = open ? 'var(--accent)' : 'var(--muted)';
+  }
+  _updateCcrAdvSummary();
+  try { localStorage.setItem('lspCcrAdvOpen', open ? '1' : '0'); } catch(e) {}
+}
+
+function _updateCcrAdvSummary() {
+  const el = document.getElementById('ccrAdvSettingsSummary');
+  if (!el) return;
+  const body = document.getElementById('ccrAdvSettingsBody');
+  if (body && body.style.display !== 'none') { el.textContent = ''; return; }
+  const circuit = document.getElementById('circuitSelect')?.value || 'OC';
+  if (circuit === 'OC') { el.textContent = ''; return; }
+  const parts = [];
+  if (circuit === 'CCR') {
+    const ds = document.getElementById('ccrDescentSetpoint')?.value;
+    const bs = document.getElementById('ccrBottomSetpoint')?.value;
+    const dec = document.getElementById('ccrDecoSetpoint')?.value;
+    if (ds && bs && dec) parts.push(`SP ${ds}/${bs}/${dec}`);
+  }
+  const bo = document.getElementById('ccrBailoutToggle')?.value;
+  if (bo === 'on') {
+    const glo = document.getElementById('ccrBailoutGfLow')?.value || '50';
+    const ghi = document.getElementById('ccrBailoutGfHigh')?.value || '85';
+    parts.push(`BO GF ${glo}/${ghi}`);
+  }
+  el.textContent = parts.length ? parts.join(' · ') : 'defaults';
 }
 
 if (typeof window !== 'undefined') {
@@ -5757,6 +6144,12 @@ if (typeof window !== 'undefined') {
   window.loadTissuesWithCCR = loadTissuesWithCCR;
   window.splitSegmentAtSetpoint = splitSegmentAtSetpoint;
   window.computePSCRFractions = computePSCRFractions;
+  window.isCcrOnLoopProfile = isCcrOnLoopProfile;
+  window.loopMixLabelFor = loopMixLabelFor;
+  window.toggleCcrAdvSettings = toggleCcrAdvSettings;
+  window.updateCcrGasCardLabels = updateCcrGasCardLabels;
+  window.updateCcrGasValidation = updateCcrGasValidation;
+  window.validateCcrGasConfiguration = validateCcrGasConfiguration;
 }
 
 function ceiling(tissues, gfHigh) {
@@ -6508,11 +6901,21 @@ function _doResetToDefaults(userDefaults) {
     decoBT:           '25',
     decoGas:          'air',
     circuitSelect:    'OC',
-    ccrSetpoint:      '1.3',
+    ccrDecoSetpoint:  '1.3',
+    ccrBottomSetpoint:'1.2',
     ccrDescentSetpoint: '0.7',
     ccrBailoutToggle: 'off',
-    scrLoopVolume:    '7',
-    scrMetabolicO2:   '0.85',
+    ccrBailoutGfLow:  '50',
+    ccrBailoutGfHigh: '85',
+    ccrLoopVolume:    '10',
+    ccrMetabolicO2:   '1.5',
+    ccrSacStress:     '50',
+    ccrSacDeco:       '25',
+    ccrStressTime:    '10',
+    ccrProblemSolve:  '3',
+    ccrSetpoint:      '1.3',
+    scrLoopVolume:    '10',
+    scrMetabolicO2:   '1.5',
     // Deco gases
     dg1Mix:           'ean50',
     dg2Mix:           'o2',
@@ -6585,6 +6988,7 @@ function _doResetToDefaults(userDefaults) {
   if (altCustomRowRec) altCustomRowRec.style.display = 'none';
   altitudeM = 0; altSurfaceP = SEA_LEVEL_P; altAcclimatized = true;
   try { localStorage.removeItem('lspAltitude'); localStorage.removeItem('lspAcclimatized'); } catch(e) {}
+  try { localStorage.removeItem('gfCustomLow'); localStorage.removeItem('gfCustomHigh'); } catch(e) {}
   const badge = document.getElementById('altitudePressureDisplay'); if(badge) badge.textContent='';
 
   // Apply water vapor constant
@@ -6644,10 +7048,18 @@ function getActiveGas(curDepthM, bottomFN2, decoGases, getPPO2LimitFn, bottomLab
 
 // Truncate ppO2 to 1 decimal place (floor, not round) — 1.67 → 1.6
 
-function ppO2Check(depthM, fN2, fHe) {
+function ppO2Check(depthM, fN2, fHe, opts) {
   // He is inert: fO2 = 1 - fN2 - fHe (trimix-safe)
-  const o2frac = Math.max(0, 1 - fN2 - (fHe || 0));
-  return ((altSurfaceP + depthM * BAR_PER_METRE) * o2frac).toFixed(2);
+  const fHeVal = fHe || 0;
+  const o2frac = Math.max(0, 1 - fN2 - fHeVal);
+  const pAmb = altSurfaceP + depthM * BAR_PER_METRE;
+  if (opts && opts.onLoop && opts.ccr && isRebreatherCircuit(opts.ccr.circuit) && !opts.ccr.bailout) {
+    const fO2 = opts.fO2 != null ? opts.fO2 : o2frac;
+    const surfP = opts.surfP != null ? opts.surfP : altSurfaceP;
+    const sp = opts.setpoint != null ? opts.setpoint : getEffectiveSetpointAtDepth(depthM, opts.ccr, surfP);
+    return getEffectivePpo2(pAmb, sp, fO2, opts.ccr, depthM, fHeVal).toFixed(2);
+  }
+  return (pAmb * o2frac).toFixed(2);
 }
 
 // ── VPM SCHEDULE RUNNER ──────────────────────────────────────────────
@@ -6772,7 +7184,7 @@ function runVPMSchedule(depthM, bt, descentRate, ascentRate, decoAscentRate, sur
 
   const levels = [{
     depth: depthM, time: bt, o2: bottomO2pct, he: bottomHePct,
-    setpoint: settings.setpoint,
+    setpoint: settings.bottomSetpoint ?? settings.setpoint ?? 1.2,
     oc: settings.bailout,
   }];
 
@@ -6833,6 +7245,22 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
     return `${m}:${String(s).padStart(2,'0')}`;
   }
 
+  const _vpmCcr = typeof getCCRSettingsFromDOM === 'function' ? getCCRSettingsFromDOM() : { circuit: 'OC' };
+  const _vpmOnLoop = isRebreatherCircuit(_vpmCcr.circuit) && !_vpmCcr.bailout;
+  function vpmDisplayPpo2(depthM, o2pct, hepct, seg) {
+    const fO2 = o2pct / 100;
+    const fHe = hepct / 100;
+    const fN2 = Math.max(0, 1 - fO2 - fHe);
+    if (_vpmOnLoop) {
+      const pAmb = surfP + depthM * BAR_PER_METRE;
+      const sp = (seg && seg.setpoint > 0)
+        ? seg.setpoint
+        : getEffectiveSetpointAtDepth(depthM, _vpmCcr, surfP);
+      return getEffectivePpo2(pAmb, sp, fO2, _vpmCcr, depthM, fHe).toFixed(2);
+    }
+    return ppO2Check(depthM, fN2, fHe);
+  }
+
   let html = '';
   let prevGas = `${bottomO2pct}/${bottomHePct}`;
   let gasLabel = getGasLabel(bottomO2pct/100, bottomHePct/100);
@@ -6844,15 +7272,14 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
     const o2pct = parseInt(gasParts[0]) || bottomO2pct;
     const hepct = parseInt(gasParts[1]) || 0;
     const gc = gasColor(o2pct);
-    const gasDisp = getGasLabel(o2pct/100, hepct/100);
-    const pAmb = surfP + seg.depth * BAR_PER_METRE; // VPM depths always in metres internally
-    const ppO2 = (o2pct / 100 * (seg.startDepth !== undefined ? surfP + seg.startDepth * BAR_PER_METRE : pAmb)).toFixed(2);
+    const gasDisp = _vpmOnLoop
+      ? loopMixLabelFor(getGasLabel(o2pct/100, hepct/100), _vpmCcr)
+      : getGasLabel(o2pct/100, hepct/100);
 
     // Gas switch row
-    if (segGas !== prevGas && seg.type !== 'descent') {
+    if (!_vpmOnLoop && segGas !== prevGas && seg.type !== 'descent') {
       const switchDepth = seg.type === 'stop' ? seg.depth : (seg.startDepth || seg.depth || 0);
-      const switchPAmb = surfP + switchDepth * BAR_PER_METRE;
-      const switchPpO2 = (o2pct / 100 * switchPAmb).toFixed(2);
+      const switchPpO2 = vpmDisplayPpo2(switchDepth, o2pct, hepct, seg);
       html += `<tr data-phase="switch">
         <td style="text-align:center;">⇄</td>
         <td data-label="Depth">${gasDisp} @ ${switchDepth}${du}</td>
@@ -6876,7 +7303,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
         <td data-label="Stop"></td>
         <td data-label="Mix" style="color:${gc};">${gasDisp}</td>
         <td data-label="Run" style="color:var(--accent);">${rtDisp}</td>
-        <td data-label="PPO2" style="color:var(--muted);">${(o2pct / 100 * (surfP + seg.endDepth * BAR_PER_METRE)).toFixed(2)}</td>
+        <td data-label="PPO2" style="color:var(--muted);">${vpmDisplayPpo2(seg.endDepth, o2pct, hepct, seg)}</td>
         <td data-label="EAD" style="color:var(--muted);">—</td>
         <td data-label="CNS%" style="color:var(--muted);">—</td>
       </tr>`;
@@ -6884,8 +7311,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
     } else if (seg.type === 'bottom') {
       vpmRtAtBottomEnd = seg.runtime;
       const rtDisp = fmtRT(seg.runtime);
-      const pAmbB = surfP + seg.depth * BAR_PER_METRE;
-      const ppO2b = (o2pct / 100 * pAmbB).toFixed(2);
+      const ppO2b = vpmDisplayPpo2(seg.depth, o2pct, hepct, seg);
       html += `<tr class="btm-row" data-phase="bottom">
         <td><span style="color:var(--accent);font-size:13px;">🔵</span></td>
         <td data-label="Depth" style="color:var(--accent);">${dU ? seg.depth : Math.round(seg.depth * 3.28084)}${du}</td>
@@ -6898,8 +7324,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
       </tr>`;
     } else if (seg.type === 'ascent') {
       const rtDisp = fmtRT(seg.runtime);
-      const pAmbFrom = surfP + seg.startDepth * BAR_PER_METRE;
-      const ppO2a = (o2pct / 100 * pAmbFrom).toFixed(2);
+      const ppO2a = vpmDisplayPpo2(seg.startDepth, o2pct, hepct, seg);
       const fromD = dU ? seg.startDepth : Math.round(seg.startDepth * 3.28084);
       const toD   = dU ? seg.endDepth   : Math.round(seg.endDepth   * 3.28084);
       html += `<tr class="asc-row" data-phase="ascent">
@@ -6914,8 +7339,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
       </tr>`;
     } else if (seg.type === 'stop') {
       const rtDisp = fmtRT(seg.runtime);
-      const pAmbS = surfP + seg.depth * BAR_PER_METRE;
-      const ppO2s = (o2pct / 100 * pAmbS).toFixed(2);
+      const ppO2s = vpmDisplayPpo2(seg.depth, o2pct, hepct, seg);
       const ppO2Color = parseFloat(ppO2s) > 1.6 ? 'color:var(--red);font-weight:700;' : 'color:var(--muted);';
       // Cumulative CNS row highlight (same logic as Bühlmann, uses _cumCNS stored by VPM engine)
       const cumCnsPctVPM = seg._cumCNS != null ? seg._cumCNS : 0;
@@ -7005,10 +7429,20 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
     const durMin = (() => { const p = stopRaw.split(':'); return p.length===2 ? parseInt(p[0]) + parseInt(p[1])/60 : parseFloat(stopRaw)||0; })();
     if (!durMin || !mixRaw || mixRaw === '-') return;
     const gasKey = mixRaw; // labels now always in O2/He format (e.g. '50/00', '21/35', '100/00')
-    const sac = (ph === 'bottom') ? sacBotVPM : sacDecoVPM;
-    const absP = surfP + depthM2 * BAR_PER_METRE;
-    gasConsVPM[gasKey] = (gasConsVPM[gasKey] || 0) + sac * absP * durMin;
+    const sac = resolveCcrSacForGas(gasKey, (ph === 'bottom') ? sacBotVPM : sacDecoVPM, _vpmCcr);
+    gasConsVPM[gasKey] = (gasConsVPM[gasKey] || 0) + ccrGasLitres(gasKey, depthM2, durMin, sac);
   });
+  if (_vpmOnLoop) {
+    const reserveMin = (_vpmCcr.stressTimeMin || 0) + (_vpmCcr.problemSolveMin || 0);
+    if (reserveMin > 0) {
+      const botFracs = _vpmBotFracs || getBottomGasFractions();
+      const reserveLabel = getBailoutReserveMixLabel(depthM, botFracs.fO2, botFracs.fHe);
+      if (reserveLabel) {
+        const stressSac = _vpmCcr.sacStress || sacBotVPM;
+        gasConsVPM[reserveLabel] = (gasConsVPM[reserveLabel] || 0) + ccrGasLitres(reserveLabel, depthM, reserveMin, stressSac);
+      }
+    }
+  }
   const gasElVPM = document.getElementById('gasConsumptionSummary');
   if (gasElVPM && Object.keys(gasConsVPM).length) {
     const cylIds = [['cylBot_size','cylBot_pres'],['cylDg1_size','cylDg1_pres'],['cylDg2_size','cylDg2_pres'],['cylTravelGas_size','cylTravelGas_pres']];
@@ -7016,7 +7450,8 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
     Object.keys(gasConsVPM).forEach((label, idx) => {
       const [sId,pId] = cylIds[idx] || [];
       if (!sId) return;
-      const sz = parseFloat(document.getElementById(sId)?.value) || 0;
+      const szRaw = parseFloat(document.getElementById(sId)?.value) || 0;
+      const sz = units === 'imperial' ? szRaw * 28.3168 : szRaw;
       const prRaw = parseFloat(document.getElementById(pId)?.value) || 0;
       const pr = units === 'imperial' ? prRaw / 14.5038 : prRaw;
       if (sz > 0 && pr > 0) cylCapVPM[label] = sz * pr;
@@ -7037,8 +7472,8 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
     const _cylDefsVPM = [
       { ids:['cylBot_size','cylBot_pres','cylBot_reserve'],                   label: gasLabels[0] || null,                                              isBottom: true  },
       { ids:['cylTravelGas_size','cylTravelGas_pres','cylTravelGas_reserve'], label: (getTravelGasInfo()?.label || null),                                isBottom: false },
-      { ids:['cylDg1_size','cylDg1_pres','cylDg1_reserve'],                   label: (getDecoGasLabel('decoGas1Mix','decoGas1Custom') || null),           isBottom: false },
-      { ids:['cylDg2_size','cylDg2_pres','cylDg2_reserve'],                   label: (getDecoGasLabel('decoGas2Mix','decoGas2Custom') || null),           isBottom: false },
+      { ids:['cylDg1_size','cylDg1_pres','cylDg1_reserve'],                   label: (getDecoGasLabel('dg1Mix','dg1CustomO2') || null),           isBottom: false },
+      { ids:['cylDg2_size','cylDg2_pres','cylDg2_reserve'],                   label: (getDecoGasLabel('dg2Mix','dg2CustomO2') || null),           isBottom: false },
     ];
     const _cylByLabelVPM = {};
     _cylDefsVPM.forEach(cyl => {
@@ -7987,8 +8422,10 @@ const VPMEngine = (() => {
         const surfP = settings ? getSurfacePressure(settings) : altSurfaceP;
         const ccr = {
             circuit: settings?.circuit || 'CCR',
-            setpoint: level.setpoint || settings?.setpoint || 1.3,
-            descentSetpoint: settings?.descentSetpoint || 0.7,
+            descentSetpoint: settings?.descentSetpoint ?? 0.7,
+            bottomSetpoint: settings?.bottomSetpoint ?? 1.2,
+            decoSetpoint: settings?.decoSetpoint ?? settings?.setpoint ?? 1.3,
+            setpoint: settings?.setpoint ?? 1.3,
             bailout: false,
         };
         return getEffectiveSetpointAtDepth(depthM != null ? depthM : 0, ccr, surfP);
@@ -8138,6 +8575,7 @@ const VPMEngine = (() => {
             ctx.plan.push(segment);
         }
         function runAscentSegment(ctx, toDepth, rate) {
+            settings._scrRuntimeMin = ctx.runtime;
             const fromDepth = ctx.currentDepth;
             const segTime = loadTissuesLinear(
                 ctx.state, fromDepth, toDepth, rate,
@@ -8159,6 +8597,7 @@ const VPMEngine = (() => {
             return segTime;
         }
         function runRoundedDecoStop(ctx, stopDepth, nextStop) {
+            settings._scrRuntimeMin = ctx.runtime;
             let effectiveMinStop = (firstStop30sec && stopDepth === ctx.firstStopDepth) ? 0.5 : minStopTime;
             const roundedRuntime = (ctx.continuationFinalPhase && stopDepth <= 12)
                 ? ctx.runtime
@@ -8174,7 +8613,7 @@ const VPMEngine = (() => {
                 bailout: settings.bailout,
                 scrLoopVolume: settings.scrLoopVolume,
                 scrMetabolicO2: settings.scrMetabolicO2,
-                scrRuntimeMin: settings._scrRuntimeMin || 0,
+                scrRuntimeMin: ctx.runtime,
             };
             const insp = getInspiredInertPressures(pAmb, ctx.currentSP, ctx.currentO2, ctx.currentHe, ccr);
             const inspHe = insp.pHe;
@@ -8208,6 +8647,7 @@ const VPMEngine = (() => {
             return totalStopTime;
         }
         function maybeSwitchDecoGas(ctx, depth) {
+            if (isRebreatherCircuit(settings.circuit) && !settings.bailout) return;
             const decoGas = selectDecoGas(depth, normalizedDecoGases, ppO2Deco, settings);
             if (!decoGas) return;
             const pAmb = getAmbientPressure(depth, settings);
@@ -8287,6 +8727,7 @@ const VPMEngine = (() => {
             ctx.currentGasLabel = `${level.o2}/${level.he}`;
             ctx.currentSP = getEffectiveSetpoint(level, isCCR, settings, level.depth);
             if (level.time <= 0) return;
+            settings._scrRuntimeMin = ctx.runtime;
             loadTissuesConstant(ctx.state, level.depth, level.time, ctx.currentO2, ctx.currentHe, settings, ctx.currentSP);
             ctx.runtime += level.time;
             addConstantExposure(ctx, level.depth, level.time);
@@ -8431,6 +8872,7 @@ const VPMEngine = (() => {
             if (model === 'VPMBE') extendedCompensation(state, settings);
             let rawCeiling = getVPMCeiling(state, settings);
             if (rawCeiling <= targetDepth) {
+                settings._scrRuntimeMin = runtime;
                 const ascTime = loadTissuesLinear(
                     state, currentDepth, targetDepth, ascentRate,
                     curO2, curHe, settings, curSP
@@ -8481,6 +8923,7 @@ const VPMEngine = (() => {
                 if (firstStopDepth < targetDepth + stepSize) firstStopDepth = targetDepth + stepSize;
                 state.firstStopDepth = firstStopDepth;
             }
+            settings._scrRuntimeMin = runtime;
             const ascTimeToFirst = loadTissuesLinear(
                 state, currentDepth, firstStopDepth, ascentRate,
                 curO2, curHe, settings, curSP
@@ -8510,16 +8953,18 @@ const VPMEngine = (() => {
             let stopDepth = firstStopDepth;
             let maxIter = 500;
             while (stopDepth > targetDepth && maxIter-- > 0) {
-                const decoGas = selectDecoGas(stopDepth, normalizedDecoGases, ppO2Deco, settings);
-                if (decoGas) {
-                    const pAmbHere = getAmbientPressure(stopDepth, settings);
-                    const ocPpO2 = decoGas.o2 * pAmbHere;
-                    const ccrPpO2 = curSP > 0 ? Math.min(curSP, pAmbHere) : 0;
-                    if (decoGas.o2 > curO2 || (curSP > 0 && ocPpO2 > ccrPpO2)) {
-                        curO2 = decoGas.o2;
-                        curHe = decoGas.he;
-                        curGasLabel = decoGas.label;
-                        curSP = 0;
+                if (!isCCR) {
+                    const decoGas = selectDecoGas(stopDepth, normalizedDecoGases, ppO2Deco, settings);
+                    if (decoGas) {
+                        const pAmbHere = getAmbientPressure(stopDepth, settings);
+                        const ocPpO2 = decoGas.o2 * pAmbHere;
+                        const ccrPpO2 = curSP > 0 ? Math.min(curSP, pAmbHere) : 0;
+                        if (decoGas.o2 > curO2 || (curSP > 0 && ocPpO2 > ccrPpO2)) {
+                            curO2 = decoGas.o2;
+                            curHe = decoGas.he;
+                            curGasLabel = decoGas.label;
+                            curSP = 0;
+                        }
                     }
                 }
                 const nextStop = stopDepth - stepSize;
@@ -8530,6 +8975,7 @@ const VPMEngine = (() => {
                 const effectiveMinStop = (firstStop30sec && stopDepth === firstStopDepth) ? 0.5 : minStopTime;
                 let stopTime = 0;
                 while (!isClearToAscendVPM(state, nextStopClamped, firstStopDepth, model, settings) && stopTime < 999) {
+                    settings._scrRuntimeMin = runtime;
                     loadTissuesConstant(state, stopDepth, effectiveMinStop, curO2, curHe, settings, curSP);
                     stopTime += effectiveMinStop;
                 }
@@ -8548,6 +8994,7 @@ const VPMEngine = (() => {
                     setpoint: curSP > 0 ? curSP : 0
                 });
                 if (nextStopClamped < stopDepth) {
+                    settings._scrRuntimeMin = runtime;
                     const ascSegTime = loadTissuesLinear(state, stopDepth, nextStopClamped, decoAscentRate, curO2, curHe, settings, curSP);
                     runtime += Math.abs(stopDepth - nextStopClamped) / decoAscentRate;
                     const stepsA = Math.max(1, Math.ceil(Math.abs(stopDepth - nextStopClamped)));
@@ -8574,6 +9021,7 @@ const VPMEngine = (() => {
             const nextLevelOffLoop = isCCR && !!(level.oc || level.scr);
             const sp = (forcedOCMode || nextLevelOffLoop) ? 0 : getEffectiveSetpoint(level, isCCR, settings, depth);
             if (depth > currentDepth) {
+                settings._scrRuntimeMin = runtime;
                 const descTime = loadTissuesLinear(state, currentDepth, depth, descentRate, o2Frac, heFrac, settings, sp);
                 runtime += descTime;
                 const pAmbEnd = getAmbientPressure(depth, settings);
@@ -8598,6 +9046,7 @@ const VPMEngine = (() => {
             const descTimeFromLevel = Math.abs(depth - currentDepth) / descentRate;
             const bottomTime = Math.max(0, time - descTimeFromLevel);
             if (bottomTime > 0) {
+                settings._scrRuntimeMin = runtime;
                 loadTissuesConstant(state, depth, bottomTime, o2Frac, heFrac, settings, sp);
                 runtime += bottomTime;
                 const pAmbB = getAmbientPressure(depth, settings);
@@ -8632,6 +9081,7 @@ const VPMEngine = (() => {
         const totalOTUStartOfAscent = totalOTU;
         const totalCNSStartOfAscent = totalCNS;
         const depthStartOfAscent = currentDepth;
+        settings._scrRuntimeMin = runtimeStartOfAscent;
         const depthStartOfDecoZone = calcStartOfDecoZone(
             startOfAscentState,
             depthStartOfAscent,
@@ -8644,6 +9094,7 @@ const VPMEngine = (() => {
         const trialStartState = cloneVPMState(startOfAscentState);
         let runtimeStartOfDecoZone = runtimeStartOfAscent;
         if (depthStartOfDecoZone > 0 && depthStartOfDecoZone < depthStartOfAscent) {
+            settings._scrRuntimeMin = runtimeStartOfAscent;
             runtimeStartOfDecoZone += loadTissuesLinear(
                 trialStartState,
                 depthStartOfAscent,
@@ -8860,6 +9311,7 @@ function updateGasMODDisplays() {
   const ppO2Limit = parseFloat(document.getElementById('ppo2Bottom')?.value) || 1.4;
   const ppO2Deco  = parseFloat(document.getElementById('ppo2Deco')?.value)   || 1.6;
   const isMetric  = units !== 'imperial';
+  const ccrUi     = typeof isCcrGasUiMode === 'function' && isCcrGasUiMode();
   const o2AtMOD   = typeof allowO2AtMOD !== 'undefined' ? allowO2AtMOD : true;
   const lastStop  = parseInt(document.getElementById('lastDecoStop')?.value) || 3;
   const o2MODm    = Math.max(lastStop, 6); // 6 m is the standard O2 operating depth
@@ -8891,7 +9343,7 @@ function updateGasMODDisplays() {
     const botLabel = getGasLabel(botFO2, botFracs.fHe);
     const heNote   = botFracs.fHe > 0 ? '  (' + botLabel + ')' : '';
     botEl.value    = fmtDepth(botMOD) + heNote;
-    botEl.title    = tooltipText(botFO2, ppO2Limit, 'Bottom');
+    botEl.title    = tooltipText(botFO2, ppO2Limit, ccrUi ? 'Diluent' : 'Bottom');
   }
 
   // Loop over all deco gas cards
@@ -8903,11 +9355,13 @@ function updateGasMODDisplays() {
     const dgFracs = getDecoCardFractions(cidx);
     if (!dgFracs) { disp.value = '—'; continue; }
     const fO2 = dgFracs.fO2;
-    const mod = calcMOD(fO2, ppO2Deco);
+    const bailoutPpo2 = ccrUi ? getBailoutPpo2Limit() : ppO2Deco;
+    const mod = calcMOD(fO2, bailoutPpo2);
     const heNote = dgFracs.fHe > 0 ? '  (' + getGasLabel(fO2, dgFracs.fHe) + ')' : '';
     disp.value = fmtDepth(mod) + heNote;
-    disp.title = tooltipText(fO2, ppO2Deco, 'Deco');
+    disp.title = tooltipText(fO2, bailoutPpo2, ccrUi ? 'Bailout' : 'Deco');
   }
+  if (typeof updateCcrGasValidation === 'function') updateCcrGasValidation();
 }
 
 
@@ -8920,11 +9374,16 @@ function _dgCardCount() {
 }
 
 function renumberDecoGasCards() {
+  const ccrUi = typeof isCcrGasUiMode === 'function' && isCcrGasUiMode();
   document.querySelectorAll('.deco-gas-card').forEach((card, i) => {
-    const n = i + 1; // 1-based deco gas index
-    const mixNum = n + 1; // Gas Mix N (bottom = 1, deco gases start at 2)
+    const n = i + 1;
+    const mixNum = n + 1;
     const titleEl = card.querySelector('.dg-card-title');
-    if (titleEl) titleEl.textContent = `🟢 GAS MIX ${mixNum} — DECO GAS ${n} (optional)`;
+    if (titleEl) {
+      titleEl.textContent = ccrUi
+        ? `🟠 BAILOUT MIX ${n}`
+        : `🟢 GAS MIX ${mixNum} — DECO GAS ${n} (optional)`;
+    }
   });
   const btn = document.getElementById('addDecoGasBtn');
   if (btn) btn.style.display = _dgCardCount() >= _DG_MAX ? 'none' : 'block';
@@ -8933,8 +9392,10 @@ function renumberDecoGasCards() {
 function addDecoGasCard() {
   if (_dgCardCount() >= _DG_MAX) return;
   const idx = _dgNextIdx++;
-  const n = _dgCardCount() + 1; // after insertion, this will be card n
+  const n = _dgCardCount() + 1;
   const mixNum = n + 1;
+  const ccrUi = typeof isCcrGasUiMode === 'function' && isCcrGasUiMode();
+  const cardTitle = ccrUi ? `🟠 BAILOUT MIX ${n}` : `🟢 GAS MIX ${mixNum} — DECO GAS ${n} (optional)`;
 
   const card = document.createElement('div');
   card.className = 'deco-gas-card';
@@ -8943,7 +9404,7 @@ function addDecoGasCard() {
 
   card.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <div class="dg-card-title" style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:var(--accent);">🟢 GAS MIX ${mixNum} — DECO GAS ${n} (optional)</div>
+      <div class="dg-card-title" style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:var(--accent);">${cardTitle}</div>
       <button onclick="removeDecoGasCard(${idx})" title="Remove this gas"
         style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:0 4px;"
         onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">✕</button>
@@ -8972,15 +9433,15 @@ function addDecoGasCard() {
         <input type="number" id="dg${idx}TrimixHe" value="35" min="0" max="90" step="1" oninput="updateGasMODDisplays()" placeholder="35">
       </div>
       <div class="field">
-        <label>Optimal Switch Depth</label>
+        <label>Switch Depth <span class="tip-icon" onclick="showTip('Switch Depth','Depth at which this gas becomes optimal to breathe during ascent (or the recommended OC bailout depth). Calculated from O₂ fraction and ppO₂ limits when you generate a schedule; manual override available in Auto/Manual mode.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
         <input type="text" id="dg${idx}SwitchDepthDisplay" class="switch-depth-display" readonly style="cursor:default;" placeholder="Calculate to see">
       </div>
       <div class="field">
         <label>MOD <span class="tip-icon" onclick="showTip('MOD','Maximum Operating Depth — calculated from the selected gas O2 fraction and current ppO2 limit. Not table-based.')"><svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"/><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" fill="none"/><circle cx="5.5" cy="7.4" r="0.55" fill="currentColor"/></svg></span></label>
         <input type="text" id="dg${idx}MODDisplay" readonly style="cursor:default;" placeholder="Select gas" title="Calculated MOD using selected gas and Max Deco ppO₂">
       </div>
-      <div class="field"><label>Cyl. Size (L)</label><input type="number" id="cylDg${idx}_size" value="11" min="1" max="30" step="0.5" placeholder="11"></div>
-      <div class="field"><label id="cylDg${idx}_pres_lbl">Cyl. bar</label><input type="number" id="cylDg${idx}_pres" value="200" min="0" max="300" step="10" placeholder="200"></div>
+      <div class="field"><label>${units === 'imperial' ? 'Size (cu ft)' : 'Size (L)'}</label><input type="number" id="cylDg${idx}_size" value="11" min="1" max="30" step="0.5" placeholder="11"></div>
+      <div class="field"><label id="cylDg${idx}_pres_lbl">${units === 'imperial' ? 'PSI' : 'Bar'}</label><input type="number" id="cylDg${idx}_pres" value="200" min="0" max="300" step="10" placeholder="200"></div>
     </div>`;
 
   document.getElementById('decoGasCards').appendChild(card);
@@ -8993,6 +9454,7 @@ function removeDecoGasCard(idx) {
   if (card) card.remove();
   renumberDecoGasCards();
   updateGasMODDisplays();
+  if (typeof updateCcrGasValidation === 'function') updateCcrGasValidation();
 }
 
 // ── End Dynamic Deco Gas Cards ──────────────────────────────────────────────
@@ -9118,6 +9580,14 @@ function updateTravelGasMOD() {
 function runDecoSchedule() {
   let _zhlPrevGF = null;
   try {
+  if (typeof validateCcrGasConfiguration === 'function' && isCcrGasUiMode()) {
+    const gasVal = validateCcrGasConfiguration();
+    if (!gasVal.ok) {
+      updateCcrGasValidation();
+      alert('Cannot generate schedule:\n\n' + (gasVal.errors[0] || 'CCR gas configuration is invalid.'));
+      return;
+    }
+  }
   const rawD   = parseFloat(document.getElementById('decoDepth').value) || 40;
   const depthM = units === 'metric' ? rawD : rawD / 3.28084;
   const bt     = parseInt(document.getElementById('decoBT').value) || 30;
@@ -9125,8 +9595,8 @@ function runDecoSchedule() {
   const decoRate        = Math.max(1, parseInt(document.getElementById('decoAscentRate').value)    || 9);
   const surfaceRate     = Math.max(1, parseInt(document.getElementById('surfaceAscentRate').value) || 9);
   const descentRate = Math.max(1, parseInt(document.getElementById('descentRate').value) || 22);
-  const gfL    = mGF.low  / 100;
-  const gfH    = mGF.high / 100;
+  let gfL    = mGF.low  / 100;
+  let gfH    = mGF.high / 100;
   const ppo2Bottom = parseFloat(document.getElementById('ppo2Bottom').value) || 1.4;
   const ppo2Deco   = parseFloat(document.getElementById('ppo2Deco').value)   || 1.6;
   const minStopT   = parseFloat(document.getElementById('minStopTime').value) || 1;
@@ -9156,31 +9626,48 @@ function runDecoSchedule() {
   const _zhlOnLoop = isRebreatherCircuit(_ccrSettings.circuit) && !_ccrSettings.bailout;
   if (_ccrSettings.bailout) {
     _zhlPrevGF = { low: mGF.low, high: mGF.high };
-    mGF.low = 90;
-    mGF.high = 90;
-    gfL = 0.9;
-    gfH = 0.9;
+    const boLo = _ccrSettings.bailoutGfLow ?? 50;
+    const boHi = _ccrSettings.bailoutGfHigh ?? 85;
+    mGF.low = boLo;
+    mGF.high = boHi;
+    gfL = boLo / 100;
+    gfH = boHi / 100;
   }
-  function zhlOnLoopAt(depthM, gas) {
-    if (!_zhlOnLoop) return false;
-    const fO2 = gas.fO2 != null ? gas.fO2 : Math.max(0, 1 - gas.fN2 - (gas.fHe || 0));
-    if (gas.label === bottomMixLabel) return true;
-    const pAmb = depthBar(depthM);
-    const sp = getEffectiveSetpointAtDepth(depthM, _ccrSettings);
-    const loopPpo2 = getEffectivePpo2(pAmb, sp, bottomFO2, _ccrSettings, depthM);
-    return fO2 * pAmb <= loopPpo2 + 0.001;
-  }
-  function zhlLoadLinear(tissues, from, to, t, fO2, fHe, onLoop) {
+  let diveRuntimeMin = 0;
+  function zhlLoadLinear(tissues, from, to, t, fO2, fHe, onLoop, phase) {
     if (onLoop) {
-      return loadTissuesWithCCR(tissues, from, to, t, fO2, fHe, { ..._ccrSettings, scrRuntimeMin: rt });
+      const out = loadTissuesWithCCR(tissues, from, to, t, fO2, fHe, { ..._ccrSettings, scrRuntimeMin: diveRuntimeMin, ccrPhase: phase });
+      diveRuntimeMin += t;
+      return out;
     }
     return saturateLinear(tissues, from, to, t, Math.max(0, 1 - fO2 - fHe), fHe);
   }
-  function zhlLoadConst(tissues, depth, t, fO2, fHe, onLoop) {
+  function zhlLoadConst(tissues, depth, t, fO2, fHe, onLoop, phase) {
     if (onLoop) {
-      return loadTissuesWithCCR(tissues, depth, depth, t, fO2, fHe, { ..._ccrSettings, scrRuntimeMin: rt });
+      const out = loadTissuesWithCCR(tissues, depth, depth, t, fO2, fHe, { ..._ccrSettings, scrRuntimeMin: diveRuntimeMin, ccrPhase: phase });
+      diveRuntimeMin += t;
+      return out;
     }
     return saturate(tissues, depth, t, Math.max(0, 1 - fO2 - fHe), fHe);
+  }
+  function zhlOnLoopAt(depthM, gas) {
+    return !!_zhlOnLoop;
+  }
+  function zhlGasAt(depthM) {
+    if (_zhlOnLoop) {
+      return { fN2: bottomFN2, fHe: bottomFHe, fO2: bottomFO2, label: bottomMixLabel };
+    }
+    return getActiveGas(depthM, bottomFN2, decoGases, getPPO2Limit, bottomMixLabel);
+  }
+  function _ccrPpo2Opts(depthM, onLoop, fO2, phase) {
+    if (!onLoop || !_zhlOnLoop) return undefined;
+    return {
+      onLoop: true,
+      ccr: _ccrSettings,
+      fO2: fO2,
+      setpoint: getEffectiveSetpointAtDepth(depthM, _ccrSettings, altSurfaceP, phase),
+      surfP: altSurfaceP,
+    };
   }
 
   // Returns the ppO2 limit for a given fO2 based on O2 fraction bands
@@ -9203,6 +9690,7 @@ function runDecoSchedule() {
   let bottomFHe = _botFracs.fHe;
   let bottomFO2 = _botFracs.fO2;
   const bottomMixLabel = getGasLabel(bottomFO2, bottomFHe);  // must come after _botFracs
+  const loopMixLabel = loopMixLabelFor(bottomMixLabel, _ccrSettings);
 
   // ── Calculate optimal switch depth from ppO2 limit ──
   // ppO2 = (SURFACE_P + depth * 0.1) * fO2  ≤  maxPPO2
@@ -9304,15 +9792,15 @@ function runDecoSchedule() {
   const descentTime = depthM / descentRate;
   if (travelInfo && travelSwitchM > 0 && travelSwitchM < depthM) {
     const travelDescentTime = travelSwitchM / descentRate;
-    tissues = zhlLoadLinear(tissues, 0, travelSwitchM, travelDescentTime, 1 - travelInfo.fN2, 0, _zhlOnLoop);
+    tissues = zhlLoadLinear(tissues, 0, travelSwitchM, travelDescentTime, 1 - travelInfo.fN2, 0, _zhlOnLoop, 'descent');
     const bottomDescentTime = (depthM - travelSwitchM) / descentRate;
-    tissues = zhlLoadLinear(tissues, travelSwitchM, depthM, bottomDescentTime, bottomFO2, bottomFHe, _zhlOnLoop);
+    tissues = zhlLoadLinear(tissues, travelSwitchM, depthM, bottomDescentTime, bottomFO2, bottomFHe, _zhlOnLoop, 'descent');
   } else {
-    tissues = zhlLoadLinear(tissues, 0, depthM, descentTime, bottomFO2, bottomFHe, _zhlOnLoop);
+    tissues = zhlLoadLinear(tissues, 0, depthM, descentTime, bottomFO2, bottomFHe, _zhlOnLoop, 'descent');
   }
 
   const btAtDepth = Math.max(0, bt - descentTime);
-  tissues = zhlLoadConst(tissues, depthM, btAtDepth, bottomFO2, bottomFHe, _zhlOnLoop);
+  tissues = zhlLoadConst(tissues, depthM, btAtDepth, bottomFO2, bottomFHe, _zhlOnLoop, 'bottom');
   const tissuesAtBottom = [...tissues]; // snapshot for ceiling graph overlay
 
   // ── Decozone start (GF-INDEPENDENT) ──────────────────────────────────────
@@ -9353,7 +9841,7 @@ function runDecoSchedule() {
   }
   if (stopDepths.length === 0 || stopDepths[stopDepths.length - 1] !== lastStop) stopDepths.push(lastStop);
 
-  let prevEngineGas = bottomMixLabel; // track gas for switch pause
+  let prevEngineGas = loopMixLabel; // track gas for switch pause
   let decoZoneEntered = false; // true once first ceiling-forced stop fires
 
   // firstSwitchDepth — find first deco gas switch depth
@@ -9364,7 +9852,7 @@ function runDecoSchedule() {
     let simPrevGas = bottomMixLabel;
     for (const sd of stopDepths) {
       if (simCur > sd) simCur = sd;
-      const gas2 = getActiveGas(simCur, bottomFN2, decoGases, getPPO2Limit, bottomMixLabel);
+      const gas2 = zhlGasAt(simCur);
       if (gas2.label !== simPrevGas) { firstSwitchDepth = simCur; break; }
       simPrevGas = gas2.label;
     }
@@ -9408,23 +9896,23 @@ function runDecoSchedule() {
     // - Before first deco stop: use main ascent rate
     // - Between deco stops: use decoRate
     if (cur > stopDepth) {
-      const travelGas = getActiveGas(cur, bottomFN2, decoGases, getPPO2Limit, bottomMixLabel);
+      const travelGas = zhlGasAt(cur);
       const travelRate = decoZoneEntered ? decoRate : rate;
       const travelDur = (cur - stopDepth) / travelRate;
+      const travelOnLoop = zhlOnLoopAt(cur, travelGas);
       if (decoZoneEntered && mdCompatMode) {
         // MultiDeco-compatible mode: treat deco-zone transit as instant for tissue loading.
         // Transit time is still counted in RT and added to the displayed stop duration below.
         // (Schreiner mode: tissues off-gas normally during transit — more accurate.)
       } else {
-        const travelOnLoop = zhlOnLoopAt(cur, travelGas);
         const tFO2 = travelOnLoop ? bottomFO2 : (travelGas.fO2 != null ? travelGas.fO2 : Math.max(0, 1 - travelGas.fN2 - (travelGas.fHe || 0)));
         const tFHe = travelOnLoop ? bottomFHe : (travelGas.fHe || 0);
-        tissues = zhlLoadLinear(tissues, cur, stopDepth, travelDur, tFO2, tFHe, travelOnLoop);
+        tissues = zhlLoadLinear(tissues, cur, stopDepth, travelDur, tFO2, tFHe, travelOnLoop, decoZoneEntered ? 'deco' : 'bottom');
       }
       steps.push({
         type: 'ascent', from: cur, to: stopDepth,
-        dur: travelDur, gas: travelGas.label,
-        pO2: ppO2Check(cur, travelGas.fN2, travelGas.fHe || 0), fN2: travelGas.fN2, fHe: travelGas.fHe || 0,
+        dur: travelDur, gas: travelOnLoop ? loopMixLabel : travelGas.label,
+        pO2: ppO2Check(cur, travelGas.fN2, travelGas.fHe || 0, _ccrPpo2Opts(cur, travelOnLoop, travelOnLoop ? bottomFO2 : undefined, decoZoneEntered ? 'deco' : 'bottom')), fN2: travelGas.fN2, fHe: travelGas.fHe || 0,
         decoTransit: decoZoneEntered && mdCompatMode
       });
       rt  += travelDur;
@@ -9437,15 +9925,15 @@ function runDecoSchedule() {
     const transitDur = (si === 0) ? 0 : (stopDepths[si - 1] - stopDepth) / decoRate;
 
     // Select best gas available at this stop depth
-    const stopGas  = getActiveGas(cur, bottomFN2, decoGases, getPPO2Limit, bottomMixLabel);
+    const stopGas  = zhlGasAt(cur);
     const onLoop = zhlOnLoopAt(cur, stopGas);
     const stopFN2  = onLoop ? bottomFN2 : stopGas.fN2;
     const stopFHe  = onLoop ? bottomFHe : (stopGas.fHe || 0);
     const stopFO2  = onLoop ? bottomFO2 : (stopGas.fO2 != null ? stopGas.fO2 : Math.max(0, 1 - stopFN2 - stopFHe));
-    const gasLabel = onLoop ? (`CCR ${bottomMixLabel}`) : stopGas.label;
+    const gasLabel = onLoop ? loopMixLabel : stopGas.label;
 
     if (gasLabel !== prevEngineGas && switchPauseT > 0) {
-      tissues = zhlLoadConst(tissues, cur, switchPauseT, stopFO2, stopFHe, onLoop);
+      tissues = zhlLoadConst(tissues, cur, switchPauseT, stopFO2, stopFHe, onLoop, 'deco');
       rt += switchPauseT;
     }
     prevEngineGas = gasLabel;
@@ -9491,7 +9979,7 @@ function runDecoSchedule() {
       const rtOnArrival = rt;
       let stopT = 0;
       while (ceiling(tissues, gfForClear) > ceilTarget && stopT < 360) {
-        tissues = zhlLoadConst(tissues, cur, holdStep, stopFO2, stopFHe, onLoop);
+        tissues = zhlLoadConst(tissues, cur, holdStep, stopFO2, stopFHe, onLoop, 'deco');
         stopT += holdStep; rt += holdStep;
       }
       if (isFirstDecoStop) {
@@ -9502,10 +9990,10 @@ function runDecoSchedule() {
         const actualStop = Math.max(rawRounded, minFirstStop);
         if (actualStop > stopT) {
           const extra = actualStop - stopT;
-          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop);
+          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop, 'deco');
           rt += extra; stopT = actualStop;
         }
-        if (stopT < 1/60) { tissues = zhlLoadConst(tissues, cur, 1/60 - stopT, stopFO2, stopFHe, onLoop); rt += 1/60 - stopT; stopT = 1/60; }
+        if (stopT < 1/60) { tissues = zhlLoadConst(tissues, cur, 1/60 - stopT, stopFO2, stopFHe, onLoop, 'deco'); rt += 1/60 - stopT; stopT = 1/60; }
       } else {
         let roundedStop;
         {
@@ -9514,18 +10002,18 @@ function runDecoSchedule() {
         }
         if (roundedStop > stopT) {
           const extra = roundedStop - stopT;
-          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop);
+          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop, 'deco');
           rt += extra; stopT = roundedStop;
         }
         // Enforce minimum stop time — every non-first deco stop gets at least minStopT
         if (stopT < minStopT) {
           const extra = minStopT - stopT;
-          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop);
+          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop, 'deco');
           rt += extra; stopT = minStopT;
         }
       }
       const mustStopDisplay = (mdCompatMode && !isFirstDecoStop) ? stopT + transitDur : stopT;
-      steps.push({ type: 'deco', depth: cur, dur: mustStopDisplay, gas: gasLabel, pO2: ppO2Check(cur, stopFN2, stopFHe), fN2: stopFN2, fHe: stopFHe, _tissues: tissues.map(t => ({ pN2: t.pN2, pHe: t.pHe })) });
+      steps.push({ type: 'deco', depth: cur, dur: mustStopDisplay, gas: gasLabel, pO2: ppO2Check(cur, stopFN2, stopFHe, _ccrPpo2Opts(cur, onLoop, stopFO2, 'deco')), fN2: stopFN2, fHe: stopFHe, _tissues: tissues.map(t => ({ pN2: t.pN2, pHe: t.pHe })) });
     } else if (minStopT > 0 && minStopZoneDepth !== null && cur <= minStopZoneDepth && cur !== lastStop) {
       decoZoneEntered = true;
       let stopT = 0;
@@ -9541,11 +10029,11 @@ function runDecoSchedule() {
         stopT = needed;
       }
       if (stopT > 0) {
-        tissues = zhlLoadConst(tissues, cur, stopT, stopFO2, stopFHe, onLoop);
+        tissues = zhlLoadConst(tissues, cur, stopT, stopFO2, stopFHe, onLoop, 'deco');
         rt += stopT;
       }
       while (ceiling(tissues, gfForClear) > ceilTarget && stopT < 360) {
-        tissues = zhlLoadConst(tissues, cur, minStopT, stopFO2, stopFHe, onLoop);
+        tissues = zhlLoadConst(tissues, cur, minStopT, stopFO2, stopFHe, onLoop, 'deco');
         stopT += minStopT; rt += minStopT;
       }
       if (!isFirstDecoStop) {
@@ -9554,18 +10042,18 @@ function runDecoSchedule() {
         const roundedStop = totalAtLevel - transitDur;
         if (roundedStop > stopT) {
           const extra = roundedStop - stopT;
-          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop);
+          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop, 'deco');
           rt += extra; stopT = roundedStop;
         }
         if (stopT < minStopT) {
           const extra = minStopT - stopT;
-          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop);
+          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop, 'deco');
           rt += extra; stopT = minStopT;
         }
       }
       if (stopT > 0) {
         const minStopDisplay = (mdCompatMode && !isFirstDecoStop) ? stopT + transitDur : stopT;
-        steps.push({ type: 'deco', depth: cur, dur: minStopDisplay, gas: gasLabel, pO2: ppO2Check(cur, stopFN2, stopFHe), fN2: stopFN2, fHe: stopFHe, _tissues: tissues.map(t => ({ pN2: t.pN2, pHe: t.pHe })) });
+        steps.push({ type: 'deco', depth: cur, dur: minStopDisplay, gas: gasLabel, pO2: ppO2Check(cur, stopFN2, stopFHe, _ccrPpo2Opts(cur, onLoop, stopFO2, 'deco')), fN2: stopFN2, fHe: stopFHe, _tissues: tissues.map(t => ({ pN2: t.pN2, pHe: t.pHe })) });
       }
     } else if (cur === lastStop) {
       const isDecoNeeded = steps.some(s => s.type === 'deco');
@@ -9575,7 +10063,7 @@ function runDecoSchedule() {
       if (isDecoNeeded) {
         transitToLastStop = (stopDepths.length > 1) ? (stopDepths[stopDepths.length - 2] - lastStop) / decoRate : 0;
         while (ceiling(tissues, gfAt(0)) > 0.01 && stopT < 180) {
-          tissues = zhlLoadConst(tissues, cur, minStopT, stopFO2, stopFHe, onLoop);
+          tissues = zhlLoadConst(tissues, cur, minStopT, stopFO2, stopFHe, onLoop, 'deco');
           stopT += minStopT; rt += minStopT;
         }
         let roundedLastStop;
@@ -9585,21 +10073,21 @@ function runDecoSchedule() {
         }
         if (roundedLastStop > stopT) {
           const extra = roundedLastStop - stopT;
-          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop);
+          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop, 'deco');
           stopT += extra; rt += extra;
         }
         if (stopT < minStopT) {
           const extra = minStopT - stopT;
-          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop);
+          tissues = zhlLoadConst(tissues, cur, extra, stopFO2, stopFHe, onLoop, 'deco');
           stopT += extra; rt += extra;
         }
       } else {
         stopT = Math.max(3, minStopT);
-        tissues = zhlLoadConst(tissues, cur, stopT, stopFO2, stopFHe, onLoop);
+        tissues = zhlLoadConst(tissues, cur, stopT, stopFO2, stopFHe, onLoop, 'deco');
         rt += stopT;
       }
       const lastStopDisplay = mdCompatMode ? stopT + transitToLastStop : stopT;
-      steps.push({ type: stopType, depth: cur, dur: lastStopDisplay, gas: gasLabel, pO2: ppO2Check(cur, stopFN2, stopFHe), fN2: stopFN2, fHe: stopFHe, _tissues: tissues.map(t => ({ pN2: t.pN2, pHe: t.pHe })) });
+      steps.push({ type: stopType, depth: cur, dur: lastStopDisplay, gas: gasLabel, pO2: ppO2Check(cur, stopFN2, stopFHe, _ccrPpo2Opts(cur, onLoop, stopFO2, 'deco')), fN2: stopFN2, fHe: stopFHe, _tissues: tissues.map(t => ({ pN2: t.pN2, pHe: t.pHe })) });
     }
     // No stop needed and not lastStop — continue ascending
   }
@@ -9614,15 +10102,15 @@ function runDecoSchedule() {
   // same final-ascent time the reference tools already count.
   if (cur > 0) {
     const finalAscentDur = cur / surfaceRate;
-    const finalGas = getActiveGas(cur, bottomFN2, decoGases, getPPO2Limit, bottomMixLabel);
+    const finalGas = zhlGasAt(cur);
     const finalOnLoop = zhlOnLoopAt(cur, finalGas);
     const fFO2 = finalOnLoop ? bottomFO2 : (finalGas.fO2 != null ? finalGas.fO2 : Math.max(0, 1 - finalGas.fN2 - (finalGas.fHe || 0)));
     const fFHe = finalOnLoop ? bottomFHe : (finalGas.fHe || 0);
-    tissues = zhlLoadLinear(tissues, cur, 0, finalAscentDur, fFO2, fFHe, finalOnLoop);
+    tissues = zhlLoadLinear(tissues, cur, 0, finalAscentDur, fFO2, fFHe, finalOnLoop, 'deco');
     steps.push({
       type: 'ascent', from: cur, to: 0,
-      dur: finalAscentDur, gas: finalGas.label,
-      pO2: ppO2Check(cur, finalGas.fN2, finalGas.fHe || 0), fN2: finalGas.fN2, fHe: finalGas.fHe || 0,
+      dur: finalAscentDur, gas: finalOnLoop ? loopMixLabel : finalGas.label,
+      pO2: ppO2Check(cur, finalGas.fN2, finalGas.fHe || 0, _ccrPpo2Opts(cur, finalOnLoop, fFO2, 'deco')), fN2: finalGas.fN2, fHe: finalGas.fHe || 0,
     });
     rt += finalAscentDur;
     cur = 0;
@@ -9693,7 +10181,9 @@ function runDecoSchedule() {
         const frac = di / descSteps;
         const partDur = descentTime * frac;
         const partDepth = depthM * frac;
-        const tis = di === 0 ? dTissues : saturateLinear([...initTissues()], 0, partDepth, partDur, bottomFN2, bottomFHe);
+        const tis = di === 0 ? dTissues : (_zhlOnLoop
+          ? zhlLoadLinear([...initTissues()], 0, partDepth, partDur, bottomFO2, bottomFHe, true)
+          : saturateLinear([...initTissues()], 0, partDepth, partDur, bottomFN2, bottomFHe));
         const gf = gfAt ? gfAt(partDepth) : gfH;
         const ceilM = Math.max(0, ceiling(tis, gf));
         ceilWps.push({ t: partDur, ceil: ceilM });
@@ -9707,7 +10197,10 @@ function runDecoSchedule() {
       let bTissues = [...tissuesAtBottom]; // end of bottom
       // Reconstruct intermediate bottom states (simplified: just record ceiling at start and end)
       const gfBottom = gfAt ? gfAt(depthM) : gfH;
-      ceilWps.push({ t: descentTime, ceil: Math.max(0, ceiling(saturateLinear([...initTissues()], 0, depthM, descentTime, bottomFN2, bottomFHe), gfBottom)) });
+      const btStartTis = _zhlOnLoop
+        ? zhlLoadLinear([...initTissues()], 0, depthM, descentTime, bottomFO2, bottomFHe, true)
+        : saturateLinear([...initTissues()], 0, depthM, descentTime, bottomFN2, bottomFHe);
+      ceilWps.push({ t: descentTime, ceil: Math.max(0, ceiling(btStartTis, gfBottom)) });
       ceilWps.push({ t: bt, ceil: Math.max(0, ceiling(bTissues, gfBottom)) });
     }
 
@@ -9726,16 +10219,24 @@ function runDecoSchedule() {
             const frac = si / nSteps;
             const partDur = s.dur * frac;
             const midTis = s.type === 'ascent'
-              ? saturateLinear([...cTissues2], s.from, s.to, partDur, s.fN2 || bottomFN2, s.fHe !== undefined ? s.fHe : bottomFHe)
-              : saturate([...cTissues2], s.depth || 0, partDur, s.fN2 || bottomFN2, s.fHe !== undefined ? s.fHe : bottomFHe);
+              ? (_zhlOnLoop
+                ? zhlLoadLinear([...cTissues2], s.from, s.to, partDur, bottomFO2, bottomFHe, true)
+                : saturateLinear([...cTissues2], s.from, s.to, partDur, s.fN2 || bottomFN2, s.fHe !== undefined ? s.fHe : bottomFHe))
+              : (_zhlOnLoop
+                ? zhlLoadConst([...cTissues2], s.depth || 0, partDur, bottomFO2, bottomFHe, true)
+                : saturate([...cTissues2], s.depth || 0, partDur, s.fN2 || bottomFN2, s.fHe !== undefined ? s.fHe : bottomFHe));
             const gfMid = gfAt ? gfAt(s.type === 'ascent' ? (s.from + (s.to - s.from) * frac) : (s.depth || 0)) : gfH;
             ceilWps.push({ t: walkT + partDur, ceil: Math.max(0, ceiling(midTis, gfMid)) });
           }
         }
         if (s.type === 'ascent') {
-          cTissues2 = saturateLinear(cTissues2, s.from, s.to, s.dur, s.fN2 || bottomFN2, s.fHe !== undefined ? s.fHe : bottomFHe);
+          cTissues2 = _zhlOnLoop
+            ? zhlLoadLinear(cTissues2, s.from, s.to, s.dur, bottomFO2, bottomFHe, true)
+            : saturateLinear(cTissues2, s.from, s.to, s.dur, s.fN2 || bottomFN2, s.fHe !== undefined ? s.fHe : bottomFHe);
         } else {
-          cTissues2 = saturate(cTissues2, s.depth || 0, s.dur, s.fN2 || bottomFN2, s.fHe !== undefined ? s.fHe : bottomFHe);
+          cTissues2 = _zhlOnLoop
+            ? zhlLoadConst(cTissues2, s.depth || 0, s.dur, bottomFO2, bottomFHe, true)
+            : saturate(cTissues2, s.depth || 0, s.dur, s.fN2 || bottomFN2, s.fHe !== undefined ? s.fHe : bottomFHe);
         }
         walkT += s.dur;
       }
@@ -9759,8 +10260,8 @@ function runDecoSchedule() {
       gsT += s.dur;
     }
     // Prepend descent + bottom segment using bottom gas (covers 0 → bt)
-    if (!gasColorMap[bottomMixLabel]) { gasColorMap[bottomMixLabel] = gasColors[gcIdx++ % gasColors.length]; }
-    gasSegs.unshift({ fromT: 0, toT: bt, gas: bottomMixLabel, color: gasColorMap[bottomMixLabel] });
+    if (!gasColorMap[loopMixLabel]) { gasColorMap[loopMixLabel] = gasColors[gcIdx++ % gasColors.length]; }
+    gasSegs.unshift({ fromT: 0, toT: bt, gas: loopMixLabel, color: gasColorMap[loopMixLabel] });
     window._decoGasSegments = gasSegs;
     window._decoGasColorMap = gasColorMap;
   }
@@ -9783,7 +10284,7 @@ function runDecoSchedule() {
 
   tbody.innerHTML = '';
   const _decoTotalsEl = document.getElementById('decoTotals'); if (_decoTotalsEl) _decoTotalsEl.innerHTML = '';
-  let prevGas = bottomMixLabel;
+  let prevGas = loopMixLabel;
   let rowRT = 0;
   // ── EAD (Equivalent Air Depth) ──
   // EAD = (fN2 × (depth + 10) / 0.79) − 10  [metres]
@@ -9806,9 +10307,7 @@ function runDecoSchedule() {
   // gasConsumed[gasLabel] = litres
   const gasConsumed = {};
   function addGas(label, depthM, dur, sac) {
-    const absP = altSurfaceP + depthM * BAR_PER_M;
-    const litres = sac * absP * dur;
-    gasConsumed[label] = (gasConsumed[label] || 0) + litres;
+    gasConsumed[label] = (gasConsumed[label] || 0) + ccrGasLitres(label, depthM, dur, resolveCcrSacForGas(label, sac, _ccrSettings));
   }
 
 
@@ -9860,6 +10359,11 @@ function runDecoSchedule() {
     const s = totalSec % 60;
     return `${m}:${String(s).padStart(2,'0')}`;
   }
+  function rowDisplayPpo2(depthM, fN2, fHe, fO2, phase) {
+    const fo2 = fO2 != null ? fO2 : Math.max(0, 1 - fN2 - (fHe || 0));
+    if (_zhlOnLoop) return ppO2Check(depthM, fN2, fHe, _ccrPpo2Opts(depthM, true, fo2, phase || 'bottom'));
+    return ((depthM * BAR_PER_METRE + altSurfaceP) * fo2).toFixed(2);
+  }
 
   // ── DESCENT ROW(S) — split by travel gas if active ──
   const travelInfoRow = getTravelGasInfo(); // null if no travel gas
@@ -9869,7 +10373,7 @@ function runDecoSchedule() {
     // --- Phase 1: travel gas, surface → switch depth ---
     const travelDescentTimeMin = travelSwitchMrow / descentRate;
     const travelMidM = travelSwitchMrow / 2;
-    const travelPPO2 = ((travelMidM * BAR_PER_METRE + altSurfaceP) * (1 - travelInfoRow.fN2)).toFixed(2);
+    const travelPPO2 = rowDisplayPpo2(travelMidM, travelInfoRow.fN2, 0);
     rowRT += travelDescentTimeMin;
     totalCNSfrac += segCNSfrac(parseFloat(travelPPO2), travelDescentTimeMin);
     totalOTU     += segOTU(parseFloat(travelPPO2), travelDescentTimeMin);
@@ -9889,16 +10393,16 @@ function runDecoSchedule() {
     // --- Phase 2: bottom gas, switch depth → bottom ---
     const bottomDescentTimeMin = (depthM - travelSwitchMrow) / descentRate;
     const bottomMidM = (travelSwitchMrow + depthM) / 2;
-    const descentPPO2 = ((bottomMidM * BAR_PER_METRE + altSurfaceP) * bottomFO2).toFixed(2); // trimix-safe (was 1-bottomFN2)
+    const descentPPO2 = rowDisplayPpo2(bottomMidM, bottomFN2, bottomFHe, bottomFO2, 'descent');
     rowRT += bottomDescentTimeMin;
     totalCNSfrac += segCNSfrac(parseFloat(descentPPO2), bottomDescentTimeMin);
     totalOTU     += segOTU(parseFloat(descentPPO2), bottomDescentTimeMin);
-    addGas(bottomMixLabel, bottomMidM, bottomDescentTimeMin, sacBottom);
+    addGas(loopMixLabel, bottomMidM, bottomDescentTimeMin, sacBottom);
     tbody.innerHTML += `<tr class="asc-row" data-phase="descent">
       <td><span style="font-size:18px;color:#ff8080;">↓</span></td>
       <td data-label="Depth" style="color:#ff8080;">${travelSwitchDisp}→${dU?rawD+'m':mToFt(rawD)+'ft'}</td>
       <td data-label="Stop" style="color:#ff8080;"></td>
-      <td data-label="Mix"><span style="color:var(--accent);">${bottomMixLabel}</span></td>
+      <td data-label="Mix"><span style="color:var(--accent);">${loopMixLabel}</span></td>
       <td data-label="Run" style="color:#ff8080;">${fmtMM(rowRT)}</td>
       <td data-label="PPO2" style="color:var(--muted);">${descentPPO2}</td>
       <td data-label="EAD" style="color:var(--muted);"></td>
@@ -9907,15 +10411,15 @@ function runDecoSchedule() {
   } else {
     // No travel gas — single descent row as before
     rowRT += descentTimeMin;
-    const descentPPO2 = ((rawD/2 * BAR_PER_METRE + altSurfaceP) * bottomFO2).toFixed(2); // trimix-safe (was 1-bottomFN2)
+    const descentPPO2 = rowDisplayPpo2(rawD / 2, bottomFN2, bottomFHe, bottomFO2, 'descent');
     totalCNSfrac += segCNSfrac(parseFloat(descentPPO2), descentTimeMin);
     totalOTU     += segOTU(parseFloat(descentPPO2), descentTimeMin);
-    addGas(bottomMixLabel, rawD / 2, descentTimeMin, sacBottom);
+    addGas(loopMixLabel, rawD / 2, descentTimeMin, sacBottom);
     tbody.innerHTML += `<tr class="asc-row" data-phase="descent">
       <td><span style="font-size:18px;color:#ff8080;">↓</span></td>
       <td data-label="Depth" style="color:#ff8080;">0→${dU?rawD+'m':mToFt(rawD)+'ft'}</td>
       <td data-label="Stop" style="color:#ff8080;"></td>
-      <td data-label="Mix"><span style="color:var(--accent);">${bottomMixLabel}</span></td>
+      <td data-label="Mix"><span style="color:var(--accent);">${loopMixLabel}</span></td>
       <td data-label="Run" style="color:#ff8080;">${fmtMM(rowRT)}</td>
       <td data-label="PPO2" style="color:var(--muted);">${descentPPO2}</td>
       <td data-label="EAD" style="color:var(--muted);"></td>
@@ -9926,16 +10430,25 @@ function runDecoSchedule() {
   // ── BOTTOM ROW ──
   const btAtDepthMin = Math.max(0, bt - descentTimeMin);
   rowRT += btAtDepthMin;
-  const btPPO2 = ((rawD * BAR_PER_METRE + altSurfaceP) * bottomFO2).toFixed(2); // trimix-safe (was 1-bottomFN2)
+  const btPPO2 = rowDisplayPpo2(rawD, bottomFN2, bottomFHe, bottomFO2, 'bottom');
   const btCNS  = rowCNS(parseFloat(btPPO2), btAtDepthMin);
   totalCNSfrac += segCNSfrac(parseFloat(btPPO2), btAtDepthMin);
   totalOTU     += segOTU(parseFloat(btPPO2), btAtDepthMin);
-  addGas(bottomMixLabel, rawD, btAtDepthMin, sacBottom);
+  addGas(loopMixLabel, rawD, btAtDepthMin, sacBottom);
+  if (_zhlOnLoop) {
+    const reserveMin = (_ccrSettings.stressTimeMin || 0) + (_ccrSettings.problemSolveMin || 0);
+    if (reserveMin > 0) {
+      const reserveLabel = getBailoutReserveMixLabel(depthM, bottomFO2, bottomFHe);
+      if (reserveLabel) {
+        addGas(reserveLabel, rawD, reserveMin, _ccrSettings.sacStress || sacBottom);
+      }
+    }
+  }
   tbody.innerHTML += `<tr class="asc-row" data-phase="bottom">
     <td>🔵</td>
     <td data-label="Depth" style="color:var(--accent);">${dU?rawD+'m':mToFt(rawD)+'ft'}</td>
     <td data-label="Stop" style="color:var(--accent);">${fmtMM(btAtDepthMin)}</td>
-    <td data-label="Mix"><span style="color:var(--accent);">${bottomMixLabel}</span></td>
+    <td data-label="Mix"><span style="color:var(--accent);">${loopMixLabel}</span></td>
     <td data-label="Run" style="color:var(--accent);">${fmtMM(rowRT)}</td>
     <td data-label="PPO2" style="color:var(--muted);">${btPPO2}</td>
     <td data-label="EAD" style="color:var(--muted);"></td>
@@ -9959,7 +10472,7 @@ function runDecoSchedule() {
     const rtDisp = fmtMM(rowRT);
 
     // ── GAS SWITCH ROW ──
-    if (s.gas && s.gas !== prevGas && s.gas !== bottomMixLabel) {
+    if (!_zhlOnLoop && s.gas && s.gas !== prevGas && s.gas !== bottomMixLabel && s.gas !== loopMixLabel) {
       const isO2        = s.fN2 === 0;
       const switchDepth = s.type === 'deco' ? s.depth : (s.from ?? s.depth);
       const switchDepthDisp = dU ? switchDepth+'m' : mToFt(switchDepth)+'ft';
@@ -10312,18 +10825,35 @@ const ZHLEngine = (() => {
     setEl('ppo2Deco',        s.ppO2Deco        || 1.6);
     const prevCCR = {
       circuit: document.getElementById('circuitSelect')?.value,
-      setpoint: document.getElementById('ccrSetpoint')?.value,
+      setpoint: document.getElementById('ccrDecoSetpoint')?.value || document.getElementById('ccrSetpoint')?.value,
       descentSetpoint: document.getElementById('ccrDescentSetpoint')?.value,
+      bottomSetpoint: document.getElementById('ccrBottomSetpoint')?.value,
       bailout: document.getElementById('ccrBailoutToggle')?.value,
-      scrLoopVolume: document.getElementById('scrLoopVolume')?.value,
-      scrMetabolicO2: document.getElementById('scrMetabolicO2')?.value,
+      bailoutGfLow: document.getElementById('ccrBailoutGfLow')?.value,
+      bailoutGfHigh: document.getElementById('ccrBailoutGfHigh')?.value,
+      scrLoopVolume: document.getElementById('ccrLoopVolume')?.value || document.getElementById('scrLoopVolume')?.value,
+      scrMetabolicO2: document.getElementById('ccrMetabolicO2')?.value || document.getElementById('scrMetabolicO2')?.value,
+      sacStress: document.getElementById('ccrSacStress')?.value,
+      sacDecoCcr: document.getElementById('ccrSacDeco')?.value,
+      stressTimeMin: document.getElementById('ccrStressTime')?.value,
+      problemSolveMin: document.getElementById('ccrProblemSolve')?.value,
     };
     if (s.circuit) setEl('circuitSelect', s.circuit);
-    if (s.setpoint != null) setEl('ccrSetpoint', s.setpoint);
+    if (s.setpoint != null) {
+      setEl('ccrDecoSetpoint', s.setpoint);
+      setEl('ccrSetpoint', s.setpoint);
+    }
     if (s.descentSetpoint != null) setEl('ccrDescentSetpoint', s.descentSetpoint);
+    if (s.bottomSetpoint != null) setEl('ccrBottomSetpoint', s.bottomSetpoint);
     if (s.bailout != null) setEl('ccrBailoutToggle', s.bailout ? 'on' : 'off');
-    if (s.scrLoopVolume != null) setEl('scrLoopVolume', s.scrLoopVolume);
-    if (s.scrMetabolicO2 != null) setEl('scrMetabolicO2', s.scrMetabolicO2);
+    if (s.bailoutGfLow != null) setEl('ccrBailoutGfLow', s.bailoutGfLow);
+    if (s.bailoutGfHigh != null) setEl('ccrBailoutGfHigh', s.bailoutGfHigh);
+    if (s.scrLoopVolume != null) { setEl('ccrLoopVolume', s.scrLoopVolume); setEl('scrLoopVolume', s.scrLoopVolume); }
+    if (s.scrMetabolicO2 != null) { setEl('ccrMetabolicO2', s.scrMetabolicO2); setEl('scrMetabolicO2', s.scrMetabolicO2); }
+    if (s.sacStress != null) setEl('ccrSacStress', s.sacStress);
+    if (s.sacDecoCcr != null) setEl('ccrSacDeco', s.sacDecoCcr);
+    if (s.stressTimeMin != null) setEl('ccrStressTime', s.stressTimeMin);
+    if (s.problemSolveMin != null) setEl('ccrProblemSolve', s.problemSolveMin);
 
     // ── GF: set via mGF global (Bühlmann reads from mGF, not settings) ──────
     const prevGF = { low: mGF.low, high: mGF.high };
@@ -10521,11 +11051,18 @@ const ZHLEngine = (() => {
     if (decoGasEl) decoGasEl.value = prevDecoGasVal;
     prevDGVals.forEach(({ id, val }) => { const el = document.getElementById(id); if (el && val != null) el.value = val; });
     if (prevCCR.circuit != null) setEl('circuitSelect', prevCCR.circuit);
-    if (prevCCR.setpoint != null) setEl('ccrSetpoint', prevCCR.setpoint);
+    if (prevCCR.setpoint != null) { setEl('ccrDecoSetpoint', prevCCR.setpoint); setEl('ccrSetpoint', prevCCR.setpoint); }
     if (prevCCR.descentSetpoint != null) setEl('ccrDescentSetpoint', prevCCR.descentSetpoint);
+    if (prevCCR.bottomSetpoint != null) setEl('ccrBottomSetpoint', prevCCR.bottomSetpoint);
     if (prevCCR.bailout != null) setEl('ccrBailoutToggle', prevCCR.bailout);
-    if (prevCCR.scrLoopVolume != null) setEl('scrLoopVolume', prevCCR.scrLoopVolume);
-    if (prevCCR.scrMetabolicO2 != null) setEl('scrMetabolicO2', prevCCR.scrMetabolicO2);
+    if (prevCCR.bailoutGfLow != null) setEl('ccrBailoutGfLow', prevCCR.bailoutGfLow);
+    if (prevCCR.bailoutGfHigh != null) setEl('ccrBailoutGfHigh', prevCCR.bailoutGfHigh);
+    if (prevCCR.scrLoopVolume != null) { setEl('ccrLoopVolume', prevCCR.scrLoopVolume); setEl('scrLoopVolume', prevCCR.scrLoopVolume); }
+    if (prevCCR.scrMetabolicO2 != null) { setEl('ccrMetabolicO2', prevCCR.scrMetabolicO2); setEl('scrMetabolicO2', prevCCR.scrMetabolicO2); }
+    if (prevCCR.sacStress != null) setEl('ccrSacStress', prevCCR.sacStress);
+    if (prevCCR.sacDecoCcr != null) setEl('ccrSacDeco', prevCCR.sacDecoCcr);
+    if (prevCCR.stressTimeMin != null) setEl('ccrStressTime', prevCCR.stressTimeMin);
+    if (prevCCR.problemSolveMin != null) setEl('ccrProblemSolve', prevCCR.problemSolveMin);
     if (typeof toggleCircuitFields === 'function') toggleCircuitFields();
     // Remove any dynamic deco gas cards we added for this headless call
     _addedDGIdxs.forEach(idx => { const card = document.getElementById(`dgCard_${idx}`); if (card) card.remove(); });
@@ -10756,7 +11293,32 @@ function runUnifiedPlan() {
   const isM  = units === 'metric';
   const conv = isM ? 1 : 3.28084;
   const du   = isM ? 'm' : 'ft';
-  const fN2  = FN2_AIR;
+  const ccr  = getCCRSettingsFromDOM();
+  const rbOnLoop = isRebreatherCircuit(ccr.circuit) && !ccr.bailout;
+  const bot  = getBottomGasFractions();
+  const fN2  = rbOnLoop ? bot.fN2 : FN2_AIR;
+  const fHe  = rbOnLoop ? (bot.fHe || 0) : 0;
+  const fO2  = rbOnLoop ? bot.fO2 : 0.21;
+
+  function loadAtDepth(tissues, depthM, durMin) {
+    if (rbOnLoop) return loadTissuesWithCCR(tissues, depthM, depthM, durMin, fO2, fHe, ccr);
+    return saturate(tissues, depthM, durMin, fN2, fHe);
+  }
+  function offgasAtSurface(tissues, durMin) {
+    if (rbOnLoop) return loadTissuesWithCCR(tissues, 0, 0, durMin, fO2, fHe, ccr);
+    return saturate(tissues, 0, durMin, fN2, fHe);
+  }
+
+  const infoBox = document.querySelector('#multi .info-box');
+  if (infoBox) {
+    const base = 'Set depth and bottom time for each dive. Sliders turn 🟢 green when within NDL, 🟡 yellow within 10 min of NDL, 🔴 red when exceeded. Surface interval offgassing is tracked — each subsequent dive shows available NDL after residual nitrogen.';
+    const rbNote = rbOnLoop
+      ? (ccr.circuit === 'CCR'
+        ? ' CCR on-loop: NDL uses diluent + setpoint tissue loading (not OC air).'
+        : ' pSCR: NDL uses constant-FIO₂ loop loading (not OC air).')
+      : (ccr.bailout ? ' Bailout mode: NDL uses OC air loading.' : '');
+    infoBox.textContent = base + rbNote;
+  }
 
   // Colour helper — margin = NDL - BT
   function statusColor(margin) {
@@ -10782,7 +11344,7 @@ function runUnifiedPlan() {
     let effNDL = 0;
     let testT  = tissues.slice();
     for (let t = 1; t <= 200; t++) {
-      testT = saturate(testT, dM, 1, fN2);
+      testT = loadAtDepth(testT, dM, 1);
       if (ceiling(testT, mGF.high / 100) > 0.5) break;
       effNDL = t;
     }
@@ -10819,7 +11381,7 @@ function runUnifiedPlan() {
     }
 
     // Load tissues for this dive (use actual bt, even if over NDL — diver plans what they plan)
-    tissues = saturate(tissues, dM, bt, fN2, 0);
+    tissues = loadAtDepth(tissues, dM, bt);
 
     // Offgas during surface interval
     if (i < diveCount - 1) {
@@ -10828,9 +11390,9 @@ function runUnifiedPlan() {
       const si     = parseFloat(siEl?.value) || 60;
       if (siDisp) siDisp.textContent = si + ' min';
       // Offgas
-      for (let s = 0; s < Math.floor(si); s++) tissues = saturate(tissues, 0, 1, fN2, 0);
+      for (let s = 0; s < Math.floor(si); s++) tissues = offgasAtSurface(tissues, 1);
       const frac = si % 1;
-      if (frac > 0) tissues = saturate(tissues, 0, frac, fN2, 0);
+      if (frac > 0) tissues = offgasAtSurface(tissues, frac);
     }
   }
 }
@@ -13259,7 +13821,7 @@ function buildGasPlanText() {
     L.push('');
   });
 
-  L.push('LSP D-Planner — threecats-lsp.com/d-planner');
+  L.push('LSP D-Planner + CCR — threecats-lsp.com/d-planner-ccr');
   return L.join('\n');
 }
 
@@ -13303,7 +13865,7 @@ async function buildGasPlanPDF() {
   function drawHeader() {
     doc.setFillColor(0,90,140); doc.rect(0,0,PW,8,'F');
     doc.setFontSize(8); doc.setFont('DejaVuSans','bold'); doc.setTextColor(255,255,255);
-    doc.text('LSP D-PLANNER - GAS PLAN', ML, 5.5);
+    doc.text('LSP D-PLANNER + CCR - GAS PLAN', ML, 5.5);
     doc.setFont('DejaVuSans','normal');
     doc.text(ruleName, PW/2, 5.5, {align:'center'});
     doc.text(`${dateStr} ${timeStr}`, PW-MR, 5.5, {align:'right'});
@@ -13794,7 +14356,7 @@ function buildExportText(mode) {
 
   // ────────────────────────────────────────
   } else if (mode === 'multi') {
-    lines.push('LSP D-PLANNER - MULTI DIVE DAY PLAN');
+    lines.push('LSP D-PLANNER + CCR - MULTI DIVE DAY PLAN');
     lines.push(hr);
     lines.push(`Water : ${density}`);
     lines.push('');
@@ -13863,8 +14425,8 @@ function buildExportText(mode) {
   // ── Footer (all modes) ──
   lines.push(hr);
   lines.push('Planning Aid Only - Not a substitute for training, certification, or a dive computer.');
-  lines.push(`Generated by LSP D-PLANNER  ${dateStr} ${timeStr}`);
-  lines.push('https://threecats-lsp.com/d-planner/');
+  lines.push(`Generated by LSP D-PLANNER + CCR  ${dateStr} ${timeStr}`);
+  lines.push('https://threecats-lsp.com/d-planner-ccr/');
   lines.push('');
   lines.push('*'.repeat(43));
   lines.push('*       WARNING & DISCLAIMER              *');
@@ -14246,10 +14808,18 @@ function buildMessengerText(mode) {
       ? `${_algoShort} C+${_cons}`
       : `${_algoShort} GFHi${gfH} C+${_cons}`;
   result.push(`${depth}${du} / ${bt}min / ${_algoStr}`);
-  result.push(`Bottom Gas  : ${_msgBotDetail}`);
   const _msgGasHdr = buildDecoPlanHeaderData();
+  if (isCcrOnLoopProfile({ circuit: _msgGasHdr.circuit, bailout: _msgGasHdr.ccrBailout })) {
+    result.push(`Loop gas    : ${loopMixLabelFor(_msgBotLabel, { circuit: _msgGasHdr.circuit, bailout: _msgGasHdr.ccrBailout })} (on-loop)`);
+  } else {
+    const botLine = (_msgGasHdr.circuit === 'CCR' || _msgGasHdr.circuit === 'pSCR') ? 'Diluent     ' : 'Bottom Gas  ';
+    result.push(`${botLine}: ${_msgBotDetail}`);
+  }
   if (_msgGasHdr.travelGas) result.push(`Travel Gas  : ${_msgGasHdr.travelGas.gas} (switch @ ${_msgGasHdr.travelGas.depth})`);
-  _msgGasHdr.decoGases.forEach((g, i) => result.push(`Deco Gas ${i + 1}  : ${g.gas} (switch @ ${g.depth})`));
+  if (!isCcrOnLoopProfile({ circuit: _msgGasHdr.circuit, bailout: _msgGasHdr.ccrBailout })) {
+    const gasPrefix = (_msgGasHdr.circuit === 'CCR' || _msgGasHdr.circuit === 'pSCR') ? 'Bailout mix' : 'Deco Gas';
+    _msgGasHdr.decoGases.forEach((g, i) => result.push(`${gasPrefix} ${i + 1}  : ${g.gas} (switch @ ${g.depth})`));
+  }
   const rndVal = (document.getElementById('stopRounding')?.value||'fractional')==='wholeminute'?'Yes':'No';
   const wvVal  = parseFloat(document.getElementById('waterVapor')?.value||'0.0627');
   const wvLbl  = wvVal<=0.058?'M':'B';
@@ -15292,7 +15862,18 @@ function calcCNS() {
   const fO2    = parseFloat(document.getElementById('cnsO2')?.value)    || 21;
   const dives  = parseInt(document.getElementById('cnsDives')?.value)   || 1;
 
-  const ppo2 = (altSurfaceP + depth * BAR_PER_METRE) * (fO2 / 100);
+  const fO2frac = fO2 / 100;
+  const botFracs = typeof getBottomGasFractions === 'function' ? getBottomGasFractions() : { fHe: 0 };
+  const fHe = botFracs.fHe || 0;
+  const pAmb = altSurfaceP + depth * BAR_PER_METRE;
+  const ccr = typeof getCCRSettingsFromDOM === 'function' ? getCCRSettingsFromDOM() : { circuit: 'OC' };
+  let ppo2;
+  if (isRebreatherCircuit(ccr.circuit) && !ccr.bailout) {
+    const sp = getEffectiveSetpointAtDepth(depth, ccr, altSurfaceP);
+    ppo2 = getEffectivePpo2(pAmb, sp, fO2frac, ccr, depth, fHe);
+  } else {
+    ppo2 = pAmb * fO2frac;
+  }
   const singleLimit = getCNSLimit(ppo2);
   const dailyLimit  = singleLimit * 2; // NOAA daily ≈ 2× single
 
@@ -16053,7 +16634,7 @@ async function exportPDF(opts) {
   let decoStopVal = planSumPdf.decoStop;
   let surfGFVal = planSumPdf.surfGF || '-';
   const algoTag = decoModelSel==='ZHLC_GF'?`GF${mGF.low}-${mGF.high}_Buhlmann`:decoModelSel==='VPMB'?`C${cons}_VPM-B`:`GFHi${mGF.high}_C${cons}_VPM-B_GFS`;
-  const fileName = `LSP_${isoDate}_Deco_${depthVal}${du}_${btVal}min_${algoTag}.pdf`;
+  const fileName = `LSP_CCR_${isoDate}_Deco_${depthVal}${du}_${btVal}min_${algoTag}.pdf`;
   const PW=210, PH=297, ML=14, MR=14, MT=10, MB=10, CW=182;
   let y=MT;
 
@@ -16071,7 +16652,7 @@ async function exportPDF(opts) {
   function drawHeader() {
     doc.setFillColor(0,85,170); doc.rect(0,0,PW,8,'F');
     doc.setFontSize(8); doc.setFont('DejaVuSans','bold'); doc.setTextColor(255,255,255);
-    doc.text('LSP D-PLANNER', ML, 5.5);
+    doc.text('LSP D-PLANNER + CCR', ML, 5.5);
     doc.setFont('DejaVuSans','normal');
     doc.setFontSize(8);
     const hdrMid = `${btVal}min @ ${depthVal}${du} | ${bottomGasVal} | ${gfStr} | ${algo} | ${densityLabel}`;
@@ -16669,8 +17250,10 @@ var appSettings = {
     'descentRate', 'ascentRate', 'decoAscentRate', 'surfaceAscentRate', 'decoStep', 'lastDecoStop',
     'minStopTime', 'stopRounding', 'waterVapor', 'ppo2Bottom', 'ppo2Deco',
     'shallowGradient',
-    'circuitSelect', 'ccrSetpoint', 'ccrDescentSetpoint', 'ccrBailoutToggle',
-    'scrLoopVolume', 'scrMetabolicO2',
+    'circuitSelect', 'ccrDecoSetpoint', 'ccrBottomSetpoint', 'ccrDescentSetpoint',
+    'ccrBailoutToggle', 'diluentUseAsBailout', 'ccrBailoutGfLow', 'ccrBailoutGfHigh',
+    'ccrLoopVolume', 'ccrMetabolicO2', 'ccrSacStress', 'ccrSacDeco', 'ccrStressTime', 'ccrProblemSolve',
+    'ccrSetpoint', 'scrLoopVolume', 'scrMetabolicO2',
     'minDecoProfileEnable', 'minDeco9m', 'minDeco6m',
     'algorithmSelect', 'conservatismSelect', 'gfPresetSelect', 'gfLowInput', 'gfHighInput',
     'heHalfTimeMode',
@@ -16739,6 +17322,10 @@ var appSettings = {
       if (id === '__algo__') {
         return; // Already saved above
       }
+      // Only persist custom GF inputs when Custom preset is active (avoids stale values overriding preset on restore)
+      if ((id === 'gfLowInput' || id === 'gfHighInput') && document.getElementById('gfPresetSelect')?.value !== 'custom') {
+        return;
+      }
       
       const el = document.getElementById(id);
       if (el) {
@@ -16805,33 +17392,45 @@ var appSettings = {
   _restoreFields: function(values) {
     let restored = 0;
     const allPossible = this.getAllPossibleFields();
+    const gfPreset = values.gfPresetSelect;
+    const gfIsCustom = gfPreset === 'custom';
+    
+    const restoreOne = (id) => {
+      if (id === '__algo__' || id === 'gfPresetSelect' || !values.hasOwnProperty(id)) {
+        return;
+      }
+      // Stale custom GF dropdown values must not override a named preset on restore
+      if ((id === 'gfLowInput' || id === 'gfHighInput') && !gfIsCustom) {
+        return;
+      }
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = values[id];
+      if (id === 'gfLowInput' || id === 'gfHighInput') {
+        restored++;
+        return;
+      }
+      if (!window._zhlHeadless) {
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      restored++;
+    };
     
     allPossible.forEach(id => {
-      if (id === '__algo__' || !values.hasOwnProperty(id)) {
-        return; // Skip algorithm and non-existent values
-      }
-      
-      // Wait a bit more for dynamic fields to be created
-      const checkAndRestore = () => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.value = values[id];
-          // GF preset needs special handler to sync mGF state
-          if (id === 'gfPresetSelect' && typeof handleGFSelect === 'function') {
-            handleGFSelect(values[id]);
-          } else if (!window._zhlHeadless) {
-            el.dispatchEvent(new Event('change', { bubbles: true }));
-          }
-          restored++;
-        }
-      };
-      
-      // Check immediately
-      checkAndRestore();
-      
-      // Also check after a short delay for dynamically created fields
-      setTimeout(checkAndRestore, 100);
+      restoreOne(id);
+      setTimeout(() => restoreOne(id), 100);
     });
+    
+    // Apply GF preset last so mGF and UI stay in sync
+    const applyGfPreset = () => {
+      const sel = document.getElementById('gfPresetSelect');
+      if (!sel || !gfPreset || typeof handleGFSelect !== 'function') return;
+      sel.value = gfPreset;
+      handleGFSelect(gfPreset);
+      restored++;
+    };
+    applyGfPreset();
+    setTimeout(applyGfPreset, 100);
     
     console.log('[LSP] ✅ Settings restored (' + restored + ' fields) - Algo: ' + (values['__algo__'] || 'padi'));
   },
@@ -17418,6 +18017,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const open = adv === '1';
     toggleAdvancedSettings(open);
   } catch(e) { toggleAdvancedSettings(false); }
+
+  // ── Restore rebreather adv. settings collapse state ───────────────────────
+  try {
+    const ccrAdv = localStorage.getItem('lspCcrAdvOpen');
+    toggleCcrAdvSettings(ccrAdv === '1');
+  } catch(e) { toggleCcrAdvSettings(false); }
+
   const vEl = document.getElementById('appVersionLabel');
   if (vEl) vEl.textContent = 'Version ' + APP_VERSION;
   const vMain = document.getElementById('mainVersionLabel');
@@ -17453,12 +18059,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Try to load immediately
   appSettings.load();
-  if (!localStorage.getItem('lspDiveSettingsv6')) {
-    var __lspDefaults = {descentRate:'20', ascentRate:'10', decoAscentRate:'3', surfaceAscentRate:'3', minStopTime:'2', stopRounding:'wholeminute', decoTransitMode:'multideco', waterVapor:'0.0577', minDecoProfileEnable:'no', minDeco9m:'1', minDeco6m:'3'};
+  if (!localStorage.getItem('lspDiveSettings_v6')) {
+    setGF(20, 85);
+    var __lspDefaults = {descentRate:'20', ascentRate:'10', decoAscentRate:'3', surfaceAscentRate:'3', minStopTime:'2', stopRounding:'wholeminute', decoTransitMode:'multideco', waterVapor:'0.0577', minDecoProfileEnable:'no', minDeco9m:'1', minDeco6m:'3', gfPresetSelect:'20/85'};
     Object.keys(__lspDefaults).forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.value = __lspDefaults[id];
     });
+    handleGFSelect('20/85');
   }
   updateWaterVapor(); // apply after settings loaded
   setDecoAlgorithm(document.getElementById('algorithmSelect')?.value || 'ZHLC_GF', true);
@@ -17488,10 +18096,51 @@ window.addEventListener('load', function() {
 </script>
 <!-- PWA: service worker registration -->
 <script>
+  const SW_VERSION_KEY = 'lspSwVersion';
+  const SW_MIGRATION_FLAG = `lspSwMigrated:${APP_VERSION}`;
+  (async () => {
+    try {
+      const prev = localStorage.getItem(SW_VERSION_KEY);
+      if (prev === APP_VERSION || sessionStorage.getItem(SW_MIGRATION_FLAG) === '1') return;
+      sessionStorage.setItem(SW_MIGRATION_FLAG, '1');
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
+      if (window.caches && typeof caches.keys === 'function') {
+        const keys = await caches.keys();
+        await Promise.all(keys.filter(k => /^lsp-dplanner-ccr-v/i.test(k)).map(k => caches.delete(k)));
+      }
+      localStorage.setItem(SW_VERSION_KEY, APP_VERSION);
+      window.location.reload();
+    } catch (e) {
+      console.warn('[SW] version migration failed:', e);
+    }
+  })();
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(r => console.log('[SW] registered, scope:', r.scope))
+      navigator.serviceWorker.register(`sw.js?v=${APP_VERSION}`, { updateViaCache: 'none' })
+        .then(r => {
+          console.log('[SW] registered, scope:', r.scope);
+          r.update();
+          if (r.waiting) r.waiting.postMessage({ type: 'SKIP_WAITING' });
+          r.addEventListener('updatefound', () => {
+            const sw = r.installing;
+            if (!sw) return;
+            sw.addEventListener('statechange', () => {
+              if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+                sw.postMessage({ type: 'SKIP_WAITING' });
+              }
+            });
+          });
+          let reloaded = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (reloaded) return;
+            reloaded = true;
+            window.location.reload();
+          });
+        })
         .catch(e => console.warn('[SW] registration failed:', e));
     });
   }
@@ -17505,7 +18154,7 @@ window.addEventListener('load', function() {
     banner.id = 'pwaBanner';
     banner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border-hi);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.4);font-family:Outfit,sans-serif;max-width:340px;width:90%;';
     banner.innerHTML = '<span style="font-size:28px;">\uD83E\uDD3F</span>'
-      + '<div style="flex:1;"><div style="color:var(--text);font-weight:600;font-size:14px;">Install LSP D-Planner</div>'
+      + '<div style="flex:1;"><div style="color:var(--text);font-weight:600;font-size:14px;">Install LSP D-Planner + CCR</div>'
       + '<div style="color:var(--muted);font-size:12px;margin-top:2px;">Add to home screen for offline use</div></div>'
       + '<button onclick="_pwaPrompt.prompt();_pwaPrompt.userChoice.then(()=>{_pwaPrompt=null;document.getElementById(\'pwaBanner\').remove();})" style="background:linear-gradient(135deg,#00d9ff,#00b8a0);border:none;border-radius:8px;padding:8px 14px;color:#030c18;font-weight:700;font-size:12px;cursor:pointer;">INSTALL</button>'
       + '<button onclick="this.parentNode.remove()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0;line-height:1;">&times;</button>';

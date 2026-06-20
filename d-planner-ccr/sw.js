@@ -1,8 +1,8 @@
-// LSP D-Planner — Service Worker
+// LSP D-Planner + CCR — Service Worker
 // Network-first for HTML (always fresh), cache-first for static assets.
 // Bump CACHE_VERSION on every deploy to force old SW replacement.
 
-const CACHE_VERSION = 'lsp-dplanner-ccr-v2.30.0';
+const CACHE_VERSION = 'lsp-dplanner-ccr-v2.30.3';
 
 // These are never cached — always fetched live or passed through
 const NEVER_CACHE = [
@@ -20,13 +20,22 @@ function isHTMLRequest(request) {
   return accept.includes('text/html');
 }
 
+function getAppBasePath() {
+  const p = self.location.pathname || '/';
+  if (p.includes('/d-planner-ccr')) return '/d-planner-ccr/';
+  if (p.includes('/LSP_D-planner-CCR')) return '/LSP_D-planner-CCR/';
+  const swDir = p.replace(/[^/]*$/, '');
+  return swDir || '/LSP_D-planner-CCR/';
+}
+
+const APP_BASE = getAppBasePath();
+const OFFLINE_INDEX = APP_BASE + 'index.html';
+
 // Install — skip waiting immediately so new SW takes over fast
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_VERSION)
-      .then(cache => cache.addAll([
-        '/LSP_D-planner/index.html'
-      ]))
+      .then(cache => cache.addAll([OFFLINE_INDEX]))
       .then(() => self.skipWaiting())
   );
 });
@@ -45,6 +54,12 @@ self.addEventListener('activate', event => {
       ))
       .then(() => self.clients.claim())
   );
+});
+
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // Fetch strategy:
@@ -78,7 +93,7 @@ self.addEventListener('fetch', event => {
         .catch(() => {
           // Network failed — serve cached version as offline fallback
           return caches.match(event.request, { ignoreSearch: true })
-            || caches.match('/LSP_D-planner/index.html', { ignoreSearch: true });
+            || caches.match(OFFLINE_INDEX, { ignoreSearch: true });
         })
     );
     return;
@@ -91,7 +106,7 @@ self.addEventListener('fetch', event => {
         if (cached) return cached;
         return fetch(event.request)
           .then(response => {
-            if (response.ok && url.pathname.startsWith('/LSP_D-planner/')) {
+            if (response.ok && url.pathname.startsWith(APP_BASE)) {
               const clone = response.clone();
               const cacheKey = new Request(url.origin + url.pathname);
               caches.open(CACHE_VERSION).then(cache => cache.put(cacheKey, clone));

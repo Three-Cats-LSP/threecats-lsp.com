@@ -14,7 +14,8 @@ Part of the [Three Cats LSP](https://threecats-lsp.com) **Diver's Toolkit**.
 
 | App | Purpose |
 |-----|---------|
-| **LSP D-Planner** | Decompression planning (this app) |
+| **LSP D-Planner** | Decompression planning — open circuit (this app) |
+| **[LSP D-Planner + CCR](https://github.com/Three-Cats-LSP/LSP_D-planner-CCR)** | Rebreather edition — CCR, pSCR, bailout (separate repo) |
 | **[T-Viewer](https://threecats-lsp.com/t-viewer/)** | Open and share exported dive plan TXT/PDF files |
 | **[Get In Water](https://threecats-lsp.com/get-in-water/)** | Trip packing checklists |
 
