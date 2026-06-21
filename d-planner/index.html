@@ -1287,7 +1287,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <div id="headerTopRow" style="display:flex;flex-wrap:wrap;align-items:center;width:100%;padding:2px 0;border-bottom:1px solid var(--border);">
 <!-- Logo — left, fixed size -->
 <div style="display:flex;align-items:center;gap:12px;padding-left:14px;flex-shrink:0;flex-grow:0;">
-<div class="brand-icon" id="brandIcon">🤿</div>
+<div class="brand-icon" id="brandIcon" aria-hidden="true">🫧</div>
 <div class="brand-text">
 <h1>LSP D-PLANNER · <span class="algo-label" id="algoLabel">Rec</span></h1>
 <p id="algoSubtitle">Recreational Dive Tables · RDP Reference</p>
@@ -1309,7 +1309,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <button class="algo-btn" id="algoPADI" onclick="setAlgo('padi')">Rec</button>
 <button class="algo-btn active" id="algoBUH" onclick="setAlgo('buh')">Tec</button>
 <div style="width:1px;height:18px;background:var(--border-hi);margin:0 2px;"></div>
-<button class="algo-btn u6" id="algoTools" onclick="setAlgo('tools')">🔧 Tools</button>
+<button class="algo-btn u6" id="algoTools" onclick="setAlgo('tools')">Tools</button>
 <div style="width:1px;height:18px;background:var(--border-hi);margin:0 2px;"></div>
 <button class="algo-btn" onclick="toggleReference()" title="Reference &amp; Info">?</button>
 </div>
@@ -3253,6 +3253,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <svg fill="currentColor" height="16" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"></path></svg>
           LSP D-Planner · Open Source on GitHub
         </a>
+<a href="https://threecats-lsp.com/d-planner-ccr/" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">LSP D-Planner + CCR · Rebreather Edition</span></a>
 <a href="https://threecats-lsp.com/d-planner/download.html" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">LSP D-Planner · Download Android APK</span></a>
 <a href="https://www.thingiverse.com/Roman_Markovtsev/designs" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank"><img alt="Thingiverse" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHIAAAByCAMAAAC4A3VPAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABpUExURStS/gAAADBY/yhY/zBQ/yhQ/yxT/yxT/ipT/ipR/ixT/itT/ixS/itS/v////H1//L0/8rU/8rT/73J/73J/rzJ/6++/6++/qKz/pWp/5Wo/oid/nuT/nuS/m2I/mB9/lNz/kZo/jld/g0+l6gAAAAOdFJOU/8AICAgIK+vr7C/v+/vniJZ+QAAAKhJREFUeNrt2ckNwjAARNFxFpbENmELO4T0XyQV2DJI9gH938DTnEem6a3KtaqMGquiuUoLFa5X8ZyIiIjo26ZHht6KtfMZ2kJCQkJCQkJCQkLmJZ9jpP3Ghxpj3fR755B4UK6uIfIECQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQn5d6QrT3ZK7xi+ftNbq02fOflgL6Vma5l2qaTmyxAmh/ucBna1+QBeIOmb8eOcqAAAAABJRU5ErkJggg==" style="width:16px;height:16px;object-fit:contain;border-radius:2px;flex-shrink:0;"/><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">My Designs · Thingiverse</span></a>
 <a href="https://www.instagram.com/threecats_lsp" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='#d92e7f';this.style.color='#d92e7f'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank">
@@ -3345,11 +3346,22 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.21';
+const APP_VERSION = '2.20.22';
 window.APP_VERSION = APP_VERSION;
+// Test harness: skip DOM recalc storms when loaded inside tests-massive.html iframe
+(function() {
+  try {
+    if (new URLSearchParams(location.search).get('massiveSuite') === '1') {
+      window._zhlHeadless = true;
+      window._massiveSuiteActive = true;
+    }
+  } catch (e) {}
+})();
 // _zhlPrewarmed: set true by test harness after first headless run to skip
 // DOM warm-up cost on subsequent calls. Kept as a no-op flag for compatibility.
 window._zhlPrewarmed = window._zhlPrewarmed || false;
+
+const CUFT_PER_L = 0.0353147; // litres per cubic foot — SAC/cylinder conversions
 
 const ZHL16C = [
   [4.0,   1.2599, 0.5050],[8.0,   1.0000, 0.6514],[12.5,  0.8618, 0.7222],
@@ -3856,6 +3868,13 @@ let lastTissues = null;
 // ═══════════════════════════════════════════════
 // ALGO SWITCH
 // ═══════════════════════════════════════════════
+function setBrandIcon(mode) {
+  const el = document.getElementById('brandIcon');
+  if (!el) return;
+  const icons = { padi: '🤿', buh: '🫧', tools: '🔧' };
+  el.textContent = icons[mode] || icons.buh;
+}
+
 function setAlgo(a) {
   algo = a;
   const isBuh   = a === 'buh';
@@ -3885,7 +3904,7 @@ function setAlgo(a) {
   if (isTools) {
     document.getElementById('algoLabel').textContent    = 'TOOLS';
     document.getElementById('algoSubtitle').textContent = 'Dive Planning Tools & Calculators';
-    document.getElementById('brandIcon').textContent    = '🔧';
+    setBrandIcon('tools');
     document.querySelector('.tabs-nav').style.display = 'none';
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.getElementById('tools').classList.add('active');
@@ -3902,7 +3921,7 @@ function setAlgo(a) {
   if (isBuh) {
     document.getElementById('algoLabel').textContent    = 'TEC';
     document.getElementById('algoSubtitle').textContent = 'Bühlmann ZH-L16C · Gradient Factors';
-    document.getElementById('brandIcon').textContent    = '🫧';
+    setBrandIcon('buh');
     document.getElementById('plannerTitle').textContent = 'Bühlmann Dive Plan';
     document.getElementById('algoRow').style.display         = 'flex';
     document.getElementById('envRow').style.display           = 'flex';
@@ -3911,7 +3930,7 @@ function setAlgo(a) {
   } else {
     document.getElementById('algoLabel').textContent    = 'Rec';
     document.getElementById('algoSubtitle').textContent = 'Recreational Dive Planner';
-    document.getElementById('brandIcon').textContent    = '🤿';
+    setBrandIcon('padi');
     document.getElementById('plannerTitle').textContent = 'Single Dive Plan';
     // Rec mode: hide TEC rows, show REC water/units row
     document.getElementById('algoRow').style.display          = 'none';
@@ -4338,7 +4357,7 @@ function setGF(low, high) {
   // Legacy button sync (in case gf-btn elements still exist elsewhere)
   document.querySelectorAll('.gf-btn').forEach(btn => btn.classList.remove('active'));
 
-  renderNDLTable();
+  if (!window._zhlHeadless) renderNDLTable();
 
   // GF FIX: re-run deco schedule with updated GF values instead of hiding result
   const decoRes = document.getElementById('decoResult');
@@ -4392,7 +4411,7 @@ function setCustomGF(commit) {
   const sel = document.getElementById('gfPresetSelect');
   if (sel && sel.value !== 'custom') sel.value = 'custom';
 
-  renderNDLTable();
+  if (!window._zhlHeadless) renderNDLTable();
 
   // GF FIX: re-run deco schedule with updated GF values instead of hiding result
   const decoResC = document.getElementById('decoResult');
@@ -4884,7 +4903,7 @@ function drawDecoPlanBannerPdf(doc, y, layout, data, planSum, hasDeco) {
   doc.setFontSize(9);
   doc.setFont('DejaVuSans', 'bold');
   doc.setTextColor(...titleColor);
-  doc.text(hasDeco ? '!' : 'OK', boxX + padX, cy);
+  doc.text(hasDeco ? '\u26A0' : 'OK', boxX + padX, cy);
   doc.text('DECO PLAN', boxX + padX + 5, cy);
   doc.setFontSize(7);
   doc.setFont('DejaVuSans', 'normal');
@@ -5487,11 +5506,11 @@ function ceiling(tissues, gfHigh) {
 // Matches MultiDeco/DiveKit's published "decozone" definition exactly.
 // Surface GF — maximum tissue loading ratio vs M-value at surface pressure.
 // Formula (tl5915 / Baker): surfGF_i = (pN2+pHe - P_surf) / (a_i + P_surf/b_i - P_surf)
-// where P_surf = 1.0 bar (sea-level ambient). Returns 0–100+ as a percentage.
+// where P_surf = altSurfaceP (actual surface ambient — altitude-aware). Returns 0–100+ as a percentage.
 // Negative values (all tissues undersaturated at surface) are clamped to 0.
 function computeSurfaceGF(tissues) {
   if (!tissues || !tissues.length) return null;
-  const P_surf = 1.0; // bar
+  const P_surf = altSurfaceP;
   let maxGF = -Infinity;
   tissues.forEach((t, i) => {
     const pTotal = (t.pN2 || 0) + (t.pHe || 0);
@@ -5873,6 +5892,13 @@ function getDecoGasFrac(selectId, customId) {
   const fracs = getDecoGasFractions(selectId, customId,
     selectId.replace('Mix', 'TrimixO2'), selectId.replace('Mix', 'TrimixHe'));
   return fracs ? fracs.fN2 : null;
+}
+
+/** Read SAC from DOM; always returns L/min (converts cu ft/min when units === 'imperial'). */
+function sacDomToLpm(inputId, defaultLpm) {
+  const raw = parseFloat(document.getElementById(inputId)?.value);
+  const val = Number.isFinite(raw) && raw > 0 ? raw : defaultLpm;
+  return units === 'imperial' ? val / CUFT_PER_L : val;
 }
 
 function getDecoGasLabel(selectId, customId) {
@@ -6677,8 +6703,8 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
 
   // Gas Consumption — compute from rendered table rows
   const gasConsVPM = {};
-  const sacBotVPM  = parseFloat(document.getElementById('sacBottom')?.value) || 20;
-  const sacDecoVPM = parseFloat(document.getElementById('sacDeco')?.value) || 15;
+  const sacBotVPM  = sacDomToLpm('sacBottom', 20);
+  const sacDecoVPM = sacDomToLpm('sacDeco', 15);
   document.querySelectorAll('#decoTableBody tr[data-phase]').forEach(tr => {
     const ph = tr.dataset.phase;
     if (ph === 'switch' || ph === 'totals') return;
@@ -6722,8 +6748,8 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
     const _cylDefsVPM = [
       { ids:['cylBot_size','cylBot_pres','cylBot_reserve'],                   label: gasLabels[0] || null,                                              isBottom: true  },
       { ids:['cylTravelGas_size','cylTravelGas_pres','cylTravelGas_reserve'], label: (getTravelGasInfo()?.label || null),                                isBottom: false },
-      { ids:['cylDg1_size','cylDg1_pres','cylDg1_reserve'],                   label: (getDecoGasLabel('decoGas1Mix','decoGas1Custom') || null),           isBottom: false },
-      { ids:['cylDg2_size','cylDg2_pres','cylDg2_reserve'],                   label: (getDecoGasLabel('decoGas2Mix','decoGas2Custom') || null),           isBottom: false },
+      { ids:['cylDg1_size','cylDg1_pres','cylDg1_reserve'],                   label: (getDecoGasLabel('dg1Mix','dg1CustomO2') || null),           isBottom: false },
+      { ids:['cylDg2_size','cylDg2_pres','cylDg2_reserve'],                   label: (getDecoGasLabel('dg2Mix','dg2CustomO2') || null),           isBottom: false },
     ];
     const _cylByLabelVPM = {};
     _cylDefsVPM.forEach(cyl => {
@@ -6762,8 +6788,9 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
       const portionL = usableL != null ? usableL * fraction : null;
       const turnBar  = (hasCyl && isBottom && sizeL > 0) ? fillBar - (portionL / sizeL) : null;
 
-      const reqDisp  = Math.round(reqL);
-      const availDisp = usableL != null ? Math.round(usableL) : null;
+      const reqDisp  = gpVolDisp(reqL);
+      const availDisp = usableL != null ? gpVolDisp(usableL) : null;
+      const shortVolDisp = (litres) => gpVolDisp(Math.max(0, litres));
       const short = usableL != null && reqL > usableL;
       const tight = usableL != null && !short && reqL > usableL * 0.90;
       const sufficient = usableL != null && !short;
@@ -6771,7 +6798,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
       // Sufficiency colour
       const sufCol = short ? 'var(--red)' : tight ? 'var(--yellow)' : hasCyl ? 'var(--green)' : 'var(--muted)';
       const sufIcon = short ? '✗' : tight ? '⚠' : hasCyl ? '✓' : '—';
-      const sufTxt  = short ? `Short ${Math.round(reqL-(usableL||0))} ${volUnitV}` : tight ? 'Tight' : hasCyl ? 'OK' : 'No cyl data';
+      const sufTxt  = short ? `Short ${shortVolDisp(reqL - (usableL || 0))} ${volUnitV}` : tight ? 'Tight' : hasCyl ? 'OK' : 'No cyl data';
 
       // Thirds/Half portion in litres (bottom only)
       const portionDispV = (isBottom && portionL != null) ? `${Math.round(portionL)} ${volUnitV}` : '—';
@@ -6789,7 +6816,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
       const reqColorV   = short ? 'var(--red)'  : 'var(--text)';
       const availColorV = short ? 'var(--red)'  : tight ? 'var(--yellow)' : hasCyl ? 'var(--green)' : 'var(--muted)';
       const statusCellV = short
-        ? `<td style="color:var(--red);font-weight:700;">✗ short ${Math.round(reqL-(usableL||0))} ${volUnitV}</td>`
+        ? `<td style="color:var(--red);font-weight:700;">✗ short ${shortVolDisp(reqL - (usableL || 0))} ${volUnitV}</td>`
         : tight
           ? `<td style="color:var(--yellow);font-weight:700;">⚠ tight</td>`
           : (isBottom && turnDispV != null)
@@ -6817,7 +6844,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
           const maxTurnDisp = units === 'imperial' ? Math.round(maxTurnBar*14.5038) : Math.round(maxTurnBar);
           btSuggest = `Shorten BT to <strong>${maxBT} min</strong> and turn at <strong>${maxTurnDisp} ${presUnitV}</strong>, or use a larger cylinder / add a stage.`;
         }
-        warnings += `<div class="alert dang" style="margin-top:6px;"><span>⚠</span><div><strong>${gas} insufficient</strong> — need ${reqDisp} ${volUnitV}, have ${availDisp} ${volUnitV}. Short by <strong>${Math.round(reqL-usableL)} ${volUnitV}</strong>.${btSuggest ? '<br>' + btSuggest : ''}</div></div>`;
+        warnings += `<div class="alert dang" style="margin-top:6px;"><span>⚠</span><div><strong>${gas} insufficient</strong> — need ${reqDisp} ${volUnitV}, have ${availDisp} ${volUnitV}. Short by <strong>${shortVolDisp(reqL - usableL)} ${volUnitV}</strong>.${btSuggest ? '<br>' + btSuggest : ''}</div></div>`;
       }
     }
 
@@ -6856,7 +6883,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
         </table>
       </div>
       ${gpNoteVPM?.innerHTML ? `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;">${gpNoteVPM.innerHTML}</div>` : ''}
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:1px;">SAC bottom: ${sacBottom} ${sacUnitVPM2} · deco: ${sacDeco} ${sacUnitVPM2}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:1px;">SAC bottom: ${document.getElementById('sacBottom')?.value || '20'} ${sacUnitVPM2} · deco: ${document.getElementById('sacDeco')?.value || '15'} ${sacUnitVPM2}</div>
       </div></div>`;
     gasElVPM.innerHTML = ghtml;
     _applyGasWarningStyles(gasElVPM);
@@ -9434,8 +9461,8 @@ function runDecoSchedule() {
   }
 
   // ── SAC gas consumption ──
-  const sacBottom = parseFloat(document.getElementById('sacBottom')?.value) || 20;
-  const sacDeco   = parseFloat(document.getElementById('sacDeco')?.value)   || 15;
+  const sacBottom = sacDomToLpm('sacBottom', 20);
+  const sacDeco   = sacDomToLpm('sacDeco', 15);
   const BAR_PER_M = BAR_PER_METRE;
   // gasConsumed[gasLabel] = litres
   const gasConsumed = {};
@@ -9784,7 +9811,8 @@ function runDecoSchedule() {
     gasLabels.forEach((label, idx) => {
       const [sId, pId] = cylIds[idx] || [];
       if (!sId) return;
-      const sz  = parseFloat(document.getElementById(sId)?.value) || 0;
+      const szRaw = parseFloat(document.getElementById(sId)?.value) || 0;
+      const sz  = units === 'imperial' ? szRaw * 28.3168 : szRaw;
       const prRaw = parseFloat(document.getElementById(pId)?.value) || 0;
       // Pressure input is in bar (metric) or psi (imperial) — always calc in bar
       const pr = units === 'imperial' ? prRaw / 14.5038 : prRaw;
@@ -9835,7 +9863,7 @@ function runDecoSchedule() {
           </table>
         </div>
         ${gpNote ? gpNote.innerHTML ? `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;">${gpNote.innerHTML}</div>` : '' : ''}
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:1px;">SAC bottom: ${sacBottom} ${sacUnitBHL2} · deco: ${sacDeco} ${sacUnitBHL2}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:1px;">SAC bottom: ${document.getElementById('sacBottom')?.value || '20'} ${sacUnitBHL2} · deco: ${document.getElementById('sacDeco')?.value || '15'} ${sacUnitBHL2}</div>
         </div></div>`;
       gasEl.innerHTML = html;
       gasEl.style.display = 'block';
@@ -9860,9 +9888,12 @@ function runDecoSchedule() {
         const avail = sL>0&&fB>rB?(fB-rB)*sL:null;
         const short2 = avail!=null&&reqL>avail;
         const sufCol2 = short2?'var(--red)':avail!=null?'var(--green)':'var(--muted)';
-        const sufTxt2 = short2?`✗ short ${Math.round(reqL-(avail||0))} ${volUnitV2}`:avail!=null?'✓ OK':'—';
-        emergRows += `<tr><td style="font-weight:700;">${gas}</td><td style="color:${short2?'var(--red)':'var(--text)'};">${Math.round(reqL)} ${volUnitV2}</td><td style="color:${avail!=null?(short2?'var(--red)':'var(--green)'):'var(--muted)'};">${avail!=null?Math.round(avail)+' '+volUnitV2:'—'}</td><td style="color:${sufCol2};font-weight:700;">${sufTxt2}</td></tr>`;
-        if (short2) emergWarn += `<div class="alert dang" style="margin-top:6px;"><span>⚠</span><div><strong>${gas} insufficient</strong> — need ${Math.round(reqL)} ${volUnitV2}, have ${Math.round(avail||0)} ${volUnitV2}.</div></div>`;
+        const reqDispE = gpVolDisp(reqL);
+        const availDispE = avail != null ? gpVolDisp(avail) : null;
+        const shortDispE = gpVolDisp(Math.max(0, reqL - (avail || 0)));
+        const sufTxt2 = short2?`✗ short ${shortDispE} ${volUnitV2}`:avail!=null?'✓ OK':'—';
+        emergRows += `<tr><td style="font-weight:700;">${gas}</td><td style="color:${short2?'var(--red)':'var(--text)'};">${reqDispE} ${volUnitV2}</td><td style="color:${avail!=null?(short2?'var(--red)':'var(--green)'):'var(--muted)'};">${availDispE != null ? availDispE + ' ' + volUnitV2 : '—'}</td><td style="color:${sufCol2};font-weight:700;">${sufTxt2}</td></tr>`;
+        if (short2) emergWarn += `<div class="alert dang" style="margin-top:6px;"><span>⚠</span><div><strong>${gas} insufficient</strong> — need ${reqDispE} ${volUnitV2}, have ${availDispE} ${volUnitV2}.</div></div>`;
       });
       const html2 = `<div style="margin-top:14px;">
         <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">${cardTitle}</div>
@@ -16284,6 +16315,7 @@ var appSettings = {
     'algorithmSelect', 'conservatismSelect', 'gfPresetSelect', 'gfLowInput', 'gfHighInput',
     'heHalfTimeMode',
     'botTrimixO2', 'botTrimixHe',
+    'dg1Mix', 'dg1CustomO2', 'dg2Mix', 'dg2CustomO2',
     'dg1TrimixO2', 'dg1TrimixHe', 'dg2TrimixO2', 'dg2TrimixHe',
     'vpmRepMode', 'vpmSurfaceInterval',
     'sacBottom', 'sacDeco',
@@ -16414,41 +16446,41 @@ var appSettings = {
   _restoreFields: function(values) {
     let restored = 0;
     const allPossible = this.getAllPossibleFields();
-    
-    allPossible.forEach(id => {
-      if (id === '__algo__' || !values.hasOwnProperty(id)) {
-        return; // Skip algorithm and non-existent values
+
+    const restoreOne = (id) => {
+      if (id === '__algo__' || !values.hasOwnProperty(id)) return;
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = values[id];
+      if (id === 'gfPresetSelect' && typeof handleGFSelect === 'function') {
+        handleGFSelect(values[id]);
+      } else if (id === 'gfLowInput' || id === 'gfHighInput') {
+        restored++;
+        return;
+      } else if (!window._zhlHeadless) {
+        el.dispatchEvent(new Event('change', { bubbles: true }));
       }
-      
-      // Wait a bit more for dynamic fields to be created
-      const checkAndRestore = () => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.value = values[id];
-          // GF preset needs special handler to sync mGF state
-          if (id === 'gfPresetSelect' && typeof handleGFSelect === 'function') {
-            handleGFSelect(values[id]);
-          } else if (!window._zhlHeadless) {
-            el.dispatchEvent(new Event('change', { bubbles: true }));
-          }
-          restored++;
-        }
-      };
-      
-      // Check immediately
-      checkAndRestore();
-      
-      // Also check after a short delay for dynamically created fields
-      setTimeout(checkAndRestore, 100);
-    });
-    
+      restored++;
+    };
+
+    allPossible.forEach(id => restoreOne(id));
+
     console.log('[LSP] ✅ Settings restored (' + restored + ' fields) - Algo: ' + (values['__algo__'] || 'padi'));
   },
 
   // Clear all saved values
   clear: function() {
     try {
-      localStorage.removeItem('lspDiveSettings_v3');
+      [
+        'lspDiveSettings_v6', 'lspDiveSettings_v5', 'lspDiveSettings_v4',
+        'lspDiveSettings_v3', 'lspDiveSettings_v2', 'lspDiveSettings',
+        'lspDiveDefaults_v2',
+        'waterDensity', 'waterDensityCustom',
+        'lspAltitude', 'lspAcclimatized',
+        'gfCustomLow', 'gfCustomHigh',
+        'lspEnvOpen', 'lspAdvancedOpen',
+        'lspUserAdvDefaults', 'decoTableView', 'diveTheme',
+      ].forEach(k => localStorage.removeItem(k));
       console.log('[LSP] ✅ Settings cleared');
     } catch(e) {
       console.warn('[LSP] Clear failed:', e.message);
@@ -17096,10 +17128,51 @@ window.addEventListener('load', function() {
 </script>
 <!-- PWA: service worker registration -->
 <script>
+  const SW_VERSION_KEY = 'lspSwVersion';
+  const SW_MIGRATION_FLAG = `lspSwMigrated:${APP_VERSION}`;
+  (async () => {
+    try {
+      const prev = localStorage.getItem(SW_VERSION_KEY);
+      if (prev === APP_VERSION || sessionStorage.getItem(SW_MIGRATION_FLAG) === '1') return;
+      sessionStorage.setItem(SW_MIGRATION_FLAG, '1');
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
+      if (window.caches && typeof caches.keys === 'function') {
+        const keys = await caches.keys();
+        await Promise.all(keys.filter(k => /^lsp-dplanner-v/i.test(k)).map(k => caches.delete(k)));
+      }
+      localStorage.setItem(SW_VERSION_KEY, APP_VERSION);
+      window.location.reload();
+    } catch (e) {
+      console.warn('[SW] version migration failed:', e);
+    }
+  })();
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(r => console.log('[SW] registered, scope:', r.scope))
+      navigator.serviceWorker.register(`sw.js?v=${APP_VERSION}`, { updateViaCache: 'none' })
+        .then(r => {
+          console.log('[SW] registered, scope:', r.scope);
+          r.update();
+          if (r.waiting) r.waiting.postMessage({ type: 'SKIP_WAITING' });
+          r.addEventListener('updatefound', () => {
+            const sw = r.installing;
+            if (!sw) return;
+            sw.addEventListener('statechange', () => {
+              if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+                sw.postMessage({ type: 'SKIP_WAITING' });
+              }
+            });
+          });
+          let reloaded = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (reloaded) return;
+            reloaded = true;
+            window.location.reload();
+          });
+        })
         .catch(e => console.warn('[SW] registration failed:', e));
     });
   }
