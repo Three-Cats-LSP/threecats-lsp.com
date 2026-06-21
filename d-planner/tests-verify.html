@@ -86,7 +86,7 @@ const BAKER = {
   '50m/25min TMX18/45 C0': { rt:73, first:27, stops:{27:1,24:1,21:1,18:3,15:3,12:4,9:6,6:10,3:17} },
 };
 
-// LSP v2.10.5 pinned outputs (captured 2026-06-16 after water-factor + Baker He HT alignment)
+// LSP pinned ZHL outputs — MultiDeco transit (default since v2.20.25); captured v2.20.28
 const LSP_PINNED = {
   'vpmb_40_25_air_c0':       { rt:62,  first:18, stops:{18:1,15:1,12:2,9:4,6:7,3:13}   },
   'vpmb_40_25_air_c2':       { rt:71,  first:21, stops:{21:0,18:1,15:2,12:3,9:5,6:9,3:16} },
@@ -96,9 +96,9 @@ const LSP_PINNED = {
   'vpmb_70_20_air_c0':       { rt:116, first:39, stops:{39:1,36:1,33:1,30:1,27:1,24:1,21:2,18:4,15:4,12:7,9:11,6:17,3:29} },
   'vpmb_50_25_tmx2135_c0':   { rt:85,  first:27, stops:{27:1,24:1,21:1,18:1,15:1,12:4,9:6,6:11,3:21} },
   'vpmb_50_25_tmx1845_c0':   { rt:106, first:30, stops:{30:1,27:1,24:1,21:1,18:1,15:3,12:6,9:8,6:15,3:30} },
-  'zhl_40_25_air_gf3085':    { rt:63,  first:18, stops:{18:1,15:2,12:4,9:4,6:8,3:18}   },
-  'zhl_60_20_air_gf3085':    { rt:94,  first:30, stops:{30:1,27:1,24:1,21:1,18:2,15:3,12:5,9:7,6:13,3:23} },
-  'zhl_40_25_ean50_gf3085':  { rt:33,  first:18, stops:{18:1,15:1,12:2,9:3,6:6,3:12}   },
+  'zhl_40_25_air_gf3085':    { rt:66,  first:18, stops:{18:2,15:2,12:3,9:5,6:7,3:18}   },
+  'zhl_60_20_air_gf3085':    { rt:96,  first:27, stops:{27:2,24:2,21:2,18:3,15:5,12:5,9:8,6:16,3:29} },
+  'zhl_40_25_ean50_gf3085':  { rt:35,  first:6,  stops:{6:4,3:2}   },
 };
 
 // ZHL-16C Bühlmann coefficients (must match canonical Bühlmann 2003 values)
@@ -214,7 +214,7 @@ const SECTIONS = [
 {
   title: 'B · Pinned Regression — Bühlmann ZHL-16C+GF (LSP v2.9.0)',
   badge: 'badge-zhl',
-  desc: 'Exact Bühlmann outputs pinned to LSP v2.9.0. GF30/85 standard. Any change = engine regression.',
+  desc: 'Exact Bühlmann outputs pinned to MultiDeco default (v2.20.25+). GF30/85. Any change = engine regression.',
   tests: [
     ['40m/25min Air GF30/85 — RT matches pinned', () => {
       const r = zhlCalc(40,25); const p = LSP_PINNED.zhl_40_25_air_gf3085;
@@ -237,6 +237,12 @@ const SECTIONS = [
       const r = zhlCalc(60,20); const p = LSP_PINNED.zhl_60_20_air_gf3085;
       assert(r.totalRuntime === p.rt, `RT=${r.totalRuntime} expected ${p.rt}`);
       return `RT=${r.totalRuntime}min ✓`;
+    }],
+    ['40m/25min EAN50 GF30/85 — first stop at 6m', () => {
+      const r = zhlCalc(40,25,50,0);
+      assert(firstStop(r) === LSP_PINNED.zhl_40_25_ean50_gf3085.first,
+        `first=${firstStop(r)}m expected ${LSP_PINNED.zhl_40_25_ean50_gf3085.first}m`);
+      return `first=${firstStop(r)}m ✓`;
     }],
     ['40m/25min EAN50 GF30/85 — RT matches pinned (nitrox shortens deco)', () => {
       const r = zhlCalc(40,25,50,0); const p = LSP_PINNED.zhl_40_25_ean50_gf3085;

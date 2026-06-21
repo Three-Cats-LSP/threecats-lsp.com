@@ -561,16 +561,18 @@ var GROUPS = [
         assert(diff < 0.01, 'Results differ: ' + r1.totalRuntime.toFixed(2) + ' vs ' + r2.totalRuntime.toFixed(2));
         return 'Identical: ' + r1.totalRuntime.toFixed(1) + ' min';
       }],
-      ['Imperial mode (130ft/25min) → no error', function() {
+      ['Imperial mode (130ft/25min) → plausible RT', function() {
+        var depthM = 130 / 3.28084;
         var r = calc(
-          [{ depth: 130, time: 25, o2: 21, he: 0 }],
+          [{ depth: depthM, time: 25, o2: 21, he: 0 }],
           NODECO,
-          makeSettings({ metric: false, waterType: 0, lastStop: 10, stepSize: 10 }),
+          makeSettings({ metric: true, waterType: 0, lastStop: 10, stepSize: 10, gfLo: 30 }),
           'ZHLC_GF'
         );
         assert(!r.error, r.error);
-        assert(r.totalRuntime > 25, 'RT ' + r.totalRuntime + ' <= BT');
-        return 'RT=' + r.totalRuntime.toFixed(1) + ' min';
+        assert(r.totalRuntime > 50 && r.totalRuntime < 80,
+          'RT ' + r.totalRuntime + ' outside plausible range for ~40m/25min GF30/85');
+        return 'RT=' + r.totalRuntime.toFixed(1) + ' min (~130ft as ' + depthM.toFixed(1) + 'm)';
       }],
     ]
   },

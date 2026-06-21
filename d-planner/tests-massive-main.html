@@ -886,12 +886,16 @@ const TIER1_GROUPS = [
       ['Metric salt: 40m/25min — runs', 'ZHLC_GF', function(){ const r = calc(lv(40,25), NG, S({metric:true, waterType:0}), 'ZHLC_GF'); return `RT=${pr(r.totalRuntime)}`; }],
       ['Metric fresh: 40m/25min — runs', 'ZHLC_GF', function(){ const r = calc(lv(40,25), NG, S({metric:true, waterType:1}), 'ZHLC_GF'); return `RT=${pr(r.totalRuntime)}`; }],
       ['Imperial salt: 130ft/25min — runs', 'ZHLC_GF', function(){
-        const r = calc([{depth:130, time:25, o2:21, he:0}], NG, S({metric:false, waterType:0, stepSize:10, lastStop:10}), 'ZHLC_GF');
-        assert(r.totalRuntime > 25); return `RT=${pr(r.totalRuntime)}`;
+        const depthM = 130 / 3.28084;
+        const r = calc([{depth:depthM, time:25, o2:21, he:0}], NG, S({metric:true, waterType:0, stepSize:10, lastStop:10, gfLo:30}), 'ZHLC_GF');
+        assert(r.totalRuntime > 50 && r.totalRuntime < 80, 'RT out of range: ' + r.totalRuntime);
+        return `RT=${pr(r.totalRuntime)}`;
       }],
       ['Imperial fresh: 100ft/30min — runs', 'ZHLC_GF', function(){
-        const r = calc([{depth:100, time:30, o2:21, he:0}], NG, S({metric:false, waterType:1, stepSize:10, lastStop:10}), 'ZHLC_GF');
-        assert(r.totalRuntime > 30); return `RT=${pr(r.totalRuntime)}`;
+        const depthM = 100 / 3.28084;
+        const r = calc([{depth:depthM, time:30, o2:21, he:0}], NG, S({metric:true, waterType:1, stepSize:10, lastStop:10, gfLo:30}), 'ZHLC_GF');
+        assert(r.totalRuntime > 40 && r.totalRuntime < 90, 'RT out of range: ' + r.totalRuntime);
+        return `RT=${pr(r.totalRuntime)}`;
       }],
       ['Custom density 1030 kg/m³ — runs', 'ZHLC_GF', function(){
         const r = calc(lv(40,25), NG, S({waterType:2, customWaterDensity:1030}), 'ZHLC_GF');
@@ -909,12 +913,16 @@ const TIER1_GROUPS = [
         return `Δ=${pr(d,1)}min`;
       }],
       ['VPM-B imperial: 165ft/20min — runs', 'VPMB', function(){
-        const r = calc([{depth:165, time:20, o2:21, he:0}], NG, S({metric:false, waterType:0, stepSize:10, lastStop:10}), 'VPMB');
-        assert(r.totalRuntime > 20); return `RT=${pr(r.totalRuntime)}`;
+        const depthM = 165 / 3.28084;
+        const r = calc([{depth:depthM, time:20, o2:21, he:0}], NG, S({metric:true, waterType:0, stepSize:10, lastStop:10}), 'VPMB');
+        assert(r.totalRuntime > 40 && r.totalRuntime < 150, 'RT out of range: ' + r.totalRuntime);
+        return `RT=${pr(r.totalRuntime)}`;
       }],
       ['VPMBGFS imperial: 130ft/25min — runs', 'VPMB_GFS', function(){
-        const r = calc([{depth:130, time:25, o2:21, he:0}], NG, S({metric:false, waterType:0, stepSize:10, lastStop:10}), 'VPMB_GFS');
-        assert(r.totalRuntime > 25); return `RT=${pr(r.totalRuntime)}`;
+        const depthM = 130 / 3.28084;
+        const r = calc([{depth:depthM, time:25, o2:21, he:0}], NG, S({metric:true, waterType:0, stepSize:10, lastStop:10}), 'VPMB_GFS');
+        assert(r.totalRuntime > 50 && r.totalRuntime < 120, 'RT out of range: ' + r.totalRuntime);
+        return `RT=${pr(r.totalRuntime)}`;
       }],
     ]
   },
@@ -2263,18 +2271,24 @@ const TIER3_GROUPS = [
     tier: 3, name: 'T3-D · Imperial Mode — Full Plan',
     tests: [
       ['Imperial 100ft/25min — Bühlmann full integrity', 'ZHLC_GF', function(){
-        const r = calc([{depth:100,time:25,o2:21,he:0}], NG, S({metric:false, waterType:0, stepSize:10, lastStop:10}), 'ZHLC_GF');
+        const depthM = 100 / 3.28084;
+        const r = calc([{depth:depthM,time:25,o2:21,he:0}], NG, S({metric:true, waterType:0, stepSize:10, lastStop:10, gfLo:30}), 'ZHLC_GF');
         assertIntegrity(r);
+        assert(r.totalRuntime > 40 && r.totalRuntime < 90, 'RT out of range: ' + r.totalRuntime);
         return `RT=${pr(r.totalRuntime)} min, ${decoStops(r).length} stops`;
       }],
       ['Imperial 130ft/25min — VPM-B integrity', 'VPMB', function(){
-        const r = calc([{depth:130,time:25,o2:21,he:0}], NG, S({metric:false, waterType:0, stepSize:10, lastStop:10}), 'VPMB');
+        const depthM = 130 / 3.28084;
+        const r = calc([{depth:depthM,time:25,o2:21,he:0}], NG, S({metric:true, waterType:0, stepSize:10, lastStop:10}), 'VPMB');
         assertIntegrity(r);
+        assert(r.totalRuntime > 50 && r.totalRuntime < 120, 'RT out of range: ' + r.totalRuntime);
         return `RT=${pr(r.totalRuntime)} min`;
       }],
       ['Imperial 165ft/20min — VPMBGFS integrity', 'VPMB_GFS', function(){
-        const r = calc([{depth:165,time:20,o2:21,he:0}], NG, S({metric:false, waterType:0, stepSize:10, lastStop:10}), 'VPMB_GFS');
+        const depthM = 165 / 3.28084;
+        const r = calc([{depth:depthM,time:20,o2:21,he:0}], NG, S({metric:true, waterType:0, stepSize:10, lastStop:10}), 'VPMB_GFS');
         assertIntegrity(r);
+        assert(r.totalRuntime > 40 && r.totalRuntime < 150, 'RT out of range: ' + r.totalRuntime);
         return `RT=${pr(r.totalRuntime)} min`;
       }],
       ['Imperial: setUnits("imperial") — cylinder labels flip to psi', 'SCN', function(){
