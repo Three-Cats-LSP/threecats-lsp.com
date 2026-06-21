@@ -308,7 +308,7 @@ iframe { display: none; }
 
 </div><!-- .container -->
 
-<iframe id="app-frame" src="index.html"></iframe>
+<iframe id="app-frame" src="about:blank"></iframe>
 
 <script>
 'use strict';
@@ -317,6 +317,31 @@ iframe { display: none; }
 // GLOBALS
 // ══════════════════════════════════════════════════════════════════════════════
 let E = null, WIN = null, SURF = 1.01325, BAR = null;
+let _suiteRunId = 0;
+
+function refreshFrameWin() {
+  const frame = document.getElementById('app-frame');
+  if (!frame) return null;
+  try {
+    const w = frame.contentWindow;
+    if (!w || !w.VPMEngine || typeof w.VPMEngine.calculate !== 'function') return null;
+    WIN = w;
+    E = w.VPMEngine;
+    return w;
+  } catch (_) {
+    return null;
+  }
+}
+
+function vpmEngine(w) {
+  if (E && typeof E.calculate === 'function') return E;
+  const vpm = (w && w.VPMEngine) || (WIN && WIN.VPMEngine);
+  if (vpm && typeof vpm.calculate === 'function') {
+    E = vpm;
+    return vpm;
+  }
+  return null;
+}
 let ONLY_FAIL = false;
 let ACTIVE_FILTER = 'all';
 let LAST_RESULTS = null;
@@ -368,17 +393,25 @@ const TX_DECO = [g(50), g(100)];
 // Engine wrapper — routes ZHLC_GF to ZHLEngine (Bühlmann), all others to VPMEngine
 function calc(levels, gases, settings, model) {
   TOTAL_ENGINE_CALLS++;
+  const w = refreshFrameWin() || WIN;
+  const keepHeadless = !!(w && w._zhlHeadless);
+  if (w) w._zhlHeadless = true;
   let r;
-  if (model === 'ZHLC_GF') {
-    // ZHLEngine wraps the live Bühlmann engine in the iframe
-    if (!WIN || !WIN.ZHLEngine) throw new Error('ZHLEngine not available — iframe not loaded');
-    r = WIN.ZHLEngine.calculate(cloneJ(levels), cloneJ(gases || []), cloneJ(settings || S()));
-  } else {
-    r = E.calculate(cloneJ(levels), cloneJ(gases || []), cloneJ(settings || S()), model);
+  try {
+    if (model === 'ZHLC_GF') {
+      if (!w || !w.ZHLEngine) throw new Error('ZHLEngine not available — iframe not loaded');
+      r = w.ZHLEngine.calculate(cloneJ(levels), cloneJ(gases || []), cloneJ(settings || S()));
+    } else {
+      const vpm = vpmEngine(w);
+      if (!vpm) throw new Error('VPMEngine not available — iframe not loaded');
+      r = vpm.calculate(cloneJ(levels), cloneJ(gases || []), cloneJ(settings || S()), model);
+    }
+    assert(r && typeof r === 'object', 'No result object');
+    if (r.error) throw new Error('Engine error: ' + r.error);
+    return r;
+  } finally {
+    if (w) w._zhlHeadless = keepHeadless || true;
   }
-  assert(r && typeof r === 'object', 'No result object');
-  if (r.error) throw new Error('Engine error: ' + r.error);
-  return r;
 }
 
 // Result inspectors
@@ -2914,7 +2947,22 @@ function renderResults(groups) {
 // ══════════════════════════════════════════════════════════════════════════════
 // ENGINE BOOT
 // ══════════════════════════════════════════════════════════════════════════════
+const MIN_APP_VERSION = '2.20.23';
 let iframeBootError = null;
+let iframeReloadAttempted = false;
+
+function parseAppVersion(v) {
+  return String(v || '0').split('.').map(n => parseInt(n, 10) || 0);
+}
+
+function appVersionAtLeast(v, min) {
+  const a = parseAppVersion(v), b = parseAppVersion(min);
+  for (let i = 0; i < 3; i++) {
+    if (a[i] > b[i]) return true;
+    if (a[i] < b[i]) return false;
+  }
+  return true;
+}
 
 function waitForEngine(iframe, timeout, cb) {
   const start = Date.now();
@@ -2935,7 +2983,6 @@ function waitForEngine(iframe, timeout, cb) {
       const w = iframe.contentWindow;
       if (!w) return null;
       if (w.VPMEngine && typeof w.VPMEngine.calculate === 'function') return {engine: w.VPMEngine, win: w};
-      // scan globals
       try {
         const keys = Object.getOwnPropertyNames(w);
         for (const k of keys) {
@@ -2950,8 +2997,19 @@ function waitForEngine(iframe, timeout, cb) {
   function check() {
     const found = tryGet();
     if (found) {
-      // Wait 2s for deferred app init (appSettings.load retries, setTimeout callbacks)
-      // to complete before starting tests. This prevents mid-test DOM thrashing.
+      const ver = found.win.APP_VERSION || found.win.APPVERSION;
+      if (!appVersionAtLeast(ver, MIN_APP_VERSION)) {
+        if (!iframeReloadAttempted) {
+          iframeReloadAttempted = true;
+          iframe.src = 'index.html?massiveSuite=1&v=' + MIN_APP_VERSION + '&ts=' + Date.now();
+          setTimeout(check, 500);
+          return;
+        }
+        return cb(new Error(
+          'Stale index.html v' + (ver || '?') + ' — need v' + MIN_APP_VERSION +
+          '+. Hard refresh (Ctrl+Shift+R) or clear site data.'
+        ));
+      }
       setTimeout(() => cb(null, found.engine, found.win), 2000);
       return;
     }
@@ -3001,6 +3059,7 @@ async function runGroupsAsync(groups) {
 // START
 // ══════════════════════════════════════════════════════════════════════════════
 async function startTests() {
+  const runId = ++_suiteRunId;
   TOTAL_ENGINE_CALLS = 0;
   const btn = document.getElementById('run-btn');
   const statusEl = document.getElementById('status');
@@ -3010,11 +3069,20 @@ async function startTests() {
   document.getElementById('summary').style.display = 'none';
   document.getElementById('results').innerHTML = '';
   iframeBootError = null;
+  iframeReloadAttempted = false;
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistration().then(reg => {
+      if (reg && reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      if (reg) reg.update();
+    }).catch(() => {});
+  }
 
   const frame = document.getElementById('app-frame');
-  frame.src = 'index.html?ts=' + Date.now();
+  frame.src = 'index.html?massiveSuite=1&v=' + MIN_APP_VERSION + '&ts=' + Date.now();
 
-  waitForEngine(frame, 30000, async function(err, engine, win) {
+  waitForEngine(frame, 45000, async function(err, engine, win) {
+    if (runId !== _suiteRunId) return;
     if (err) {
       statusEl.className = 'error';
       statusEl.textContent = '✗ ' + err.message + ' — keep this file beside index.html';
@@ -3152,6 +3220,7 @@ async function startTests() {
     const t0 = performance.now();
     window._suiteT0 = t0;
     const groups = await runGroupsAsync(ALL_GROUPS);
+    if (runId !== _suiteRunId) return;
     const elapsed = Math.round(performance.now() - t0);
 
     document.getElementById('sum-time').textContent = elapsed + 'ms';

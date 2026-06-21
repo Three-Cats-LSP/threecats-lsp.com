@@ -282,6 +282,12 @@ header { display: flex;
  background: var(--card) !important;
 }
 
+.adv-stack { display: flex; flex-direction: column; gap: 10px; max-width: 560px; margin-top: 8px; }
+.adv-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+.adv-row > label { flex: 1 1 auto; min-width: 0; margin: 0; font-size: 13px; line-height: 1.35; }
+.adv-row > input[type="number"] { flex: 0 0 88px; width: 88px; max-width: 88px; font-size: 13px; }
+.adv-row > select { flex: 0 0 auto; min-width: 130px; max-width: 220px; font-size: 13px; }
+
 /* REC mode - gray out GF settings to show as inactive */
 body.rec-mode #gfPresetsRow,
 body.rec-mode #gfCustomRow { opacity: 0.4 !important;
@@ -1858,7 +1864,8 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <span id="advancedSettingsSummary" style="margin-left:auto;font-size:10px;font-weight:400;letter-spacing:0;text-transform:none;opacity:.7;"></span>
 </button>
 <div id="advancedSettingsBody" style="display:none;">
-<div class="form-grid" style="margin-top:8px;"><div class="field"><label>Descent Rate</label>
+<div class="adv-stack">
+<div class="adv-row"><label>Descent Rate</label>
 <select id="descentRate">
 <option value="10">10 m/min</option>
 <option value="15">15 m/min</option>
@@ -1869,7 +1876,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <option value="30">30 m/min</option>
 </select>
 </div>
-<div class="field"><label>Ascent Rate</label>
+<div class="adv-row"><label>Ascent Rate</label>
 <select id="ascentRate">
 <option value="3">3 m/min</option>
 <option value="6">6 m/min</option>
@@ -1880,7 +1887,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <option value="18">18 m/min</option>
 </select>
 </div>
-<div class="field"><label>Deco Ascent Rate</label>
+<div class="adv-row"><label>Deco Ascent Rate</label>
 <select id="decoAscentRate">
 <option selected="" value="3">3 m/min</option>
 <option value="6">6 m/min</option>
@@ -1889,30 +1896,28 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <option value="12">12 m/min</option>
 </select>
 </div>
-<div class="field"><label>Surf Ascent Rate</label>
+<div class="adv-row"><label>Surf Ascent Rate</label>
 <select id="surfaceAscentRate">
 <option selected="" value="3">3 m/min</option>
 <option value="6">6 m/min</option>
 <option value="9">9 m/min</option>
 </select>
 </div>
-<div class="field">
-<label>Deco Step Size</label>
+<div class="adv-row"><label>Deco Step Size</label>
 <select id="decoStep">
 <option value="1">1 m</option>
 <option selected="" value="3">3 m</option>
 <option value="5">5 m</option>
 </select>
 </div>
-<div class="field">
-<label>Last Deco Stop</label>
+<div class="adv-row"><label>Last Deco Stop</label>
 <select id="lastDecoStop">
 <option value="6">6 m</option>
 <option selected="" value="3">3 m</option>
 <option value="1">1 m</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>Minimum Stop <span class="tip-icon" onclick="showTip('Minimum Stop','Minimum time spent at any deco stop, regardless of ceiling clearance.\n1:00 = standard. Smaller values give precise plans but are harder to execute.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="minStopTime">
 <option selected="" value="2">2:00</option>
@@ -1922,84 +1927,79 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <option value="0.0167">0:01</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>Min Deco <span class="tip-icon" onclick="showTip('Minimum Decompression Profile','Enforces minimum stop times at 9 m (30 ft) and 6 m (20 ft) on every dive, regardless of algorithm output.\nStandard DIR/GUE practice. If the algorithm already schedules more time at those depths, the longer time is kept.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="minDecoProfileEnable" onchange="toggleMinDecoProfile()">
 <option selected="" value="no">Off</option>
 <option value="yes">On</option>
 </select>
 </div>
-<div class="field-row-inline" id="minDecoProfileFields" style="display:none;gap:12px;">
-<div class="field">
+<div id="minDecoProfileFields" style="display:none;">
+<div class="adv-row">
 <label id="minDeco9mLabel">9m (min)</label>
 <input id="minDeco9m" max="10" min="1" step="1" type="number" value="1"/>
 </div>
-<div class="field">
+<div class="adv-row">
 <label id="minDeco6mLabel">6m (min)</label>
 <input id="minDeco6m" max="10" min="1" step="1" type="number" value="3"/>
 </div>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>Stop Rounding <span class="tip-icon" onclick="showTip('Stop Rounding','Whether stop times are rounded to whole minutes.\nNo = fractional (Buhlmann default).\nYes (MultiDeco) = whole-minute rounding, matching MultiDeco output.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="stopRounding">
 <option value="fractional">No</option>
 <option selected="" value="wholeminute">Yes (MultiDeco)</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>Transit Mode <span class="tip-icon" onclick="showTip('Transit Mode','How deco-zone ascent transits between stops are modelled.\n\nSchreiner (accurate): tissues off-gas via Schreiner equation during each ascent segment. Most physically correct. Stop durations reflect actual hold time at depth only.\n\nMultiDeco compatible: ascent between stops is treated as instantaneous for tissue loading (matches MultiDeco 4.x). Transit time is added to the displayed stop duration, so stop times and run times match MultiDeco output exactly. Slightly more conservative.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="decoTransitMode">
 <option value="schreiner">Schreiner (accurate)</option>
 <option selected="" value="multideco">MultiDeco compatible</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>Shallow GF <span class="tip-icon" onclick="showTip('Shallow GF','Modifies the GF slope so GF High is reached at the last deco stop rather than at the surface.\n\nOff (default, standard): GF interpolates from GF Low at the first stop to GF High at the surface. The last stop is cleared at a GF slightly below GF High.\n\nOn (MultiDeco-compatible): GF High is applied from the last stop onward. The last stop is held until tissues clear at the full GF High limit, not an intermediate value. This is more conservative at the final stop and produces slightly longer last-stop times.\n\nUse On to match MultiDeco shallow gradient conservatism mode. Keep Off for standard Bühlmann GF behaviour.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="shallowGradient">
 <option selected="" value="off">Off (standard GF)</option>
 <option value="on">On (MultiDeco-compatible)</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>Water Vapor <span class="tip-icon" onclick="showTip('Water Vapor','Alveolar water vapor pressure used in tissue loading calculations.\n0.0627 bar = Buhlmann standard.\n0.0577 bar = MultiDeco standard.\nPair with Stop Rounding to match target tool.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="waterVapor" onchange="updateWaterVapor()">
 <option value="0.0627">0.0627 bar (Bühlmann)</option>
 <option selected="" value="0.0577">0.0577 bar (MultiDeco)</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>He HT Comp 1 <span class="tip-icon" onclick="showTip('He Half-Time','Helium half-time for the fastest (compartment 1) tissue.\n\nBaker 1.88 min — canonical VPM-B value (Baker FORTRAN 1998, ApexDeco, MultiDeco).\nBühlmann 1.51 min — Bühlmann 2003 textbook value (Subsurface, Shearwater, DivePro).\n\nRatio to N2 comp 1 (4.0 min):\n Baker: 4.0 / 1.88 = 2.13\n Bühlmann: 4.0 / 1.51 = 2.65 (≈ √(28/4), physical diffusion ratio)\n\nPractical difference: negligible for dives &gt;15 min. Only measurable on very short deep bounce dives where fast-compartment He loading is significant.\n\nDefault: Baker 1.88 (matches VPM-B and ApexDeco).')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="heHalfTimeMode" onchange="updateHeHalfTime()">
 <option selected="" value="baker">1.88 min (Baker / VPM-B)</option>
 <option value="buhl2003">1.51 min (Bühlmann 2003)</option>
 </select>
 </div>
-<div class="field">
-<label>BT SAC (L/min)</label>
+<div class="adv-row"><label>BT SAC (L/min)</label>
 <input id="sacBottom" max="60" min="5" step="1" type="number" value="22"/>
 </div>
-<div class="field">
-<label>Deco SAC (L/min)</label>
+<div class="adv-row"><label>Deco SAC (L/min)</label>
 <input id="sacDeco" max="40" min="5" step="1" type="number" value="20"/>
 </div>
-</div>
-<div class="form-grid" style="margin-top:10px;">
-<div class="field">
+<div class="adv-row">
 <label>N₂ Narcotic <span class="tip-icon" onclick="showTip('N2 Narcotic','Whether N2 is counted as narcotic when calculating Equivalent Narcotic Depth (END).\nYes = NOAA/IANTD standard.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="n2NarcSel" onchange="setNarcosis('n2', this.value==='yes')">
 <option selected="" value="yes">Yes</option>
 <option value="no">No</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>O₂ Narcotic <span class="tip-icon" onclick="showTip('O2 Narcotic','Whether O2 is counted as narcotic when calculating Equivalent Narcotic Depth (END).\nYes = NOAA/IANTD standard.\nNo = some technical agencies exclude O2.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="o2NarcSel" onchange="setNarcosis('o2', this.value==='yes')">
 <option selected="" value="yes">Yes</option>
 <option value="no">No</option>
 </select>
 </div>
-<div class="field">
-<label>Max Bottom ppO₂</label>
+<div class="adv-row"><label>Max Bottom ppO₂</label>
 <select id="ppo2Bottom" onchange="updateGasMODDisplays()">
 <option value="1.6">1.6 bar</option>
 <option value="1.5">1.5 bar</option>
@@ -2007,8 +2007,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <option value="1.2">1.2 bar</option>
 </select>
 </div>
-<div class="field">
-<label>Max Deco ppO₂</label>
+<div class="adv-row"><label>Max Deco ppO₂</label>
 <select id="ppo2Deco" onchange="updateGasMODDisplays()">
 <option selected="" value="1.6">1.6 bar</option>
 <option value="1.5">1.5 bar</option>
@@ -2016,14 +2015,14 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <option value="1.2">1.2 bar</option>
 </select>
 </div>
-<div class="field">
+<div class="adv-row">
 <label>O₂ @ MOD <span class="tip-icon" onclick="showTip('O2 @ MOD','Controls how pure O2 (100%) MOD is calculated.\n\n• Allow at MOD: O2 is always usable at 6m — real-world standard (Shearwater, V-Planner).\n• Strict ppO2: O2 subject to the ppO2 limit check; at 1.6 bar limit it still yields 6m, but at 1.5 bar it gives 5m.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="o2AtMODSelect" onchange="setAllowO2AtMOD(this.value === 'on');updateGasMODDisplays()">
 <option selected="" value="on">Allow at MOD</option>
 <option value="off">Strict ppO₂</option>
 </select>
 </div>
-</div><!-- end form-grid inside advanced -->
+</div>
 </div><!-- end advancedSettingsBody -->
 </div><!-- end advancedSettingsSection -->
 <!-- Gas Mix 1 — Bottom Gas -->
@@ -3346,7 +3345,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.22';
+const APP_VERSION = '2.20.23';
 window.APP_VERSION = APP_VERSION;
 // Test harness: skip DOM recalc storms when loaded inside tests-massive.html iframe
 (function() {
@@ -3844,8 +3843,10 @@ function updateHeHalfTime() {
   const src = mode === 'baker' ? ZHL16C_HE_HT_BAKER : ZHL16C_HE_HT_BUHL2003;
   // Update global array in-place (preserves all references)
   for (let i = 0; i < 16; i++) ZHL16C_HE_HT[i] = src[i];
-  // Patch VPMEngine's internal ZHL16C_He[0].ht to match
-  if (window.VPMEngine && typeof window.VPMEngine._setHeHT1 === 'function') {
+  // Patch VPMEngine's internal ZHL16C_He[].ht to match (comp [0] differs: 1.88 vs 1.51)
+  if (window.VPMEngine && typeof window.VPMEngine._syncHeHalfTimes === 'function') {
+    window.VPMEngine._syncHeHalfTimes(src);
+  } else if (window.VPMEngine && typeof window.VPMEngine._setHeHT1 === 'function') {
     window.VPMEngine._setHeHT1(src[0]);
   }
 }
@@ -3863,6 +3864,19 @@ let stopDepthM = 6;
     let allowO2AtMOD = true;
 let stopDurMin = 3;
 let mGF        = { low: 20, high: 85 }; // matches default preset 20/85
+window._gfSyncSilent = false; // suppress gfLow/gfHigh onchange while setGF syncs programmatically
+
+function _findGfPresetOption(low, high) {
+  const sel = document.getElementById('gfPresetSelect');
+  if (!sel) return null;
+  const isVPMBGFS = document.getElementById('algorithmSelect')?.value === 'VPMB_GFS';
+  const presetVal = isVPMBGFS ? `hi/${high}` : `${low}/${high}`;
+  return Array.from(sel.options).find(o => o.value === presetVal) || null;
+}
+
+function syncGfPresetFromValues() {
+  if (typeof setGF === 'function') setGF(mGF.low, mGF.high);
+}
 let lastTissues = null;
 
 // ═══════════════════════════════════════════════
@@ -4320,23 +4334,19 @@ function setGF(low, high) {
   mGF.low = low;
   mGF.high = high;
 
-  // Sync input fields
+  // Sync input fields (silent — programmatic updates must not fire setCustomGF via onchange)
   const lowInput  = document.getElementById('gfLowInput');
   const highInput = document.getElementById('gfHighInput');
+  window._gfSyncSilent = true;
   if (lowInput)  lowInput.value  = low;
   if (highInput) highInput.value = high;
+  window._gfSyncSilent = false;
 
   // Sync GF dropdown
   const sel = document.getElementById('gfPresetSelect');
   if (sel) {
     const isVPMBGFS = document.getElementById('algorithmSelect')?.value === 'VPMB_GFS';
-    let opt;
-    if (isVPMBGFS) {
-      // Match hi/N format for VPM-B/GFS
-      opt = Array.from(sel.options).find(o => o.value === `hi/${high}`);
-    } else {
-      opt = Array.from(sel.options).find(o => o.value === `${low}/${high}`);
-    }
+    const opt = _findGfPresetOption(low, high);
     sel.value = opt ? opt.value : 'custom';
     const customRow = document.getElementById('gfCustomRow');
     if (!opt) {
@@ -4345,9 +4355,13 @@ function setGF(low, high) {
         // Custom for VPM-B/GFS: only show High
         const lowField = document.getElementById('gfLowPair');
         if (lowField) lowField.style.display = 'none';
+        window._gfSyncSilent = true;
         if (highInput) highInput.value = high;
+        window._gfSyncSilent = false;
       } else {
+        window._gfSyncSilent = true;
         if (lowInput && highInput) { lowInput.value = low; highInput.value = high; }
+        window._gfSyncSilent = false;
       }
     } else {
       if (customRow) customRow.style.display = 'none';
@@ -4374,6 +4388,7 @@ function setGF(low, high) {
 }
 
 function setCustomGF(commit) {
+  if (window._gfSyncSilent) return;
   // commit=true (onchange): clamp + apply immediately
   // commit=false (oninput): just update mGF preview, no clamping mid-type
   const clamp = (commit !== false);
@@ -4612,7 +4627,7 @@ function shortMixLabel(m) {
   if (!s) return '-';
   if (/^\d+\/\d+$/.test(s)) return s;
   if (s === '100%') return '100%';
-  if (/air/i.test(s)) return 'Air';
+  if (/^air$/i.test(s)) return 'Air';
   if (/^100/i.test(s)) return '100%';
   const ean = s.match(/[Ee][Aa][Nn]\s*(\d+)/); if (ean) return ean[1] + '/00';
   const pct = s.match(/(\d+)%/); if (pct) return pct[1] + '/00';
@@ -6712,7 +6727,7 @@ function renderVPMResults(result, settings, depthM, bt, bottomO2pct, bottomHePct
     const mixRaw = tds[3]?.textContent?.trim() || '';
     const stopRaw = tds[2]?.textContent?.trim() || '';
     const depthRaw = tds[1]?.textContent?.trim() || '';
-    const depthM2 = parseFloat(depthRaw) || 0;
+    const depthM2 = endParseDepthM(depthRaw) ?? (parseFloat(depthRaw) || 0);
     const durMin = (() => { const p = stopRaw.split(':'); return p.length===2 ? parseInt(p[0]) + parseInt(p[1])/60 : parseFloat(stopRaw)||0; })();
     if (!durMin || !mixRaw || mixRaw === '-') return;
     const gasKey = mixRaw; // labels now always in O2/He format (e.g. '50/00', '21/35', '100/00')
@@ -8522,6 +8537,19 @@ const VPMEngine = (() => {
     return {
         calculate,
         createVPMState,
+        /** Sync all 16 He compartment half-times from ZHL16C_HE_HT array (Baker / Bühlmann 2003). */
+        _syncHeHalfTimes: function(htArray) {
+            for (let i = 0; i < 16 && htArray && i < htArray.length; i++) {
+                if (ZHL16C_He[i]) {
+                    const v = htArray[i];
+                    ZHL16C_He[i].ht = (v != null && typeof v === 'object') ? v.ht : v;
+                }
+            }
+        },
+        /** Compartment-1-only shortcut — kept for callers that pass a single ht value. */
+        _setHeHT1: function(htRow) {
+            if (ZHL16C_He[0]) ZHL16C_He[0].ht = (htRow != null && typeof htRow === 'object') ? htRow.ht : htRow;
+        },
         MODELS: ['VPMA', 'VPMB', 'VPMBE', 'VPMB_GFS', 'VPMBFBO'],
         MODEL_NAMES: {
             'VPMA': 'VPM-A',
@@ -10104,12 +10132,13 @@ const ZHLEngine = (() => {
     }
 
     // ── Run the Bühlmann engine (headless — skip DOM rendering) ─────────────
+    const _headlessEntry = !!window._zhlHeadless;
     window._zhlHeadless = true;
     window._lastPlan = null;
     try {
       runDecoSchedule();
     } catch(e) {
-      window._zhlHeadless = false;
+      window._zhlHeadless = _headlessEntry;
       window._zhlRepState = null;   // clear on error path too
       window._priorDiveCarry = _prevPriorDiveCarry; // restore on error path too
       mGF.low = prevGF.low; mGF.high = prevGF.high;
@@ -10117,7 +10146,7 @@ const ZHLEngine = (() => {
       if (algoEl) algoEl.value = prevAlgo;
       return { error: e.message, stops: [], plan: [], totalRuntime: 0 };
     }
-    window._zhlHeadless = false;
+    window._zhlHeadless = _headlessEntry;
 
     const lp = window._lastPlan;
 
@@ -16310,6 +16339,7 @@ var appSettings = {
     'decoDepth', 'decoBT', 'decoGas', 'decoCustomO2',
     'descentRate', 'ascentRate', 'decoAscentRate', 'surfaceAscentRate', 'decoStep', 'lastDecoStop',
     'minStopTime', 'stopRounding', 'waterVapor', 'ppo2Bottom', 'ppo2Deco',
+    'n2NarcSel', 'o2NarcSel', 'o2AtMODSelect',
     'shallowGradient',
     'minDecoProfileEnable', 'minDeco9m', 'minDeco6m',
     'algorithmSelect', 'conservatismSelect', 'gfPresetSelect', 'gfLowInput', 'gfHighInput',
@@ -17093,15 +17123,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Try to load immediately
   appSettings.load();
-  if (!localStorage.getItem('lspDiveSettingsv6')) {
-    var __lspDefaults = {descentRate:'20', ascentRate:'10', decoAscentRate:'3', surfaceAscentRate:'3', minStopTime:'2', stopRounding:'wholeminute', decoTransitMode:'multideco', waterVapor:'0.0577', minDecoProfileEnable:'no', minDeco9m:'1', minDeco6m:'3'};
+  if (!localStorage.getItem('lspDiveSettings_v6')) {
+    setGF(20, 85);
+    var __lspDefaults = {descentRate:'20', ascentRate:'10', decoAscentRate:'3', surfaceAscentRate:'3', minStopTime:'2', stopRounding:'wholeminute', decoTransitMode:'multideco', waterVapor:'0.0577', minDecoProfileEnable:'no', minDeco9m:'1', minDeco6m:'3', gfPresetSelect:'20/85'};
     Object.keys(__lspDefaults).forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.value = __lspDefaults[id];
     });
+    handleGFSelect('20/85');
   }
   updateWaterVapor(); // apply after settings loaded
   setDecoAlgorithm(document.getElementById('algorithmSelect')?.value || 'ZHLC_GF', true);
+  syncGfPresetFromValues();
   // Sync He half-time mode to ZHL16C_HE_HT array and VPMEngine on startup
   updateHeHalfTime();
   // Apply persisted END column state on load (button label + table class)
@@ -17113,6 +17146,7 @@ document.addEventListener('DOMContentLoaded', function() {
     appSettings.load();
     updateWaterVapor();
     updateHeHalfTime(); // re-sync after VPMEngine fully ready
+    syncGfPresetFromValues();
   }, 1000);
 });
 
@@ -17123,6 +17157,7 @@ window.addEventListener('load', function() {
     console.log('[LSP] Final retry load');
     appSettings.load();
     updateWaterVapor();
+    syncGfPresetFromValues();
   }, 500);
 });
 </script>
