@@ -3345,7 +3345,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.24';
+const APP_VERSION = '2.20.25';
 window.APP_VERSION = APP_VERSION;
 // Test harness: skip DOM recalc storms when loaded inside tests-massive.html iframe
 (function() {
@@ -4484,6 +4484,29 @@ function switchTab(name, btn) {
 // ═══════════════════════════════════════════════
 function mToFt(m)    { return Math.round(m * 3.28084); }
 function depthDisp(m, u) { return u === 'metric' ? `${m} m` : `${mToFt(m)} ft`; }
+/** DOM depth input → metres (handles imperial ft stored in .value). */
+function domDepthToM(idOrVal) {
+  const raw = (typeof idOrVal === 'string' && document.getElementById(idOrVal))
+    ? document.getElementById(idOrVal).value
+    : idOrVal;
+  const v = parseFloat(raw);
+  if (Number.isNaN(v)) return 0;
+  return units === 'imperial' ? v / 3.28084 : v;
+}
+/** PrT from depth (m) and bottom time (min). */
+function calcPrTBarMin(depthM, btMin) {
+  return depthM * BAR_PER_METRE * Math.sqrt(parseFloat(btMin) || 0);
+}
+/** Select .value stored in metric → display number for current units. */
+function domMetricValToDisp(val) {
+  const n = parseFloat(val);
+  if (Number.isNaN(n)) return val;
+  return units === 'imperial' ? Math.round(n * 3.28084) : n;
+}
+function altLabelDisp(altM) {
+  if (!altM) return units === 'imperial' ? 'Sea level (0 ft)' : 'Sea level (0 m)';
+  return units === 'imperial' ? `${mToFt(altM)} ft` : `${altM} m`;
+}
 function formatDecoZoneStart(depthM) {
   if (!depthM || depthM <= 0) return '—';
   const dU = units === 'metric';
@@ -4697,19 +4720,19 @@ function buildDecoPlanHeaderData() {
   const density = _densityMap[localStorage.getItem('waterDensity') || 'en13319'];
   const du = units === 'imperial' ? 'ft' : 'm';
   const altM = typeof altitudeM !== 'undefined' ? altitudeM : 0;
-  const altLabel = altM === 0 ? 'Sea level (0 m)' : `${altM} m`;
+  const altLabel = altLabelDisp(altM);
   const acclLabel = (typeof altAcclimatized !== 'undefined' ? altAcclimatized : true) ? 'Yes' : 'No';
 
   const depth = document.getElementById('decoDepth')?.value || '-';
   const bt = document.getElementById('decoBT')?.value || '-';
   const gfLow = mGF?.low ?? '-';
   const gfHigh = mGF?.high ?? '-';
-  const ascentRate = document.getElementById('ascentRate')?.value || '-';
-  const decoAscentRate = document.getElementById('decoAscentRate')?.value || '-';
-  const surfAscentRate = document.getElementById('surfaceAscentRate')?.value || '-';
-  const descentRate = document.getElementById('descentRate')?.value || '-';
-  const lastStop = document.getElementById('lastDecoStop')?.value || '-';
-  const decoStep = document.getElementById('decoStep')?.value || '-';
+  const ascentRate = domMetricValToDisp(document.getElementById('ascentRate')?.value || '-');
+  const decoAscentRate = domMetricValToDisp(document.getElementById('decoAscentRate')?.value || '-');
+  const surfAscentRate = domMetricValToDisp(document.getElementById('surfaceAscentRate')?.value || '-');
+  const descentRate = domMetricValToDisp(document.getElementById('descentRate')?.value || '-');
+  const lastStop = domMetricValToDisp(document.getElementById('lastDecoStop')?.value || '-');
+  const decoStep = domMetricValToDisp(document.getElementById('decoStep')?.value || '-');
 
   const decoModelSel = document.getElementById('algorithmSelect')?.value || 'ZHLC_GF';
   const isVPMExport = decoModelSel === 'VPMB' || decoModelSel === 'VPMB_GFS';
@@ -4749,8 +4772,8 @@ function buildDecoPlanHeaderData() {
   const wvLblTxt = wvTxt <= 0.058 ? 'M' : 'B';
 
   const _expMdpEn = document.getElementById('minDecoProfileEnable')?.value === 'yes';
-  const _expMdp9m = document.getElementById('minDeco9m')?.value || '1';
-  const _expMdp6m = document.getElementById('minDeco6m')?.value || '3';
+  const _expMdp9m = domMetricValToDisp(document.getElementById('minDeco9m')?.value || '1');
+  const _expMdp6m = domMetricValToDisp(document.getElementById('minDeco6m')?.value || '3');
   const _depthUnit = units === 'imperial' ? 'ft' : 'm';
 
   return {
@@ -6164,10 +6187,12 @@ function _updateAdvancedSummary() {
   const body = document.getElementById('advancedSettingsBody');
   if (body && body.style.display !== 'none') { el.textContent = ''; return; }
   const parts = [];
-  const dr = document.getElementById('descentRate')?.value; if (dr && dr !== '20') parts.push(dr+'↓m/min');
-  const ar = document.getElementById('ascentRate')?.value; if (ar && ar !== '10') parts.push(ar+'↑m/min');
-  const dar = document.getElementById('decoAscentRate')?.value; if (dar && dar !== '3') parts.push(dar+'↑deco');
-  const ls = document.getElementById('lastDecoStop')?.value; if (ls && ls !== '3') parts.push('last '+ls+'m');
+  const uRate = units === 'imperial' ? 'ft/min' : 'm/min';
+  const uDepth = units === 'imperial' ? 'ft' : 'm';
+  const dr = document.getElementById('descentRate')?.value; if (dr && dr !== '20') parts.push(domMetricValToDisp(dr)+'↓'+uRate);
+  const ar = document.getElementById('ascentRate')?.value; if (ar && ar !== '10') parts.push(domMetricValToDisp(ar)+'↑'+uRate);
+  const dar = document.getElementById('decoAscentRate')?.value; if (dar && dar !== '3') parts.push(domMetricValToDisp(dar)+'↑deco');
+  const ls = document.getElementById('lastDecoStop')?.value; if (ls && ls !== '3') parts.push('last '+domMetricValToDisp(ls)+uDepth);
   const ms = document.getElementById('minStopTime')?.value; if (ms && ms !== '2') parts.push('min '+ms+'min');
   const wv = document.getElementById('waterVapor')?.value; if (wv === '0.0627') parts.push('WV Bühl');
   const tr = document.getElementById('decoTransitMode')?.value; if (tr === 'schreiner') parts.push('Schreiner');
@@ -6231,6 +6256,9 @@ function _doResetToDefaults(userDefaults) {
     lastDecoStop:     '3',
     minStopTime:      '2',
     stopRounding:     'wholeminute',
+    decoTransitMode:  'multideco',
+    shallowGradient:  'off',
+    o2AtMODSelect:    'on',
     waterVapor:       '0.0577',
     // ppO2 limits
     ppo2Bottom:       '1.4',
@@ -6321,6 +6349,7 @@ function _doResetToDefaults(userDefaults) {
 
   // Apply water vapor constant
   updateWaterVapor();
+  setAllowO2AtMOD(defaults.o2AtMODSelect === 'on');
 
   // Clear custom O2 fields visibility
   toggleDecoCustomO2?.('dg1Mix', 'dg1CustomField');
@@ -8855,7 +8884,7 @@ function runDecoSchedule() {
   const minStopT   = parseFloat(document.getElementById('minStopTime').value) || 1;
   const switchPauseT = 0;
   const wholeMinStops = (document.getElementById('stopRounding')?.value || 'fractional') === 'wholeminute';
-  const mdCompatMode  = (document.getElementById('decoTransitMode')?.value || 'schreiner') === 'multideco';
+  const mdCompatMode  = (document.getElementById('decoTransitMode')?.value || 'multideco') === 'multideco';
   updateWaterVapor();
   const ppo2High = ppo2Deco;
   const ppo2Mid  = 1.5;         // mid-band: 28–44% O2 → 1.5 bar (not ppo2Bottom)
@@ -13106,7 +13135,7 @@ function buildExportText(mode) {
   // ── altitude + acclimatize helper ──
   const altM      = (typeof altitudeM !== 'undefined') ? altitudeM : 0;
   const altAccl   = (typeof altAcclimatized !== 'undefined') ? altAcclimatized : true;
-  const altLabel  = altM === 0 ? 'Sea level (0 m)' : `${altM} m`;
+  const altLabel  = altLabelDisp(altM);
   const acclLabel = altAccl ? 'Yes' : 'No';
 
   // ── helper: clean DOM text (strip emoji, fix subscripts) ──
@@ -13215,7 +13244,7 @@ function buildExportText(mode) {
 
     // PrT fallback if not in totals row
     if (planSum.prt === '-') {
-      const prtN = (parseFloat(depth) * BAR_PER_METRE) * Math.sqrt(parseFloat(bt));
+      const prtN = calcPrTBarMin(domDepthToM('decoDepth'), bt);
       if (!isNaN(prtN)) planSum.prt = prtN.toFixed(1);
     }
 
@@ -14008,7 +14037,7 @@ function buildMessengerText(mode) {
     const dtV  = document.getElementById('decoDecoTimeDisplay')?.textContent?.trim().replace(/\s*min\s*/,'') || '-';
     const cnsV = document.getElementById('decoCNSDisplay')?.textContent?.trim() || '-';
     const otuV = document.getElementById('decoOTUDisplay')?.textContent?.trim() || '-';
-    const prtN = (parseFloat(document.getElementById('decoDepth')?.value||'0') * BAR_PER_METRE) * Math.sqrt(parseFloat(document.getElementById('decoBT')?.value||'0'));
+    const prtN = calcPrTBarMin(domDepthToM('decoDepth'), document.getElementById('decoBT')?.value || '0');
     planSumCopy.runTime = `${rtV}'00"`;
     planSumCopy.decoTime = `${dtV}'00"`;
     planSumCopy.cns = cnsV;
@@ -14016,7 +14045,7 @@ function buildMessengerText(mode) {
     planSumCopy.prt = isNaN(prtN) ? '-' : prtN.toFixed(1);
   }
   if (planSumCopy.prt === '-') {
-    const prtN = (parseFloat(document.getElementById('decoDepth')?.value||'0') * BAR_PER_METRE) * Math.sqrt(parseFloat(document.getElementById('decoBT')?.value||'0'));
+    const prtN = calcPrTBarMin(domDepthToM('decoDepth'), document.getElementById('decoBT')?.value || '0');
     if (!isNaN(prtN)) planSumCopy.prt = prtN.toFixed(1);
   }
   result.push('-'.repeat(28));
@@ -14336,9 +14365,9 @@ function calcContingency() {
   resultEl.style.display = 'block';
   const _emRunFmt  = lastRunFmt  || `${lastRun}'00"`;
   const _emDecoFmt = decoTimeFmt || `${decoTime}'00"`;
-  const _emDepth   = parseFloat(document.getElementById('decoDepth')?.value || '0');
+  const _emDepthM  = domDepthToM('decoDepth');
   const _emBT      = parseFloat(document.getElementById('decoBT')?.value || '0') + (contExtraBT || 0);
-  const _emPrT     = (_emDepth * BAR_PER_METRE * Math.sqrt(_emBT)).toFixed(1);
+  const _emPrT     = calcPrTBarMin(_emDepthM, _emBT).toFixed(1);
   const _emOTU     = totalOTUc || '—';
   const cnsColor   = totalCNS && parseFloat(totalCNS) >= 100 ? 'var(--red)' : totalCNS && parseFloat(totalCNS) >= 80 ? 'var(--orange)' : 'var(--text)';
   const prtColorEm = parseFloat(_emPrT) < 15 ? 'var(--green)' : parseFloat(_emPrT) < 25 ? 'var(--yellow)' : parseFloat(_emPrT) < 40 ? 'var(--orange)' : 'var(--red)';
