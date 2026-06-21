@@ -815,26 +815,51 @@ function saveState() {
   updateWidgetSnapshot();
 }
 
-function updateWidgetSnapshot() {
+function widgetModeLabel(trip) {
+  if (trip.returnMode) return 'return';
+  if (trip.unpackMode) return 'unpack';
+  return 'pack';
+}
+
+function buildWidgetPayload() {
   const tripId = state.settings && state.settings.pinnedTripId;
-  if (!tripId) return;
+  if (!tripId) {
+    return JSON.stringify({ name: 'Get In Water', remaining: -1, total: 0, done: 0, mode: 'pack' });
+  }
   const trip = state.trips.find(t => t.id === tripId);
-  if (!trip || trip.archived) return;
+  if (!trip || trip.archived) {
+    return JSON.stringify({ name: 'Get In Water', remaining: -1, total: 0, done: 0, mode: 'pack' });
+  }
   ensureTripShape(trip);
   const p = tripProgress(trip);
-  const payload = JSON.stringify({
+  return JSON.stringify({
     name: trip.name,
     remaining: p.total - p.done,
     total: p.total,
     done: p.done,
+    mode: widgetModeLabel(trip),
     updated: Date.now()
   });
+}
+
+function pushWidgetToNative(payload) {
+  if (!window.Capacitor || !Capacitor.isNativePlatform || !Capacitor.isNativePlatform()) return;
+  const tryUpdate = () => {
+    const wb = Capacitor.Plugins && Capacitor.Plugins.WidgetBridge;
+    if (wb && wb.update) return wb.update({ json: payload });
+    return Promise.reject(new Error('WidgetBridge unavailable'));
+  };
+  tryUpdate().catch(() => {
+    setTimeout(() => { tryUpdate().catch(() => {}); }, 300);
+    setTimeout(() => { tryUpdate().catch(() => {}); }, 1200);
+  });
+}
+
+function updateWidgetSnapshot() {
+  const payload = buildWidgetPayload();
   try {
     localStorage.setItem('giw_widget', payload);
-    if (window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) {
-      const wb = Capacitor.Plugins && Capacitor.Plugins.WidgetBridge;
-      if (wb && wb.update) wb.update({ json: payload }).catch(() => {});
-    }
+    pushWidgetToNative(payload);
   } catch (e) {}
 }
 
@@ -2889,6 +2914,18 @@ ensureSettingsFromData(state);
 initBubbles();
 updateWidgetSnapshot();
 render();
+
+if (window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) {
+  const appPlugin = Capacitor.Plugins && Capacitor.Plugins.App;
+  if (appPlugin && appPlugin.addListener) {
+    appPlugin.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) updateWidgetSnapshot();
+    });
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) updateWidgetSnapshot();
+  });
+}
 </script>
 <script>
 if ('serviceWorker' in navigator) {
