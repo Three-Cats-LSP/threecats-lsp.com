@@ -3345,7 +3345,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.26';
+const APP_VERSION = '2.20.27';
 window.APP_VERSION = APP_VERSION;
 // Test harness: skip DOM recalc storms when loaded inside tests-massive.html iframe
 (function() {
@@ -14369,7 +14369,7 @@ function calcContingency() {
   resultEl.style.display = 'block';
   const _emRunFmt  = lastRunFmt  || `${lastRun}'00"`;
   const _emDecoFmt = decoTimeFmt || `${decoTime}'00"`;
-  const _emDepthM  = domDepthToM('decoDepth');
+  const _emDepthM  = domDepthToM('decoDepth') + (contExtraDepth || 0);
   const _emBT      = parseFloat(document.getElementById('decoBT')?.value || '0') + (contExtraBT || 0);
   const _emPrT     = calcPrTBarMin(_emDepthM, _emBT).toFixed(1);
   const _emOTU     = totalOTUc || '—';
