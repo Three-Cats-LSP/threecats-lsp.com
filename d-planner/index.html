@@ -3345,7 +3345,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.25';
+const APP_VERSION = '2.20.26';
 window.APP_VERSION = APP_VERSION;
 // Test harness: skip DOM recalc storms when loaded inside tests-massive.html iframe
 (function() {
@@ -8683,9 +8683,13 @@ function renumberDecoGasCards() {
   if (btn) btn.style.display = _dgCardCount() >= _DG_MAX ? 'none' : 'block';
 }
 
-function addDecoGasCard() {
+function addDecoGasCard(forcedIdx) {
   if (_dgCardCount() >= _DG_MAX) return;
-  const idx = _dgNextIdx++;
+  const idx = forcedIdx != null ? forcedIdx : _dgNextIdx++;
+  if (forcedIdx != null) {
+    if (document.getElementById(`dgCard_${idx}`) || document.getElementById(`dg${idx}Mix`)) return;
+    _dgNextIdx = Math.max(_dgNextIdx, idx + 1);
+  }
   const n = _dgCardCount() + 1; // after insertion, this will be card n
   const mixNum = n + 1;
 
@@ -16377,11 +16381,23 @@ var appSettings = {
     'botTrimixO2', 'botTrimixHe',
     'dg1Mix', 'dg1CustomO2', 'dg2Mix', 'dg2CustomO2',
     'dg1TrimixO2', 'dg1TrimixHe', 'dg2TrimixO2', 'dg2TrimixHe',
+    'dg3Mix', 'dg3CustomO2', 'dg3TrimixO2', 'dg3TrimixHe',
+    'dg4Mix', 'dg4CustomO2', 'dg4TrimixO2', 'dg4TrimixHe',
+    'dg5Mix', 'dg5CustomO2', 'dg5TrimixO2', 'dg5TrimixHe',
+    'dg6Mix', 'dg6CustomO2', 'dg6TrimixO2', 'dg6TrimixHe',
+    'dg7Mix', 'dg7CustomO2', 'dg7TrimixO2', 'dg7TrimixHe',
+    'dg8Mix', 'dg8CustomO2', 'dg8TrimixO2', 'dg8TrimixHe',
     'vpmRepMode', 'vpmSurfaceInterval',
     'sacBottom', 'sacDeco',
     'cylBot_size', 'cylBot_pres', 'cylBot_reserve',
     'cylDg1_size', 'cylDg1_pres', 'cylDg1_reserve',
     'cylDg2_size', 'cylDg2_pres', 'cylDg2_reserve',
+    'cylDg3_size', 'cylDg3_pres',
+    'cylDg4_size', 'cylDg4_pres',
+    'cylDg5_size', 'cylDg5_pres',
+    'cylDg6_size', 'cylDg6_pres',
+    'cylDg7_size', 'cylDg7_pres',
+    'cylDg8_size', 'cylDg8_pres',
     'cylTravelGas_size', 'cylTravelGas_pres', 'cylTravelGas_reserve',
     'gpBot_size', 'gpBot_fill', 'gpBot_reserve',
     'gpTravel_size', 'gpTravel_fill', 'gpTravel_reserve',
@@ -16446,6 +16462,10 @@ var appSettings = {
         values[id] = el.value || '';
       }
     });
+
+    if (typeof getAllDecoGasIds === 'function') {
+      values['__decoGasIds__'] = JSON.stringify(getAllDecoGasIds());
+    }
     
     try {
       localStorage.setItem('lspDiveSettings_v6', JSON.stringify(values));
@@ -16502,8 +16522,29 @@ var appSettings = {
     }
   },
 
+  // Recreate dynamic deco gas cards (dg3–dg8) before restoring their field values
+  _restoreDecoGasCards: function(values) {
+    let savedIds = values['__decoGasIds__'];
+    if (typeof savedIds === 'string') {
+      try { savedIds = JSON.parse(savedIds); } catch (e) { savedIds = null; }
+    }
+    if (!Array.isArray(savedIds)) {
+      savedIds = [1, 2];
+      for (let n = 3; n <= 8; n++) {
+        if (Object.prototype.hasOwnProperty.call(values, `dg${n}Mix`)) savedIds.push(n);
+      }
+    }
+    if (typeof addDecoGasCard !== 'function') return;
+    savedIds.filter(id => id > 2).sort((a, b) => a - b).forEach(idx => {
+      if (!document.getElementById(`dg${idx}Mix`)) addDecoGasCard(idx);
+    });
+    if (typeof renumberDecoGasCards === 'function') renumberDecoGasCards();
+  },
+
   // Helper to restore field values
   _restoreFields: function(values) {
+    this._restoreDecoGasCards(values);
+
     let restored = 0;
     const allPossible = this.getAllPossibleFields();
 
@@ -16524,6 +16565,17 @@ var appSettings = {
     };
 
     allPossible.forEach(id => restoreOne(id));
+
+    if (typeof getAllDecoGasIds === 'function') {
+      for (const idx of getAllDecoGasIds()) {
+        const mixEl = document.getElementById(`dg${idx}Mix`);
+        if (mixEl && typeof toggleDecoCustomO2 === 'function') {
+          toggleDecoCustomO2(`dg${idx}Mix`, `dg${idx}CustomField`);
+        }
+        if (typeof toggleDecoTrimix === 'function') toggleDecoTrimix(idx);
+      }
+      if (typeof updateGasMODDisplays === 'function') updateGasMODDisplays();
+    }
 
     console.log('[LSP] ✅ Settings restored (' + restored + ' fields) - Algo: ' + (values['__algo__'] || 'padi'));
   },
