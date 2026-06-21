@@ -3345,7 +3345,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.23';
+const APP_VERSION = '2.20.24';
 window.APP_VERSION = APP_VERSION;
 // Test harness: skip DOM recalc storms when loaded inside tests-massive.html iframe
 (function() {
@@ -4603,6 +4603,7 @@ function getPlanSummaryExport(fromTotalsEl) {
     cns: '-', otu: '-', prt: '-',
     decozone: formatDecoZoneStart(lp.decoZoneStart),
     decoStop: formatDecoStopDepth(lp.firstStopDepth),
+    surfGF: lp.surfaceGF != null ? Math.round(lp.surfaceGF) + '%' : '-',
   };
 }
 
@@ -16338,7 +16339,7 @@ var appSettings = {
   DECO_FIELDS: [
     'decoDepth', 'decoBT', 'decoGas', 'decoCustomO2',
     'descentRate', 'ascentRate', 'decoAscentRate', 'surfaceAscentRate', 'decoStep', 'lastDecoStop',
-    'minStopTime', 'stopRounding', 'waterVapor', 'ppo2Bottom', 'ppo2Deco',
+    'minStopTime', 'stopRounding', 'decoTransitMode', 'waterVapor', 'ppo2Bottom', 'ppo2Deco',
     'n2NarcSel', 'o2NarcSel', 'o2AtMODSelect',
     'shallowGradient',
     'minDecoProfileEnable', 'minDeco9m', 'minDeco6m',
