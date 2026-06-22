@@ -33,7 +33,7 @@
 <p>🌐 <strong>Live app:</strong> https://threecats-lsp.com/d-planner-ccr/</p>
 <p>📦 <strong>GitHub Pages mirror:</strong> https://three-cats-lsp.github.io/LSP_D-planner-CCR/</p>
 <p>📲 <strong>Android APK:</strong> https://threecats-lsp.com/d-planner-ccr/download.html</p>
-<p><strong>Current version: 2.30.30</strong> — Safety Sign-Off release. 85 audit findings (BUG-01–85) closed across 28 independent verification passes. 383/383 <code>audit.py</code> checks passing. See <a href="SAFETY_CERTIFICATION_v2.30.30.md">SAFETY_CERTIFICATION_v2.30.30.md</a>.</p>
+<p><strong>Current version: 2.30.31</strong> — <a href="https://github.com/Three-Cats-LSP/LSP_D-planner-CCR/issues/1">Issue #1</a> deep-audit fix milestone on top of the v2.30.30 safety sign-off. <strong>415/415</strong> <code>audit.py</code> checks passing. See <a href="RELEASE_NOTES_v2.30.31.md">RELEASE_NOTES_v2.30.31.md</a> and <a href="SAFETY_CERTIFICATION_v2.30.30.md">SAFETY_CERTIFICATION_v2.30.30.md</a>.</p>
 <hr>
 <h2>Diver&#x27;s Toolkit</h2>
 <p>All apps at the <a href="https://threecats-lsp.com">Diver&#x27;s Toolkit hub</a>.</p>
@@ -90,11 +90,16 @@
 </ul>
 <hr>
 <h2>Test Suites</h2>
+<p><strong>Release gates (CI on <code>main</code>):</strong> <code>audit.py</code> · <code>dev/run_browser_regression.py</code> · <code>dev/validate_pscr_e2e.py</code> · <code>dev/run_ccr_differential.py</code></p>
+<p>Run the CCR differential suite locally:</p>
+<pre><code>python dev/run_ccr_differential.py</code></pre>
+<p>Reports: <a href="docs/CCR_DIFFERENTIAL_REPORT.md"><code>docs/CCR_DIFFERENTIAL_REPORT.md</code></a> · <a href="dev/ccr_differential_report.json"><code>dev/ccr_differential_report.json</code></a></p>
 <hr>
 <h2>Safety &amp; Verification</h2>
 <ul>
 <li><strong>28 independent audit passes</strong> (v2.30.0 → v2.30.30)</li>
-<li><strong>85 verified findings closed</strong> (BUG-01 through BUG-85)</li>
+<li><strong>85 verified findings closed</strong> (BUG-01 through BUG-85) in the v2.30.30 sign-off; <strong>Issue #1</strong> post-sign-off defects fixed in v2.30.31</li>
+<li><strong>CCR differential harness</strong> (<a href="https://github.com/Three-Cats-LSP/LSP_D-planner-CCR/issues/2">Issue #2</a>) — 17 canonical CCR scenarios compared against captured MultiDeco 2.26 and DiveKit reference goldens</li>
 <li><strong>Full audit trail:</strong> <code>errors_bugs_report_v1.md</code> through <code>errors_bugs_report_v28.md</code></li>
 <li><strong><a href="SAFETY_CERTIFICATION_v2.30.30.md">Safety certification memo</a></strong> — approved for production, 2026-06-21</li>
 </ul>
