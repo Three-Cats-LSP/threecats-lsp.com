@@ -5668,7 +5668,7 @@ function showInputValidationError(resultElId, message, focusEl) {
 // ── Shared engine / UI input validation (GitHub #7) ───────────────────────────
 function validateGasFractionsPct(o2, he, field) {
   const o = Number(o2);
-  const h = Number(he || 0);
+  const h = (he == null || he === '') ? 0 : Number(he);
   if (!Number.isFinite(o) || !Number.isFinite(h) || o < 0 || o > 100 || h < 0 || h > 100 || o + h > 100) {
     return {
       ok: false,
@@ -5692,14 +5692,14 @@ function validateEngineInputs(levels, decoGases) {
       if (!Number.isFinite(level.time) || level.time <= 0) {
         errors.push({ code: 'INVALID_TIME', field: `levels[${index}].time`, message: 'Bottom time must be a positive number.' });
       }
-      const gasCheck = validateGasFractionsPct(level.o2, level.he || 0, `levels[${index}]`);
+      const gasCheck = validateGasFractionsPct(level.o2, level.he, `levels[${index}]`);
       if (!gasCheck.ok) errors.push(gasCheck);
     });
   }
   if (Array.isArray(decoGases)) {
     decoGases.forEach((g, index) => {
       if (g.o2 == null && g.he == null) return;
-      const gasCheck = validateGasFractionsPct(g.o2, g.he || 0, `decoGases[${index}]`);
+      const gasCheck = validateGasFractionsPct(g.o2, g.he, `decoGases[${index}]`);
       if (!gasCheck.ok) errors.push(gasCheck);
     });
   }
@@ -7933,7 +7933,14 @@ const VPMEngine = (() => {
         const validation = validateEngineInputs(levels, decoGases);
         if (!validation.ok) return engineValidationError(validation);
         if (!levels || levels.length === 0) {
-            return { error: 'No bottom segments defined', stops: [], totalTime: 0 };
+            return {
+                error: 'No bottom segments defined',
+                code: 'INVALID_PROFILE',
+                stops: [],
+                plan: [],
+                totalTime: 0,
+                totalRuntime: 0,
+            };
         }
         const stepSize = settings.stepSize || (settings.metric ? 3 : 10);
         const lastStop = settings.lastStop || (settings.metric ? 3 : 10);
