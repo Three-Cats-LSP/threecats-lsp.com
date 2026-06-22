@@ -15,7 +15,8 @@
 <link href="icon-192.png" rel="icon" type="image/png" id="favicon"/>
 <link href="icon-192.png" rel="apple-touch-icon" id="apple-touch-icon"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Noto+Sans:wght@400;500;600;700&amp;family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="backup-sanitize.js"></script>
+<script src="vendor/jspdf.umd.min.js"></script>
 <script>
   if (!window.Capacitor) {
     window.Capacitor = { isNativePlatform: () => false, Plugins: {} };
@@ -504,7 +505,7 @@ body.light-theme .about-tab-btn.active { color: #fff; }
 </div>
 <script src="capacitor-bridge.js"></script>
 <script>
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.1';
 const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 const STORAGE_KEY = 'giw_v1';
 
@@ -933,6 +934,13 @@ function createTripFromTemplate(name, dateStart, dateEnd, location, tags, source
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function jsAttr(s) {
+  const t = String(s);
+  if (t === '') return '';
+  if (!/^[a-zA-Z0-9_-]+$/.test(t)) return '_invalid';
+  return t.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
 
 const ICON_PATHS = {
@@ -1433,18 +1441,18 @@ function renderHomeTripsHtml() {
     return `
       <div class="trip-card ${t.archived ? 'archived' : ''}">
         <div class="trip-card-head">
-          <div class="trip-card-main" onclick="navigate('trip','${t.id}')">
+          <div class="trip-card-main" onclick="navigate('trip','${jsAttr(t.id)}')">
             <h3>${esc(t.name)}${pinned ? ' 📌' : ''}${t.archived ? ' <span style="font-size:11px;color:var(--muted)">(archived)</span>' : ''}</h3>
             ${t.location ? `<div class="trip-location">${esc(t.location)}</div>` : ''}
             <div class="trip-meta">${dateStr ? esc(dateStr) : ''}${dateStr && countdown ? ' · ' : ''}${countdown ? `<span class="trip-countdown">${esc(countdown)}</span> · ` : ''}${p.done}/${p.total} packed</div>
             ${(t.tags && t.tags.length) ? `<div class="trip-tags">${formatTagsHtml(t.tags)}</div>` : ''}
           </div>
           <div class="trip-card-actions">
-            <button class="icon-btn icon-btn-sm" onclick="promptDuplicateTrip('${t.id}')" title="Duplicate trip">${icon('copy', 14)}</button>
-            <button class="icon-btn icon-btn-sm danger" onclick="deleteTrip('${t.id}')" title="Remove trip">${icon('close', 14)}</button>
+            <button class="icon-btn icon-btn-sm" onclick="promptDuplicateTrip('${jsAttr(t.id)}')" title="Duplicate trip">${icon('copy', 14)}</button>
+            <button class="icon-btn icon-btn-sm danger" onclick="deleteTrip('${jsAttr(t.id)}')" title="Remove trip">${icon('close', 14)}</button>
           </div>
         </div>
-        <div class="progress-bar" onclick="navigate('trip','${t.id}')"><div class="progress-fill" style="width:${p.pct}%"></div></div>
+        <div class="progress-bar" onclick="navigate('trip','${jsAttr(t.id)}')"><div class="progress-fill" style="width:${p.pct}%"></div></div>
       </div>`;
   }).join('');
 }
@@ -1520,15 +1528,15 @@ function renderTemplateContent() {
       <div class="card collapsible card-open" id="cat-${cat.id}">
         <div class="card-title" onclick="toggleCard(this)">
           <div class="card-title-left" onclick="event.stopPropagation()">
-            <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameCategory('${cat.id}',this.value)" title="Rename card"/>
+            <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameCategory('${jsAttr(cat.id)}',this.value)" title="Rename card"/>
             <div class="card-title-actions">
-              <button class="icon-btn icon-btn-sm" onclick="moveCategory('${cat.id}',-1)" title="Move up">${icon('chevUp', 13)}</button>
-              <button class="icon-btn icon-btn-sm" onclick="moveCategory('${cat.id}',1)" title="Move down">${icon('chevDown', 13)}</button>
-              <button class="icon-btn icon-btn-sm danger" onclick="deleteCategory('${cat.id}')" title="Remove card">${icon('close', 13)}</button>
+              <button class="icon-btn icon-btn-sm" onclick="moveCategory('${jsAttr(cat.id)}',-1)" title="Move up">${icon('chevUp', 13)}</button>
+              <button class="icon-btn icon-btn-sm" onclick="moveCategory('${jsAttr(cat.id)}',1)" title="Move down">${icon('chevDown', 13)}</button>
+              <button class="icon-btn icon-btn-sm danger" onclick="deleteCategory('${jsAttr(cat.id)}')" title="Remove card">${icon('close', 13)}</button>
             </div>
           </div>
           <div class="card-title-right">
-            <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addTemplateItem('${cat.id}')" title="Add item">${icon('plus', 13)}</button>
+            <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addTemplateItem('${jsAttr(cat.id)}')" title="Add item">${icon('plus', 13)}</button>
             <span class="card-caret">${icon('chevDown', 11)}</span>
           </div>
         </div>
@@ -1579,8 +1587,8 @@ function renderTemplatesGallery() {
       <p>${esc(tpl.desc || 'No description')}</p>
       <div class="template-card-meta">${catCount} card${catCount !== 1 ? 's' : ''} · ${itemCount} item${itemCount !== 1 ? 's' : ''}</div>
       <div class="template-card-actions">
-        <button class="btn-secondary btn-icon-only" onclick="openSavedTemplateEditor('${tpl.id}')" title="Edit">${icon('edit', 18)}</button>
-        <button class="btn-secondary btn-icon-only" onclick="mergeSavedTemplate('${tpl.id}')" title="Add to master gear list">${icon('merge', 18)}</button>
+        <button class="btn-secondary btn-icon-only" onclick="openSavedTemplateEditor('${jsAttr(tpl.id)}')" title="Edit">${icon('edit', 18)}</button>
+        <button class="btn-secondary btn-icon-only" onclick="mergeSavedTemplate('${jsAttr(tpl.id)}')" title="Add to master gear list">${icon('merge', 18)}</button>
       </div>
     </div>`;
   }).join('');
@@ -1602,15 +1610,15 @@ function renderSavedTemplateEditor() {
       <div class="card collapsible card-open">
         <div class="card-title" onclick="toggleCard(this)">
           <div class="card-title-left" onclick="event.stopPropagation()">
-            <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameSavedCategory('${tpl.id}','${cat.id}',this.value)" title="Rename card"/>
+            <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}',this.value)" title="Rename card"/>
             <div class="card-title-actions">
-              <button class="icon-btn icon-btn-sm" onclick="moveSavedCategory('${tpl.id}','${cat.id}',-1)" title="Move up">${icon('chevUp', 13)}</button>
-              <button class="icon-btn icon-btn-sm" onclick="moveSavedCategory('${tpl.id}','${cat.id}',1)" title="Move down">${icon('chevDown', 13)}</button>
-              <button class="icon-btn icon-btn-sm danger" onclick="deleteSavedCategory('${tpl.id}','${cat.id}')" title="Remove card">${icon('close', 13)}</button>
+              <button class="icon-btn icon-btn-sm" onclick="moveSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}',-1)" title="Move up">${icon('chevUp', 13)}</button>
+              <button class="icon-btn icon-btn-sm" onclick="moveSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}',1)" title="Move down">${icon('chevDown', 13)}</button>
+              <button class="icon-btn icon-btn-sm danger" onclick="deleteSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}')" title="Remove card">${icon('close', 13)}</button>
             </div>
           </div>
           <div class="card-title-right">
-            <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addSavedTemplateItem('${tpl.id}','${cat.id}')" title="Add item">${icon('plus', 13)}</button>
+            <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addSavedTemplateItem('${jsAttr(tpl.id)}','${jsAttr(cat.id)}')" title="Add item">${icon('plus', 13)}</button>
             <span class="card-caret">${icon('chevDown', 11)}</span>
           </div>
         </div>
@@ -1625,19 +1633,19 @@ function renderSavedTemplateEditor() {
     </div>
     <div class="card">
       <div class="modal-field"><label style="display:block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Template name</label>
-        <input style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px" value="${esc(tpl.name)}" onchange="updateSavedTemplateMeta('${tpl.id}',this.value,null)"/></div>
+        <input style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px" value="${esc(tpl.name)}" onchange="updateSavedTemplateMeta('${jsAttr(tpl.id)}',this.value,null)"/></div>
       <div class="modal-field" style="margin-top:10px"><label style="display:block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Description</label>
-        <input style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px" value="${esc(tpl.desc || '')}" placeholder="What is this template for?" onchange="updateSavedTemplateMeta('${tpl.id}',null,this.value)"/></div>
+        <input style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px" value="${esc(tpl.desc || '')}" placeholder="What is this template for?" onchange="updateSavedTemplateMeta('${jsAttr(tpl.id)}',null,this.value)"/></div>
     </div>
     <div class="action-row">
-      <button class="btn-secondary btn-icon-only" onclick="addSavedCategory('${tpl.id}')" title="Add card">${icon('plus', 18)}</button>
+      <button class="btn-secondary btn-icon-only" onclick="addSavedCategory('${jsAttr(tpl.id)}')" title="Add card">${icon('plus', 18)}</button>
     </div>
     ${catsHtml}
     <div class="action-row" style="margin-top:8px">
-      <button class="btn-primary btn-icon-only" onclick="mergeSavedTemplate('${tpl.id}')" title="Add to master gear list">${icon('merge', 18)}</button>
+      <button class="btn-primary btn-icon-only" onclick="mergeSavedTemplate('${jsAttr(tpl.id)}')" title="Add to master gear list">${icon('merge', 18)}</button>
       ${tpl.builtIn
-        ? `<button class="btn-export btn-reset-red btn-icon-only" onclick="resetSavedTemplate('${tpl.id}')" title="Reset to default">${icon('reset', 18)}</button>`
-        : `<button class="btn-secondary btn-danger" onclick="deleteSavedTemplate('${tpl.id}')">Delete template</button>`}
+        ? `<button class="btn-export btn-reset-red btn-icon-only" onclick="resetSavedTemplate('${jsAttr(tpl.id)}')" title="Reset to default">${icon('reset', 18)}</button>`
+        : `<button class="btn-secondary btn-danger" onclick="deleteSavedTemplate('${jsAttr(tpl.id)}')">Delete template</button>`}
     </div>`;
 }
 
@@ -1686,8 +1694,8 @@ function renderItemRow(ctx, it) {
     if (it.critical) badges.push(`<span class="item-badge">★ critical</span>`);
     if (it.bag) badges.push(`<span class="item-badge">${esc(bagLabel(it.bag))}</span>`);
     const delFn = type === 'saved'
-      ? `deleteSavedTemplateItem('${tripId}','${it.id}')`
-      : `deleteTemplateItem('${it.id}')`;
+      ? `deleteSavedTemplateItem('${jsAttr(tripId)}','${jsAttr(it.id)}')`
+      : `deleteTemplateItem('${jsAttr(it.id)}')`;
     return `
       <div class="edit-row">
         <div style="flex:1;min-width:0">
@@ -1695,7 +1703,7 @@ function renderItemRow(ctx, it) {
           ${it.note ? `<div class="item-note">${esc(it.note)}</div>` : ''}
           ${badges.length ? `<div class="item-meta">${badges.join('')}</div>` : ''}
         </div>
-        <button class="icon-btn" onclick="openItemEditor('${type}','${tripId}','${it.id}')" title="Edit">${icon('edit', 14)}</button>
+        <button class="icon-btn" onclick="openItemEditor('${type}','${jsAttr(tripId)}','${jsAttr(it.id)}')" title="Edit">${icon('edit', 14)}</button>
         <button class="icon-btn danger" onclick="${delFn}" title="Delete">${icon('close', 14)}</button>
       </div>`;
   }
@@ -1706,13 +1714,13 @@ function renderItemRow(ctx, it) {
   const packedCount = itemPackedCount(it, trip);
   const cls = ['check-item', packed ? 'checked' : '', it.critical ? 'critical-item' : ''].filter(Boolean).join(' ');
   const onToggle = type === 'trip'
-    ? `onclick="toggleTripItem('${tripId}','${it.id}')"`
+    ? `onclick="toggleTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}')"`
     : '';
   const qtyHtml = it.qty > 1 ? `
     <div class="qty-controls" onclick="event.stopPropagation()">
-      <button class="qty-btn" onclick="adjustItemQty('${type}','${tripId || ''}','${it.id}',-1)">−</button>
+      <button class="qty-btn" onclick="adjustItemQty('${type}','${jsAttr(tripId)}','${jsAttr(it.id)}',-1)">−</button>
       <span class="qty-label">${packedCount}/${it.qty}</span>
-      <button class="qty-btn" onclick="adjustItemQty('${type}','${tripId || ''}','${it.id}',1)">+</button>
+      <button class="qty-btn" onclick="adjustItemQty('${type}','${jsAttr(tripId)}','${jsAttr(it.id)}',1)">+</button>
     </div>` : '';
   const badges = [];
   if (it.bag) badges.push(`<span class="item-badge">${esc(bagLabel(it.bag))}</span>`);
@@ -1722,10 +1730,10 @@ function renderItemRow(ctx, it) {
       if (sec) badges.push(`<span class="item-badge">${esc(sec.label)}</span>`);
     });
   }
-  const editBtn = `<button class="icon-btn" onclick="event.stopPropagation(); openItemEditor('${type}','${tripId || ''}','${it.id}')" title="Edit item">${icon('edit', 14)}</button>`;
+  const editBtn = `<button class="icon-btn" onclick="event.stopPropagation(); openItemEditor('${type}','${jsAttr(tripId)}','${jsAttr(it.id)}')" title="Edit item">${icon('edit', 14)}</button>`;
   const delBtn = type === 'trip'
-    ? `<button class="icon-btn danger" onclick="deleteTripItem('${tripId}','${it.id}')" title="Remove item">${icon('close', 14)}</button>`
-    : `<button class="icon-btn danger" onclick="deleteTemplateItem('${it.id}')" title="Delete item">${icon('close', 14)}</button>`;
+    ? `<button class="icon-btn danger" onclick="deleteTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}')" title="Remove item">${icon('close', 14)}</button>`
+    : `<button class="icon-btn danger" onclick="deleteTemplateItem('${jsAttr(it.id)}')" title="Delete item">${icon('close', 14)}</button>`;
   return `
     <div class="${cls}">
       <div class="check-main" ${onToggle}>
@@ -1765,12 +1773,12 @@ function renderTrip() {
 
   const sectionTabs = `<div class="trip-subbar">
     <div class="section-tabs">
-      <button class="section-tab ${trip.viewSection === 'all' ? 'active' : ''}" onclick="setTripSection('${trip.id}','all')">All</button>
-      ${TRIP_SECTIONS.map(s => `<button class="section-tab ${trip.viewSection === s.id ? 'active' : ''}" onclick="setTripSection('${trip.id}','${s.id}')">${esc(s.label)}</button>`).join('')}
+      <button class="section-tab ${trip.viewSection === 'all' ? 'active' : ''}" onclick="setTripSection('${jsAttr(trip.id)}','all')">All</button>
+      ${TRIP_SECTIONS.map(s => `<button class="section-tab ${trip.viewSection === s.id ? 'active' : ''}" onclick="setTripSection('${jsAttr(trip.id)}','${s.id}')">${esc(s.label)}</button>`).join('')}
     </div>
     <div class="trip-mode-actions">
-      <button class="trip-mode-btn ${trip.unpackMode ? 'active' : ''}" onclick="toggleUnpackMode('${trip.id}')" title="${trip.unpackMode ? 'Exit unpack mode' : 'Unpack mode — tap items as you repack'}">${trip.unpackMode ? 'Unpacking' : 'Unpack'}</button>
-      <button class="trip-mode-btn ${trip.returnMode ? 'return-active' : ''}" onclick="toggleReturnMode('${trip.id}')" title="${trip.returnMode ? 'Exit return mode' : 'Return mode — pack gear for the trip home'}">${trip.returnMode ? 'Returning' : 'Return'}</button>
+      <button class="trip-mode-btn ${trip.unpackMode ? 'active' : ''}" onclick="toggleUnpackMode('${jsAttr(trip.id)}')" title="${trip.unpackMode ? 'Exit unpack mode' : 'Unpack mode — tap items as you repack'}">${trip.unpackMode ? 'Unpacking' : 'Unpack'}</button>
+      <button class="trip-mode-btn ${trip.returnMode ? 'return-active' : ''}" onclick="toggleReturnMode('${jsAttr(trip.id)}')" title="${trip.returnMode ? 'Exit return mode' : 'Return mode — pack gear for the trip home'}">${trip.returnMode ? 'Returning' : 'Return'}</button>
     </div>
   </div>`;
 
@@ -1800,16 +1808,16 @@ function renderTrip() {
       <div class="card collapsible card-open">
         <div class="card-title" onclick="toggleCard(this)">
           <div class="card-title-left" onclick="event.stopPropagation()">
-            <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameTripCategory('${trip.id}','${cat.id}',this.value)" title="Rename card"/>
+            <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}',this.value)" title="Rename card"/>
             <div class="card-title-actions">
-              <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${trip.id}','${cat.id}',-1)" title="Move up">${icon('chevUp', 13)}</button>
-              <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${trip.id}','${cat.id}',1)" title="Move down">${icon('chevDown', 13)}</button>
-              <button class="icon-btn icon-btn-sm" onclick="duplicateTripCategory('${trip.id}','${cat.id}')" title="Duplicate card">${icon('copy', 13)}</button>
-              <button class="icon-btn icon-btn-sm danger" onclick="removeTripCategory('${trip.id}','${cat.id}')" title="Remove card">${icon('close', 13)}</button>
+              <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}',-1)" title="Move up">${icon('chevUp', 13)}</button>
+              <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}',1)" title="Move down">${icon('chevDown', 13)}</button>
+              <button class="icon-btn icon-btn-sm" onclick="duplicateTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}')" title="Duplicate card">${icon('copy', 13)}</button>
+              <button class="icon-btn icon-btn-sm danger" onclick="removeTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}')" title="Remove card">${icon('close', 13)}</button>
             </div>
           </div>
           <div class="card-title-right">
-            <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addTripItem('${trip.id}','${cat.id}')" title="Add item">${icon('plus', 13)}</button>
+            <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addTripItem('${jsAttr(trip.id)}','${jsAttr(cat.id)}')" title="Add item">${icon('plus', 13)}</button>
             <span class="card-caret">${icon('chevDown', 11)}</span>
           </div>
         </div>
@@ -1844,7 +1852,7 @@ function renderTrip() {
     ${banner}
     ${sectionTabs}
     <div class="action-row">
-      <button class="btn-secondary btn-icon-only" onclick="addTripCategory('${trip.id}')" title="Add card">${icon('plus', 18)}</button>
+      <button class="btn-secondary btn-icon-only" onclick="addTripCategory('${jsAttr(trip.id)}')" title="Add card">${icon('plus', 18)}</button>
       <div class="menu-dropdown">
         <button class="btn-export btn-icon-only" onclick="toggleExportMenu(event)" title="Export">${icon('fileText', 16)}</button>
         <div class="menu-panel ${exportMenuOpen ? 'open' : ''}" id="trip-export-menu">
@@ -1859,13 +1867,13 @@ function renderTrip() {
       <div class="menu-dropdown">
         <button class="btn-secondary btn-icon-only" onclick="toggleMenu(event)" title="More">${icon('menu', 18)}</button>
         <div class="menu-panel ${menuOpen ? 'open' : ''}" id="trip-menu">
-          <button onclick="promptEditTripDetails('${trip.id}')">Trip details</button>
-          <button onclick="togglePinTrip('${trip.id}')">${pinned ? 'Unpin from widget' : 'Pin for home widget'}</button>
-          <button onclick="promptBuddyCopy('${trip.id}')">Buddy copy</button>
-          <button onclick="shareRemaining('${trip.id}')">Share remaining list</button>
-          <button onclick="resetTrip('${trip.id}')">Reset all checks</button>
-          <button onclick="toggleArchiveTrip('${trip.id}')">${trip.archived ? 'Restore from archive' : 'Archive trip'}</button>
-          <button class="danger" onclick="deleteTrip('${trip.id}')">Delete trip</button>
+          <button onclick="promptEditTripDetails('${jsAttr(trip.id)}')">Trip details</button>
+          <button onclick="togglePinTrip('${jsAttr(trip.id)}')">${pinned ? 'Unpin from widget' : 'Pin for home widget'}</button>
+          <button onclick="promptBuddyCopy('${jsAttr(trip.id)}')">Buddy copy</button>
+          <button onclick="shareRemaining('${jsAttr(trip.id)}')">Share remaining list</button>
+          <button onclick="resetTrip('${jsAttr(trip.id)}')">Reset all checks</button>
+          <button onclick="toggleArchiveTrip('${jsAttr(trip.id)}')">${trip.archived ? 'Restore from archive' : 'Archive trip'}</button>
+          <button class="danger" onclick="deleteTrip('${jsAttr(trip.id)}')">Delete trip</button>
         </div>
       </div>
     </div>
@@ -2647,9 +2655,8 @@ function importBackupJSON(input) {
   reader.onload = () => {
     try {
       const parsed = JSON.parse(reader.result);
-      const data = parsed.data || parsed;
-      if (!data.masterTemplate || !data.trips) throw new Error('Invalid backup');
       if (!confirm('Replace all current data with this backup?')) { input.value = ''; return; }
+      const data = sanitizeImportedBackup(parsed, uid);
       migrateState(data);
       state = data;
       ensureSettings();
@@ -2679,8 +2686,8 @@ async function loadPDFFonts(doc) {
   }
   try {
     const [rResp, bResp] = await Promise.all([
-      fetch('https://cdn.jsdelivr.net/npm/dejavu-fonts-ttf@2.37.3/ttf/DejaVuSans.ttf'),
-      fetch('https://cdn.jsdelivr.net/npm/dejavu-fonts-ttf@2.37.3/ttf/DejaVuSans-Bold.ttf')
+      fetch('vendor/fonts/DejaVuSans.ttf'),
+      fetch('vendor/fonts/DejaVuSans-Bold.ttf')
     ]);
     if (!rResp.ok || !bResp.ok) throw new Error('Font fetch failed');
     const [rBuf, bBuf] = await Promise.all([rResp.arrayBuffer(), bResp.arrayBuffer()]);
@@ -2702,7 +2709,7 @@ async function loadPDFFonts(doc) {
     return true;
   } catch (e) {
     console.error('[GIW] DejaVu font load failed:', e);
-    alert('Could not load PDF fonts. Check your internet connection and try again.');
+    alert('Could not load PDF fonts. Reinstall the app or refresh while online, then try again.');
     return false;
   }
 }
@@ -2848,8 +2855,13 @@ async function exportTemplatePDF() {
     date: '',
     subtitle: 'Three Cats LSP'
   }, sections);
-  if (doc) doc.save('GIW_' + dateStr() + '_MasterTemplate.pdf');
-  showExportToast();
+  if (!doc) { showToast('PDF export failed'); return; }
+  try {
+    doc.save('GIW_' + dateStr() + '_MasterTemplate.pdf');
+    showExportToast();
+  } catch (e) {
+    showToast('PDF export failed');
+  }
 }
 
 async function exportTripPDF(mode) {
@@ -2904,8 +2916,13 @@ async function exportTripPDF(mode) {
   }, sections);
 
   const tag = mode === 'remaining' ? 'Remaining' : mode === 'bag' ? 'ByBag' : 'Full';
-  if (doc) doc.save('GIW_' + dateStr() + '_' + safeFilename(trip.name) + '_' + tag + '.pdf');
-  showExportToast();
+  if (!doc) { showToast('PDF export failed'); return; }
+  try {
+    doc.save('GIW_' + dateStr() + '_' + safeFilename(trip.name) + '_' + tag + '.pdf');
+    showExportToast();
+  } catch (e) {
+    showToast('PDF export failed');
+  }
 }
 
 // ── Init ──

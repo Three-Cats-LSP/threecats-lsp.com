@@ -102,7 +102,10 @@
     if (!(await ensurePermission())) return;
     const saved = await saveFile(base64Data, filename);
     if (!saved) { notify('Export failed — could not write to device', true); return; }
-    notify('✓ Saved to ' + saved.label + ': ' + (saved.finalName || filename));
+    const where = saved.label === 'Downloads folder'
+      ? 'Downloads folder'
+      : 'app storage — use Share to copy elsewhere';
+    notify('✓ Saved to ' + where + ': ' + (saved.finalName || filename));
     await shareFile(saved.uri, filename);
   }
 

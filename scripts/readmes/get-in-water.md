@@ -44,7 +44,7 @@ All apps at the [Diver's Toolkit hub](https://threecats-lsp.com).
 ### Android Native Features
 - Full offline support — no internet needed after install
 - Edge-to-edge layout, light/dark theme
-- Export TXT/PDF direct to Downloads folder or share sheet
+- Export TXT/PDF to app storage, then share via the system sheet (Downloads when the device allows)
 
 ---
 
