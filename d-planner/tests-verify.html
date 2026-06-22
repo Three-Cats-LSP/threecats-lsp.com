@@ -660,6 +660,72 @@ const SECTIONS = [
     }],
   ]
 },
+
+// ══ G: Engine input validation (GitHub #7) ═══════════════════════════════════
+{
+  title: 'G · Engine Input Validation (GitHub #7)',
+  badge: 'badge-zhl',
+  desc: 'Invalid gas fractions and dive profiles must be rejected with stable error codes — never silently clamped.',
+  tests: [
+    ['ZHL: valid 40m/25min air still runs', () => {
+      const r = zhlCalc(40, 25);
+      assert(!r.error && !r.code, `unexpected error: ${r.error || r.code}`);
+      assert(r.totalRuntime > 50, `RT=${r.totalRuntime}`);
+      return `RT=${r.totalRuntime}min ✓`;
+    }],
+    ['ZHL: O2+He>100% → INVALID_GAS_FRACTIONS', () => {
+      const r = zhlCalc(40, 25, 50, 60);
+      assert(r.code === 'INVALID_GAS_FRACTIONS', `code=${r.code}`);
+      return `code=${r.code} ✓`;
+    }],
+    ['ZHL: O2>100% → INVALID_GAS_FRACTIONS', () => {
+      const r = zhlCalc(40, 25, 150, 0);
+      assert(r.code === 'INVALID_GAS_FRACTIONS', `code=${r.code}`);
+      return `code=${r.code} ✓`;
+    }],
+    ['ZHL: negative O2 → INVALID_GAS_FRACTIONS', () => {
+      const r = zhlCalc(40, 25, -10, 0);
+      assert(r.code === 'INVALID_GAS_FRACTIONS', `code=${r.code}`);
+      return `code=${r.code} ✓`;
+    }],
+    ['ZHL: negative depth → INVALID_DEPTH', () => {
+      const r = zhlCalc(-10, 25);
+      assert(r.code === 'INVALID_DEPTH', `code=${r.code}`);
+      return `code=${r.code} ✓`;
+    }],
+    ['ZHL: zero bottom time → INVALID_TIME', () => {
+      const r = zhlCalc(40, 0);
+      assert(r.code === 'INVALID_TIME', `code=${r.code}`);
+      return `code=${r.code} ✓`;
+    }],
+    ['ZHL: boundary 50/50 trimix totals 100% — valid', () => {
+      const r = zhlCalc(40, 25, 50, 50);
+      assert(!r.code, `unexpected code=${r.code}`);
+      assert(r.totalRuntime > 0, 'no schedule');
+      return `RT=${r.totalRuntime}min ✓`;
+    }],
+    ['ZHL: invalid deco gas → INVALID_GAS_FRACTIONS', () => {
+      const r = WIN.ZHLEngine.calculate(lv(40, 25), [{ o2: 50, he: 60 }], S());
+      assert(r.code === 'INVALID_GAS_FRACTIONS', `code=${r.code}`);
+      return `code=${r.code} ✓`;
+    }],
+    ['VPM-B: O2+He>100% → INVALID_GAS_FRACTIONS', () => {
+      const r = vpmCalc(40, 25, 50, 60);
+      assert(r.code === 'INVALID_GAS_FRACTIONS', `code=${r.code}`);
+      return `code=${r.code} ✓`;
+    }],
+    ['VPM-B: negative He → INVALID_GAS_FRACTIONS', () => {
+      const r = vpmCalc(40, 25, 21, -5);
+      assert(r.code === 'INVALID_GAS_FRACTIONS', `code=${r.code}`);
+      return `code=${r.code} ✓`;
+    }],
+    ['VPM-B: NaN O2 → INVALID_GAS_FRACTIONS', () => {
+      const r = vpmCalc(40, 25, NaN, 0);
+      assert(r.code === 'INVALID_GAS_FRACTIONS', `code=${r.code}`);
+      return `code=${r.code} ✓`;
+    }],
+  ]
+},
 ];
 
 // ─── Runner ───────────────────────────────────────────────────────────────────

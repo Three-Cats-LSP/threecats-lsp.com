@@ -3345,7 +3345,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.29';
+const APP_VERSION = '2.20.30';
 window.APP_VERSION = APP_VERSION;
 // Test harness: skip DOM recalc storms when loaded inside tests-massive.html iframe
 (function() {
@@ -5665,6 +5665,117 @@ function showInputValidationError(resultElId, message, focusEl) {
   if (focusEl && typeof focusEl.focus === 'function') focusEl.focus();
 }
 
+// ── Shared engine / UI input validation (GitHub #7) ───────────────────────────
+function validateGasFractionsPct(o2, he, field) {
+  const o = Number(o2);
+  const h = Number(he || 0);
+  if (!Number.isFinite(o) || !Number.isFinite(h) || o < 0 || o > 100 || h < 0 || h > 100 || o + h > 100) {
+    return {
+      ok: false,
+      code: 'INVALID_GAS_FRACTIONS',
+      field: field || 'gas',
+      message: 'O2 and He must be between 0 and 100 percent and total no more than 100 percent.'
+    };
+  }
+  return { ok: true, o2: o, he: h };
+}
+
+function validateEngineInputs(levels, decoGases) {
+  const errors = [];
+  if (!Array.isArray(levels) || levels.length === 0) {
+    errors.push({ code: 'INVALID_PROFILE', field: 'levels', message: 'At least one dive level is required.' });
+  } else {
+    levels.forEach((level, index) => {
+      if (!Number.isFinite(level.depth) || level.depth <= 0) {
+        errors.push({ code: 'INVALID_DEPTH', field: `levels[${index}].depth`, message: 'Depth must be a positive number.' });
+      }
+      if (!Number.isFinite(level.time) || level.time <= 0) {
+        errors.push({ code: 'INVALID_TIME', field: `levels[${index}].time`, message: 'Bottom time must be a positive number.' });
+      }
+      const gasCheck = validateGasFractionsPct(level.o2, level.he || 0, `levels[${index}]`);
+      if (!gasCheck.ok) errors.push(gasCheck);
+    });
+  }
+  if (Array.isArray(decoGases)) {
+    decoGases.forEach((g, index) => {
+      if (g.o2 == null && g.he == null) return;
+      const gasCheck = validateGasFractionsPct(g.o2, g.he || 0, `decoGases[${index}]`);
+      if (!gasCheck.ok) errors.push(gasCheck);
+    });
+  }
+  return { ok: errors.length === 0, errors };
+}
+
+function engineValidationError(validation) {
+  const first = validation.errors[0];
+  return {
+    error: first.message || 'Invalid input.',
+    code: first.code,
+    field: first.field,
+    errors: validation.errors,
+    stops: [],
+    plan: [],
+    totalRuntime: 0,
+    totalTime: 0
+  };
+}
+
+function getDomBottomGasPct() {
+  const mix = document.getElementById('decoGas')?.value;
+  if (mix === 'air') return { o2: 21, he: 0 };
+  if (mix === 'ean32') return { o2: 32, he: 0 };
+  if (mix === 'ean36') return { o2: 36, he: 0 };
+  if (mix === 'custom') {
+    return { o2: parseFloat(document.getElementById('decoCustomO2')?.value), he: 0 };
+  }
+  if (mix === 'trimix') {
+    return {
+      o2: parseFloat(document.getElementById('botTrimixO2')?.value),
+      he: parseFloat(document.getElementById('botTrimixHe')?.value)
+    };
+  }
+  return { o2: 21, he: 0 };
+}
+
+function getDomDecoGasPct(idx) {
+  const mix = document.getElementById(`dg${idx}Mix`)?.value;
+  if (!mix || mix === 'none') return null;
+  if (mix === 'ean50') return { o2: 50, he: 0 };
+  if (mix === 'ean80') return { o2: 80, he: 0 };
+  if (mix === 'o2') return { o2: 100, he: 0 };
+  if (mix === 'custom') {
+    return { o2: parseFloat(document.getElementById(`dg${idx}CustomO2`)?.value), he: 0 };
+  }
+  if (mix === 'trimix') {
+    return {
+      o2: parseFloat(document.getElementById(`dg${idx}TrimixO2`)?.value),
+      he: parseFloat(document.getElementById(`dg${idx}TrimixHe`)?.value)
+    };
+  }
+  return null;
+}
+
+function validateDomDecoGases() {
+  const errors = [];
+  const bot = getDomBottomGasPct();
+  const botCheck = validateGasFractionsPct(bot.o2, bot.he, 'bottomGas');
+  if (!botCheck.ok) errors.push(botCheck);
+  if (typeof getAllDecoGasIds === 'function') {
+    for (const idx of getAllDecoGasIds()) {
+      const g = getDomDecoGasPct(idx);
+      if (!g) continue;
+      const chk = validateGasFractionsPct(g.o2, g.he, `dg${idx}`);
+      if (!chk.ok) errors.push(chk);
+    }
+  }
+  return { ok: errors.length === 0, errors };
+}
+
+if (typeof window !== 'undefined') {
+  window.validateEngineInputs = validateEngineInputs;
+  window.validateGasFractionsPct = validateGasFractionsPct;
+}
+
 function runPlanner() {
   const depthCheck = readValidatedInput('depth', 'Depth');
   if (!depthCheck.ok) { showInputValidationError('plannerResult', depthCheck.message, depthCheck.el); return; }
@@ -7819,6 +7930,8 @@ const VPMEngine = (() => {
     }
     function calculate(levels, decoGases, settings, model) {
         model = model || 'VPMB';
+        const validation = validateEngineInputs(levels, decoGases);
+        if (!validation.ok) return engineValidationError(validation);
         if (!levels || levels.length === 0) {
             return { error: 'No bottom segments defined', stops: [], totalTime: 0 };
         }
@@ -8922,6 +9035,20 @@ function runDecoSchedule() {
   if (!depthCheck.ok) { showInputValidationError('decoResult', depthCheck.message, depthCheck.el); return; }
   const btCheck = readValidatedInput('decoBT', 'Bottom time');
   if (!btCheck.ok) { showInputValidationError('decoResult', btCheck.message, btCheck.el); return; }
+
+  const gasValidation = validateDomDecoGases();
+  if (!gasValidation.ok) {
+    window._zhlEngineValidation = gasValidation;
+    if (!window._zhlHeadless) {
+      const first = gasValidation.errors[0];
+      const dgMatch = String(first.field || '').match(/^dg(\d+)$/);
+      const focusId = first.field === 'bottomGas' ? 'botTrimixO2'
+        : dgMatch ? `dg${dgMatch[1]}TrimixO2` : null;
+      showInputValidationError('decoResult', first.message, focusId ? document.getElementById(focusId) : null);
+    }
+    return;
+  }
+  window._zhlEngineValidation = null;
 
   const rawD   = depthCheck.value;
   const depthM = units === 'metric' ? rawD : rawD / 3.28084;
@@ -10067,6 +10194,8 @@ const ZHLEngine = (() => {
   }
 
   function calculate(levels, decoGases, settings) {
+    const validation = validateEngineInputs(levels, decoGases);
+    if (!validation.ok) return engineValidationError(validation);
     if (!levels || levels.length === 0) return { error: 'No levels', stops: [], plan: [], totalRuntime: 0 };
     const s = settings || {};
     const isMetric = s.metric !== false;
@@ -10230,6 +10359,21 @@ const ZHLEngine = (() => {
       return { error: e.message, stops: [], plan: [], totalRuntime: 0 };
     }
     window._zhlHeadless = _headlessEntry;
+
+    if (window._zhlEngineValidation && !window._zhlEngineValidation.ok) {
+      const errOut = engineValidationError(window._zhlEngineValidation);
+      window._zhlEngineValidation = null;
+      mGF.low = prevGF.low; mGF.high = prevGF.high;
+      if (units !== prevUnits) setUnits(prevUnits);
+      if (algoEl) algoEl.value = prevAlgo;
+      if (decoGasEl) decoGasEl.value = prevDecoGasVal;
+      prevDGVals.forEach(({ id, val }) => { const el = document.getElementById(id); if (el && val != null) el.value = val; });
+      _addedDGIdxs.forEach(idx => { const card = document.getElementById(`dgCard_${idx}`); if (card) card.remove(); });
+      if (_addedDGIdxs.length > 0 && typeof renumberDecoGasCards === 'function') renumberDecoGasCards();
+      window._zhlRepState = null;
+      window._priorDiveCarry = _prevPriorDiveCarry;
+      return errOut;
+    }
 
     const lp = window._lastPlan;
 
