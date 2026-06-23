@@ -2,7 +2,7 @@
 // Network-first for HTML (always fresh), cache-first for static assets.
 // Bump CACHE_VERSION on every deploy to force old SW replacement.
 
-const CACHE_VERSION = 'lsp-dplanner-v2.40.01';
+const CACHE_VERSION = 'lsp-dplanner-v2.40.02';
 
 // These are never cached — always fetched live or passed through
 const NEVER_CACHE = [
@@ -31,7 +31,7 @@ function getAppBasePath() {
 const APP_BASE = getAppBasePath();
 const OFFLINE_INDEX = APP_BASE + 'index.html';
 
-// Required for offline/PWA startup after v2.40.00 Tier-3 split (Issue #10)
+// Required for offline/PWA startup (Tier-3 ZHL + self-hosted fonts/icons)
 const PRECACHE_ASSETS = [
   OFFLINE_INDEX,
   APP_BASE + 'capacitor-bridge.js',
@@ -39,6 +39,20 @@ const PRECACHE_ASSETS = [
   APP_BASE + 'zhl-worker-bridge.js',
   APP_BASE + 'zhl-schedule-worker.js',
   APP_BASE + 'vendor/jspdf.umd.min.js',
+  APP_BASE + 'vendor/fonts/fonts.css',
+  APP_BASE + 'vendor/fonts/DejaVuSans.ttf',
+  APP_BASE + 'vendor/fonts/DejaVuSans-Bold.ttf',
+  APP_BASE + 'vendor/fonts/JTUSjIg69CK48gW7PXoo9Wdhyzbi.woff2',
+  APP_BASE + 'vendor/fonts/JTUSjIg69CK48gW7PXoo9Wlhyw.woff2',
+  APP_BASE + 'vendor/fonts/QGYvz_MVcBeNP4NJtEtq.woff2',
+  APP_BASE + 'vendor/fonts/QGYvz_MVcBeNP4NJuktqQ4E.woff2',
+  APP_BASE + 'vendor/fonts/tDbV2o-flEEny0FZhsfKu5WU4xD0OwG_TA.woff2',
+  APP_BASE + 'vendor/fonts/tDbV2o-flEEny0FZhsfKu5WU4xD1OwG_TA.woff2',
+  APP_BASE + 'vendor/fonts/tDbV2o-flEEny0FZhsfKu5WU4xD2OwG_TA.woff2',
+  APP_BASE + 'vendor/fonts/tDbV2o-flEEny0FZhsfKu5WU4xD4OwG_TA.woff2',
+  APP_BASE + 'vendor/fonts/tDbV2o-flEEny0FZhsfKu5WU4xD7OwE.woff2',
+  APP_BASE + 'vendor/fonts/tDbV2o-flEEny0FZhsfKu5WU4xD_OwG_TA.woff2',
+  APP_BASE + 'vendor/icons/giw-icon-192.png',
   APP_BASE + 'manifest.json',
   APP_BASE + 'icon-192.png',
   APP_BASE + 'icon-512.png',

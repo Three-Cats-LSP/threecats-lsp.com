@@ -18,7 +18,7 @@
 <!-- Favicon (inline SVG) -->
 <link href="icon-192.png" rel="icon" type="image/png"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="vendor/fonts/fonts.css" rel="stylesheet"/>
 <style>
 /* ═══════════════════════════════════════════
  SHARED DESIGN TOKENS
@@ -3316,7 +3316,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 </svg>
 </a>
 <a href="https://threecats-lsp.com/get-in-water/" id="giwAppIcon" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'" onmouseover="this.style.opacity='1';this.style.transform='scale(1.15)'" rel="noopener noreferrer" style="display:flex;align-items:center;opacity:0.7;transition:opacity 0.2s,transform 0.2s;" target="_blank" title="Get In Water">
-<img alt="Get In Water" height="36" src="https://threecats-lsp.com/get-in-water/icon-192.png" style="display:block;width:36px;height:36px;border-radius:8px;border:1px solid var(--border-hi);object-fit:contain;" width="36"/>
+<img alt="Get In Water" height="36" src="vendor/icons/giw-icon-192.png" style="display:block;width:36px;height:36px;border-radius:8px;border:1px solid var(--border-hi);object-fit:contain;" width="36"/>
 </a>
 </div>
 <div style="margin-top:10px;display:flex;align-items:center;justify-content:center;">
@@ -3347,14 +3347,19 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.40.01';
+const APP_VERSION = '2.40.02';
 window.APP_VERSION = APP_VERSION;
 // Test harness: skip DOM recalc storms when loaded inside tests-massive.html iframe
 (function() {
   try {
-    if (new URLSearchParams(location.search).get('massiveSuite') === '1') {
+    const qs = new URLSearchParams(location.search);
+    if (qs.get('massiveSuite') === '1') {
       window._zhlHeadless = true;
       window._massiveSuiteActive = true;
+    }
+    if (qs.get('regression') === '1') {
+      window._regressionSuite = true;
+      window._zhlHeadless = true;
     }
   } catch (e) {}
 })();
@@ -14159,8 +14164,8 @@ async function loadPDFFonts(doc) {
   }
   try {
     const [rResp, bResp] = await Promise.all([
-      fetch('https://cdn.jsdelivr.net/npm/dejavu-fonts-ttf@2.37.3/ttf/DejaVuSans.ttf'),
-      fetch('https://cdn.jsdelivr.net/npm/dejavu-fonts-ttf@2.37.3/ttf/DejaVuSans-Bold.ttf'),
+      fetch('vendor/fonts/DejaVuSans.ttf'),
+      fetch('vendor/fonts/DejaVuSans-Bold.ttf'),
     ]);
     if (!rResp.ok || !bResp.ok) throw new Error('Font fetch failed');
     const [rBuf, bBuf] = await Promise.all([rResp.arrayBuffer(), bResp.arrayBuffer()]);
@@ -16907,6 +16912,7 @@ window.addEventListener('load', function() {
 <script>
   const SW_VERSION_KEY = 'lspSwVersion';
   const SW_MIGRATION_FLAG = `lspSwMigrated:${APP_VERSION}`;
+  const isTestHarness = window._massiveSuiteActive || window._regressionSuite;
   (async () => {
     try {
       const prev = localStorage.getItem(SW_VERSION_KEY);
@@ -16921,13 +16927,13 @@ window.addEventListener('load', function() {
         await Promise.all(keys.filter(k => /^lsp-dplanner-v/i.test(k)).map(k => caches.delete(k)));
       }
       localStorage.setItem(SW_VERSION_KEY, APP_VERSION);
-      window.location.reload();
+      if (!isTestHarness) window.location.reload();
     } catch (e) {
       console.warn('[SW] version migration failed:', e);
     }
   })();
 
-  if ('serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator && !isTestHarness) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register(`sw.js?v=${APP_VERSION}`, { updateViaCache: 'none' })
         .then(r => {
@@ -16945,7 +16951,7 @@ window.addEventListener('load', function() {
           });
           let reloaded = false;
           navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (reloaded) return;
+            if (isTestHarness || reloaded) return;
             reloaded = true;
             window.location.reload();
           });
