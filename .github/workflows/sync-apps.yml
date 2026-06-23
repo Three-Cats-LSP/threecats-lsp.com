@@ -100,14 +100,14 @@ jobs:
       - name: Pull latest Get In Water files
         if: github.event.action == 'sync-get-in-water' || github.event_name == 'workflow_dispatch'
         run: |
-          mkdir -p get-in-water/vendor/fonts scripts/readmes
-          for f in index.html download.html manifest.json sw.js capacitor-bridge.js backup-sanitize.js icon-192.png icon-512.png icon-192-light.png icon-512-light.png; do
+          mkdir -p get-in-water/vendor/fonts get-in-water/vendor/firebase scripts/readmes
+          for f in index.html download.html manifest.json sw.js capacitor-bridge.js backup-sanitize.js firebase-config.js sync.js icon-192.png icon-512.png icon-192-light.png icon-512-light.png; do
             curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                  -H "Accept: application/vnd.github.v3.raw" \
                  "https://api.github.com/repos/Three-Cats-LSP/Get-In-Water/contents/${f}" \
                  -o "get-in-water/${f}" || echo "skip ${f}"
           done
-          for f in vendor/jspdf.umd.min.js vendor/fonts/DejaVuSans.ttf vendor/fonts/DejaVuSans-Bold.ttf; do
+          for f in vendor/jspdf.umd.min.js vendor/fonts/DejaVuSans.ttf vendor/fonts/DejaVuSans-Bold.ttf vendor/firebase/firebase-app-compat.js vendor/firebase/firebase-auth-compat.js vendor/firebase/firebase-firestore-compat.js; do
             curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                  -H "Accept: application/vnd.github.v3.raw" \
                  "https://api.github.com/repos/Three-Cats-LSP/Get-In-Water/contents/${f}" \
