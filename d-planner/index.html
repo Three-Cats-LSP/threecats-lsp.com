@@ -1281,6 +1281,8 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <!-- Capacitor filesystem save bridge (Android app only — no-op on web/PWA) -->
 <script src="capacitor-bridge.js"></script>
+<script src="zhl-engine-bundle.js"></script>
+<script src="zhl-worker-bridge.js"></script>
 </head>
 <body>
 <!-- Bubbles (PADI mode) -->
@@ -3345,7 +3347,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.32';
+const APP_VERSION = '2.40.00';
 window.APP_VERSION = APP_VERSION;
 // Test harness: skip DOM recalc storms when loaded inside tests-massive.html iframe
 (function() {
@@ -9046,6 +9048,140 @@ function updateTravelGasMOD() {
   }
 }
 
+
+// ═══════════════════════════════════════════════
+// ZHL SCHEDULE CORE — Tier 3 (bundle + DOM param builder)
+// ═══════════════════════════════════════════════
+
+function getZhlEnvironment() {
+  return {
+    altSurfaceP: typeof altSurfaceP !== 'undefined' ? altSurfaceP : 1.01325,
+    barPerMetre: BAR_PER_METRE,
+    waterVapor: WATER_VAPOR,
+    altAcclimatized: typeof altAcclimatized !== 'undefined' ? altAcclimatized : true,
+    allowO2AtMOD: typeof allowO2AtMOD !== 'undefined' ? allowO2AtMOD : true,
+  };
+}
+
+function zhlOptimalSwitchDepth(fO2, ctx) {
+  ZhlEngineBundle.applyEnvironment(getZhlEnvironment());
+  return ZhlEngineBundle.zhlOptimalSwitchDepth(fO2, ctx);
+}
+
+function buildZhlScheduleParamsFromEngine(levels, decoGases, settings, profileSplit) {
+  return ZhlEngineBundle.buildZhlScheduleParamsFromEngine(
+    levels, decoGases, settings, profileSplit, getZhlEnvironment()
+  );
+}
+
+function buildZhlScheduleParamsFromDom(rawD, depthM, bt) {
+  const rate = Math.max(1, parseInt(document.getElementById('ascentRate').value) || 9);
+  const decoRate = Math.max(1, parseInt(document.getElementById('decoAscentRate').value) || 9);
+  const surfaceRate = Math.max(1, parseInt(document.getElementById('surfaceAscentRate').value) || 9);
+  const descentRate = Math.max(1, parseInt(document.getElementById('descentRate').value) || 22);
+  const ppo2Bottom = parseFloat(document.getElementById('ppo2Bottom').value) || 1.4;
+  const ppo2Deco = parseFloat(document.getElementById('ppo2Deco').value) || 1.6;
+  const minStopTime = parseFloat(document.getElementById('minStopTime').value) || 1;
+  const lastStop = parseInt(document.getElementById('lastDecoStop').value) || 3;
+  const decoStep = parseInt(document.getElementById('decoStep').value) || 3;
+  const metric = units === 'metric';
+  const switchCtx = { ppo2Bottom, ppo2Deco, lastStop, decoStep, metric };
+  const _botFracs = getBottomGasFractions();
+  const bottomFN2 = _botFracs.fN2;
+  const bottomFHe = _botFracs.fHe;
+  const bottomFO2 = _botFracs.fO2;
+  const bottomMixLabel = getGasLabel(bottomFO2, bottomFHe);
+  const dU = metric;
+  const decoGases = [];
+  const switchDisplays = [];
+  for (const idx of getAllDecoGasIds()) {
+    const dgf = getDecoCardFractions(idx);
+    const fN2 = dgf ? dgf.fN2 : getDecoGasFrac(`dg${idx}Mix`, `dg${idx}CustomO2`);
+    const fHe = dgf ? (dgf.fHe || 0) : 0;
+    const fO2 = dgf ? dgf.fO2 : (fN2 != null ? Math.max(0, 1 - fN2 - fHe) : null);
+    const label = getDecoGasLabel(`dg${idx}Mix`, `dg${idx}CustomO2`);
+    const depth = fN2 !== null ? zhlOptimalSwitchDepth(fO2 ?? Math.max(0, 1 - fN2 - fHe), switchCtx) : null;
+    if (depth !== null && fN2 !== null) {
+      switchDisplays.push({
+        idx,
+        text: (dU ? depth + 'm' : mToFt(depth) + 'ft') + '  (ppO₂ ' +
+          ((altSurfaceP + depth * BAR_PER_METRE) * (fO2 != null ? fO2 : (1 - fN2))).toFixed(2) + ')',
+      });
+      decoGases.push({ depth, fN2, fHe, fO2: fO2 ?? Math.max(0, 1 - fN2 - fHe), label });
+    } else {
+      switchDisplays.push({ idx, text: '—' });
+    }
+  }
+  decoGases.sort((a, b) => b.depth - a.depth);
+  const travelInfo = getTravelGasInfo();
+  if (travelInfo) {
+    const botMODm = bottomFO2 > 0
+      ? Math.floor((ppo2Bottom / bottomFO2 - altSurfaceP) / BAR_PER_METRE)
+      : depthM;
+    const travelFO2 = 1 - travelInfo.fN2;
+    const ppO2AtBotMOD = (altSurfaceP + botMODm * BAR_PER_METRE) * travelFO2;
+    if (ppO2AtBotMOD <= ppo2Bottom + 0.01) {
+      decoGases.push({
+        depth: botMODm,
+        fN2: travelInfo.fN2,
+        fHe: 0,
+        fO2: travelFO2,
+        label: travelInfo.label,
+        isTravelGas: true,
+      });
+      decoGases.sort((a, b) => b.depth - a.depth);
+    }
+  }
+  return {
+    params: {
+      depthM, bt, rawD, metric,
+      ascentRate: rate,
+      decoAscentRate: decoRate,
+      surfaceAscentRate: surfaceRate,
+      descentRate,
+      gfL: mGF.low / 100,
+      gfH: mGF.high / 100,
+      ppo2Bottom, ppo2Deco,
+      minStopTime,
+      switchPauseT: 0,
+      mdCompatMode: (document.getElementById('decoTransitMode')?.value || 'multideco') === 'multideco',
+      lastStop, decoStep,
+      shallowGradient: document.getElementById('shallowGradient')?.value === 'on',
+      bottomFN2, bottomFHe, bottomFO2, bottomMixLabel,
+      travelInfo,
+      repState: (window._zhlRepState && Array.isArray(window._zhlRepState.tissues)) ? window._zhlRepState : null,
+      continuationLevels: (window._zhlHeadless && Array.isArray(window._zhlContinuationLevels))
+        ? window._zhlContinuationLevels : [],
+      minDecoProfile: {
+        enabled: document.getElementById('minDecoProfileEnable')?.value === 'yes',
+        m9: parseFloat(document.getElementById('minDeco9m')?.value) || 1,
+        m6: parseFloat(document.getElementById('minDeco6m')?.value) || 3,
+        isMetric: document.getElementById('unitSel')?.value !== 'imperial',
+      },
+      decoGases,
+      environment: getZhlEnvironment(),
+    },
+    switchDisplays,
+  };
+}
+
+function applyZhlSwitchDepthDisplays(switchDisplays) {
+  if (!switchDisplays || window._zhlHeadless) return;
+  switchDisplays.forEach(({ idx, text }) => {
+    const swEl = document.getElementById(`dg${idx}SwitchDepthDisplay`);
+    if (swEl) swEl.value = text;
+  });
+}
+
+function runZhlScheduleCore(params) {
+  if (!params.environment) {
+    params = Object.assign({}, params, { environment: getZhlEnvironment() });
+  }
+  return ZhlEngineBundle.runZhlScheduleCore(params);
+}
+
+if (typeof window !== 'undefined') window.runZhlScheduleCore = runZhlScheduleCore;
+
 function runDecoSchedule() {
   try {
   const depthCheck = readValidatedInput('decoDepth', 'Depth');
@@ -9101,537 +9237,40 @@ function runDecoSchedule() {
   }
   // ── END VPM branch — Bühlmann continues below ─────────────────────
 
-  // Returns the ppO2 limit for a given fO2 based on O2 fraction bands
+  // ── Bühlmann via Tier-2 pure core (no inline DOM reads) ───────────────
+  const { params: zhlParams, switchDisplays } = buildZhlScheduleParamsFromDom(rawD, depthM, bt);
+  applyZhlSwitchDepthDisplays(switchDisplays);
+  const zhlCore = runZhlScheduleCore(zhlParams);
+  window._lastPlan = zhlCore.lastPlan;
+  const collapsed = zhlCore.collapsed;
+  const collapsedMDP = zhlCore.collapsedMDP;
+  const tissuesAtBottom = zhlCore.tissuesAtBottom;
+  const decoStops = zhlCore.decoStops;
+  const decoTime = zhlCore.decoTime;
+  const hasDeco = zhlCore.hasDeco;
+  const gasUsed = zhlCore.gasUsed;
+  const descentTime = zhlCore.descentTime;
+  const trueDecoZoneStart = zhlCore.trueDecoZoneStart;
+  let firstStopDepth = zhlCore.firstStopDepth;
+  const gfAt = zhlCore.gfAt;
+  const bottomFN2 = zhlCore.bottomFN2;
+  const bottomFHe = zhlCore.bottomFHe;
+  const bottomFO2 = zhlCore.bottomFO2;
+  const bottomMixLabel = zhlCore.bottomMixLabel;
+  const dU = zhlCore.dU;
+  const bottomMix = document.getElementById('decoGas')?.value || 'air';
+  const maxPPO2 = Math.max(ppo2Deco, 1.5, ppo2Bottom);
   function getPPO2Limit(fO2) {
-    const fO2pct = fO2 * 100;  // fO2 passed directly ? trimix-safe
-    if (fO2pct >= 45) return ppo2High;
-    if (fO2pct >= 28) return ppo2Mid;
-    return ppo2Low;
+    const fO2pct = fO2 * 100;
+    if (fO2pct >= 45) return ppo2Deco;
+    if (fO2pct >= 28) return 1.5;
+    return ppo2Bottom;
   }
-
-  // Convenience: most permissive limit for colour coding thresholds in table
-  const maxPPO2 = Math.max(ppo2High, ppo2Mid, ppo2Low);
-
-  // Bottom gas
-  const bottomMix = document.getElementById('decoGas').value;
-  const bottomMixEl = document.getElementById('decoGas');
-  // Use getBottomGasFractions() — handles air/nitrox/trimix uniformly
-  const _botFracs = getBottomGasFractions();
-  let bottomFN2 = _botFracs.fN2;
-  let bottomFHe = _botFracs.fHe;
-  let bottomFO2 = _botFracs.fO2;
-  const bottomMixLabel = getGasLabel(bottomFO2, bottomFHe);  // must come after _botFracs
-
-  // ── Calculate optimal switch depth from ppO2 limit ──
-  // ppO2 = (SURFACE_P + depth * 0.1) * fO2  ≤  maxPPO2
-  // depth = (maxPPO2 / fO2 - SURFACE_P) / 0.1
-  function optimalSwitchDepth(fN2, fO2override) {
-    // fO2override must be passed for trimix (fO2 ≠ 1-fN2 when He > 0)
-    const fO2 = (fO2override != null) ? fO2override : (1 - fN2);
-    if (fO2 <= 0) return 0;
-    // Pure O2 (≥99.5%): switch at 6m (o2MaxDepth), matching ApexDeco default
-    if (fO2 >= 0.995) return Math.max(lastStop, units === 'metric' ? 6 : 20);
-    const limit = getPPO2Limit(fO2);  // fO2 already trimix-safe above
-    // Exact MOD: deepest depth where raw ppO2 strictly <= limit (no floor truncation)
-    const exactMOD = (limit / fO2 - altSurfaceP) / BAR_PER_METRE;
-    // Snap DOWN to nearest deco stop (multiple of decoStep) that is <= exactMOD
-    const snapped = Math.floor(exactMOD / decoStep) * decoStep;
-    // Never go shallower than lastStop
-    return Math.max(lastStop, Math.max(0, snapped));
-  }
-
-  // Build deco gases array dynamically from all gas mix cards
-  const dU = units === 'metric';
-  const decoGases = [];
-  for (const idx of getAllDecoGasIds()) {
-    const dgf   = getDecoCardFractions(idx);
-    const fN2   = dgf ? dgf.fN2 : getDecoGasFrac(`dg${idx}Mix`, `dg${idx}CustomO2`);
-    const fHe   = dgf ? (dgf.fHe || 0) : 0;
-    const fO2   = dgf ? dgf.fO2 : (fN2 != null ? Math.max(0, 1 - fN2 - fHe) : null);
-    const label = getDecoGasLabel(`dg${idx}Mix`, `dg${idx}CustomO2`);
-    const depth = fN2 !== null ? optimalSwitchDepth(fN2, fO2) : null;
-    const swEl  = document.getElementById(`dg${idx}SwitchDepthDisplay`);
-    if (swEl) swEl.value = depth !== null
-      ? (dU ? depth+'m' : mToFt(depth)+'ft') + '  (ppO₂ ' + ((altSurfaceP + depth * BAR_PER_METRE) * (fO2 != null ? fO2 : (1-fN2))).toFixed(2) + ')'
-      : '—';
-    if (fN2 !== null && depth !== null) decoGases.push({ depth, fN2, fHe, fO2: fO2 ?? Math.max(0, 1-fN2-fHe), label });
-  }
-  decoGases.sort((a, b) => b.depth - a.depth);
-
-  // ── Travel gas ascent injection ─────────────────────────────────
-  // Travel gas is added to decoGases at the bottom gas MOD so that getActiveGas()
-  // automatically switches to it on ascent above bottom gas MOD.
-  // It is flagged as isTravelGas so we can mark it distinctly in the table.
-  const _travelInfoPre = getTravelGasInfo();
-  let   _travelAscentEntry = null;
-  if (_travelInfoPre) {
-    // Bottom gas MOD using bottom ppO2 limit
-    const botFO2 = bottomFO2;  // trimix-aware O2 fraction
-    const botMODm = botFO2 > 0
-      ? Math.floor((ppo2Bottom / botFO2 - altSurfaceP) / BAR_PER_METRE)
-      : depthM;
-    // Only inject if travel gas ppO2 at bot MOD is within its limit
-    const travelFO2 = 1 - _travelInfoPre.fN2;
-    const ppO2AtBotMOD = (altSurfaceP + botMODm * BAR_PER_METRE) * travelFO2;
-    if (ppO2AtBotMOD <= ppo2Bottom + 0.01) {
-      _travelAscentEntry = {
-        depth: botMODm,
-        fN2:   _travelInfoPre.fN2,
-        label: _travelInfoPre.label,
-        isTravelGas: true
-      };
-      decoGases.push(_travelAscentEntry);
-      // Re-sort so getActiveGas sees it in correct depth order
-      decoGases.sort((a, b) => b.depth - a.depth);
-    }
-  }
-
-  // ── Travel gas setup ───────────────────────────────────────────────
-  const travelInfo = getTravelGasInfo(); // null if no travel gas
-  // Effective travel gas switch depth: capped to actual bottom depth
-  const travelSwitchM = travelInfo
-    ? Math.min(travelInfo.switchDepthM, depthM)
-    : 0;
-
-  // Saturate tissues at depth for bottom time
-  let tissues = initTissues();
-
-  // ── Repetitive dive tissue carry (ZHL) ───────────────────────────────────
-  // ZHLEngine.calculate() sets window._zhlRepState before calling runDecoSchedule
-  // to carry end-of-dive tissues from a previous dive with a surface interval.
-  if (window._zhlRepState && Array.isArray(window._zhlRepState.tissues)) {
-    const rep = window._zhlRepState;
-    for (let i = 0; i < tissues.length && i < rep.tissues.length; i++) {
-      tissues[i].pN2 = rep.tissues[i].pN2;
-      tissues[i].pHe = rep.tissues[i].pHe || 0;
-    }
-    if (rep.surfaceIntervalMin > 0) {
-      const siMin = rep.surfaceIntervalMin;
-      const wv = WATER_VAPOR || 0.0627;
-      const inspN2 = 0.7902 * ((altSurfaceP || 1.01325) - wv);
-      for (let i = 0; i < tissues.length; i++) {
-        const kN2 = Math.LN2 / ZHL16C_N2[i].ht;
-        const kHe = Math.LN2 / (ZHL16C_He[i].ht || 1);
-        tissues[i].pN2 = inspN2 + (tissues[i].pN2 - inspN2) * Math.exp(-kN2 * siMin);
-        tissues[i].pHe = (tissues[i].pHe || 0) * Math.exp(-kHe * siMin);
-      }
-    }
-  }
-
-  // Descent phase — split by travel gas switch depth if travel gas is active
-  const descentTime = depthM / descentRate;
-  if (travelInfo && travelSwitchM > 0 && travelSwitchM < depthM) {
-    // Phase 1: surface → travel switch depth on travel gas
-    const travelDescentTime = travelSwitchM / descentRate;
-    tissues = saturateLinear(tissues, 0, travelSwitchM, travelDescentTime, travelInfo.fN2);
-    // Phase 2: travel switch depth → bottom on bottom gas
-    const bottomDescentTime = (depthM - travelSwitchM) / descentRate;
-    tissues = saturateLinear(tissues, travelSwitchM, depthM, bottomDescentTime, bottomFN2, bottomFHe);
-  } else {
-    // No travel gas or switch depth >= bottom: entire descent on bottom gas
-    tissues = saturateLinear(tissues, 0, depthM, descentTime, bottomFN2, bottomFHe);
-  }
-
-  // Bottom time input = total time from leaving surface (industry standard).
-  // Subtract descent time to get actual time spent at depth.
-  const btAtDepth = Math.max(0, bt - descentTime);
-  tissues = saturate(tissues, depthM, btAtDepth, bottomFN2, bottomFHe);
-  const tissuesAtBottom = [...tissues]; // snapshot for ceiling graph overlay
-
-  // ── Decozone start (GF-INDEPENDENT) ──────────────────────────────────────
-  // Evaluated at end-of-bottom tissue state, matching DiveKit's convention:
-  // the depth where the leading compartment's raw inert-gas tension first
-  // exceeds ambient pressure, with NO GF/M-value involved. Must NOT vary with
-  // gfLo/gfHi for the same physical dive (see ambientCrossingDepth() above).
-  const trueDecoZoneStart = ambientCrossingDepth(tissuesAtBottom);
-
-  const steps = [];
-  let cur = depthM;
-  let rt  = bt; // run time = full BT input (descent already counted in BT)
-
-
-  // ── Multi-level headless: monotonic-shallower continuation after deepest level ──
-  const _zhlContLevels = (window._zhlHeadless && Array.isArray(window._zhlContinuationLevels))
-    ? window._zhlContinuationLevels : [];
-  const _zhlAscentFloors = _zhlContLevels.length
-    ? _zhlContLevels.map(c => c.depth).concat([0]) : [0];
-
-  let firstStopDepth = 0;
-  for (let _zhlPhaseIdx = 0; _zhlPhaseIdx < _zhlAscentFloors.length; _zhlPhaseIdx++) {
-  const _zhlAscentFloor = _zhlAscentFloors[_zhlPhaseIdx];
-  firstStopDepth = 0;
-
-  // ── GF anchor: candidate stop list built from ceiling(bottom_tissues, gfL) ──
-  // firstStopDepth is NOT pre-computed here — it is anchored dynamically at the
-  // FIRST depth where mustStop actually fires. This matches MultiDeco/Baker:
-  // GF line is pinned at the actual first required stop, not at a pre-computed
-  // ceiling that may be one step above the real first stop.
-  const bottomCeil = ceiling(tissues, gfL);
-  const candidateFirstStop = bottomCeil > 0
-    ? Math.max(lastStop, Math.ceil(bottomCeil / decoStep) * decoStep)
-    : 0;
-
-  // firstStopDepth: mutable — set when the first ceiling-forced stop is reached.
-  // Until it is set, gfAt() returns gfL (GF Low determines the search for the
-  // first stop, per Baker; GF line is not yet anchored/interpolated).
-
-  // ── Stop-based ascent engine ──
-  // Start stop iteration from candidateFirstStop — ascent from bottom to first stop
-  // is a single linear segment. Gas switch happens at the first stop where it's available.
-  // This matches ApexDeco: ascend to first stop, then iterate stops down to lastStop.
-  const startStop = candidateFirstStop > 0 ? candidateFirstStop : lastStop;
-  const stopDepths = [];
-  const floorStopMin = _zhlAscentFloor > 0 ? Math.max(lastStop, _zhlAscentFloor) : lastStop;
-  for (let d = startStop; d >= floorStopMin; d -= decoStep) {
-    stopDepths.push(d);
-  }
-  if (_zhlAscentFloor > 0) {
-    if (stopDepths.length === 0 || stopDepths[stopDepths.length - 1] !== floorStopMin) stopDepths.push(floorStopMin);
-  } else if (stopDepths.length === 0 || stopDepths[stopDepths.length - 1] !== lastStop) {
-    stopDepths.push(lastStop);
-  }
-
-  let prevEngineGas = bottomMixLabel; // track gas for switch pause
-  let decoZoneEntered = _zhlPhaseIdx > 0; // true once first ceiling-forced stop fires
-
-  // firstSwitchDepth — find first deco gas switch depth
-  let firstDecoDepth   = null;
-  let firstSwitchDepth = null;
-  {
-    let simCur = cur;
-    let simPrevGas = bottomMixLabel;
-    for (const sd of stopDepths) {
-      if (simCur > sd) simCur = sd;
-      const gas2 = getActiveGas(simCur, bottomFN2, decoGases, getPPO2Limit, bottomMixLabel);
-      if (gas2.label !== simPrevGas) { firstSwitchDepth = simCur; break; }
-      simPrevGas = gas2.label;
-    }
-  }
-
-  // minStop zone: only enforce minimum stops within the GF-anchored deco zone.
-  // Dynamically updated when firstStopDepth is set — starts null (no min-stop
-  // enforcement until the first required stop depth is known).
-  let minStopZoneDepth = null;
-
-  // ── GF interpolation: gfL at firstStopDepth → gfH at surface ──
-  // Before the anchor exists, the search for "where is the first stop" must use
-  // gfL (the GF-Low M-value), matching Baker's published algorithm: GF Low is what
-  // determines the first stop. (REGRESSION FIX, v2.10.9: a prior fix here returned
-  // gfH pre-anchor, which made the search use the loose GF-High M-value instead —
-  // the loop then only stopped once GF-High itself was violated, anchoring 2-4 deco
-  // steps shallower than correct and silently dropping total deco time. Confirmed
-  // via independent ceiling() sweep against MultiDeco/DiveKit reference profiles:
-  // ceiling(tissues, gfL=0.30)=11.76m matches the expected 12m first stop, while
-  // ceiling(tissues, gfH=0.70)=5.44m was what the buggy gfAt() was actually testing.)
-  function gfAt(depthM) {
-    if (!firstStopDepth || firstStopDepth <= 0) return gfL;
-    if (depthM >= firstStopDepth) return gfL;
-    // Shallow Gradient (v2.20.0): changes the GF ramp so GF High is reached at lastStop
-    // rather than at the surface. Intermediate stops use a steeper ramp (higher GF at each
-    // stop → stops may be shorter); last stop is held at the full GF High limit (tighter).
-    // Net effect: slightly shorter intermediate stops, potentially longer last stop.
-    // Standard (off): GF interpolates linearly from GF Low at firstStop to GF High at surface.
-    const sgOn = document.getElementById('shallowGradient')?.value === 'on';
-    if (sgOn && depthM <= lastStop) return gfH;
-    const interpBase = sgOn ? lastStop : 0;
-    const gf = gfL + (gfH - gfL) * (firstStopDepth - depthM) / (firstStopDepth - interpBase);
-    return Math.min(gfH, Math.max(gfL, gf));
-  }
-
-  for (let si = 0; si < stopDepths.length; si++) {
-    const stopDepth = stopDepths[si];
-    const nextStop  = si + 1 < stopDepths.length ? stopDepths[si + 1] : 0;
-
-    // Travel from cur to stopDepth — use appropriate ascent rate:
-    // - Before first deco stop: use main ascent rate
-    // - Between deco stops: use decoRate
-    if (cur > stopDepth) {
-      const travelGas = getActiveGas(cur, bottomFN2, decoGases, getPPO2Limit, bottomMixLabel);
-      const travelRate = decoZoneEntered ? decoRate : rate;
-      const travelDur = (cur - stopDepth) / travelRate;
-      if (decoZoneEntered && mdCompatMode) {
-        // MultiDeco-compatible mode: treat deco-zone transit as instant for tissue loading.
-        // Transit time is still counted in RT and added to the displayed stop duration below.
-        // (Schreiner mode: tissues off-gas normally during transit — more accurate.)
-      } else {
-        tissues = saturateLinear(tissues, cur, stopDepth, travelDur, travelGas.fN2, travelGas.fHe || 0);
-      }
-      steps.push({
-        type: 'ascent', from: cur, to: stopDepth,
-        dur: travelDur, gas: travelGas.label,
-        pO2: ppO2Check(cur, travelGas.fN2, travelGas.fHe || 0), fN2: travelGas.fN2, fHe: travelGas.fHe || 0,
-        decoTransit: decoZoneEntered && mdCompatMode
-      });
-      rt  += travelDur;
-      cur  = stopDepth;
-    }
-
-    // Transit time for minimum stop rounding (ApexDeco style):
-    // si=0: arrived via fast ascent (rate m/min), transitDur=0 for min-stop purposes
-    // si>0: travelled at decoRate between stops
-    const transitDur = (si === 0) ? 0 : (stopDepths[si - 1] - stopDepth) / decoRate;
-
-    // Select best gas available at this stop depth
-    const stopGas  = getActiveGas(cur, bottomFN2, decoGases, getPPO2Limit, bottomMixLabel);
-    const stopFN2  = stopGas.fN2;
-    const stopFHe  = stopGas.fHe || 0;
-    const gasLabel = stopGas.label;
-
-    // Gas switch pause — saturate tissues at this depth during the switch
-    if (gasLabel !== prevEngineGas && switchPauseT > 0) {
-      tissues = saturate(tissues, cur, switchPauseT, stopFN2, stopFHe);
-      rt += switchPauseT;
-    }
-    prevEngineGas = gasLabel;
-
-    // Ceiling clearance: evaluate GF at the TARGET (next stop or surface),
-    // not the current stop. Baker/ApexDeco: "can I ascend TO the next stop?"
-    // At last stop: target=0 → uses gfH (surface GF). This is correct.
-    // Use nextStop exactly — ceiling must be strictly below the next stop.
-    const phaseNextStop = (_zhlAscentFloor > 0) ? Math.max(_zhlAscentFloor, nextStop) : nextStop;
-    const ceilTarget = (phaseNextStop < lastStop) ? 0 : phaseNextStop;
-    const gfForClear = gfAt((phaseNextStop < lastStop) ? 0 : phaseNextStop);
-
-    const isFirstDecoStop = (firstDecoDepth === null);
-    // Step resolution: first deco stop uses fine (10-sec) resolution, matching
-    // ApexDeco/MultiDeco's fractional first-stop snap. Subsequent stops use
-    // 1-min steps for ceiling resolution (MultiDeco behaviour), regardless of
-    // minStopT, ensuring stops don't under-count.
-    // BUGFIX (v2.10.44): headless mode previously forced holdStep=1 even for
-    // the first stop (a test-speed shortcut), which coarsened the while-loop's
-    // own resolution and inflated the first-stop time relative to what the
-    // real app and headless test harnesses both expect — this is the only
-    // _zhlHeadless branch in the file that changes a computed RESULT rather
-    // than skipping DOM rendering, so it was silently producing different
-    // RT/TTS numbers in headless tests than the real app would for the same
-    // inputs. Subsequent (non-first) stops still use the coarser 1-min step
-    // in headless mode for speed, since that resolution already matches the
-    // real app's own non-first-stop behavior.
-    const holdStep = isFirstDecoStop ? 1/6 : 1;
-
-    const ceil     = ceiling(tissues, gfForClear);
-    const mustStop = ceil > ceilTarget;
-
-    if (mustStop) {
-      // Record the first depth where ceiling forces a stop.
-      // CRITICAL: anchor firstStopDepth here (not pre-computed from bottom tissues).
-      // This matches MultiDeco/Baker: GF line is anchored at the ACTUAL first stop depth.
-      if (firstDecoDepth === null) {
-        firstDecoDepth  = cur;
-        firstStopDepth  = cur;   // anchor GF line at real first stop
-        minStopZoneDepth = cur;  // enable min-stop enforcement from here down
-      }
-      decoZoneEntered = true;
-      // Capture RT before ceiling loop — ApexDeco snaps the arrival RT to next minute
-      const rtOnArrival = rt;
-      let stopT = 0;
-      while (ceiling(tissues, gfForClear) > ceilTarget && stopT < 360) {
-        tissues = saturate(tissues, cur, holdStep, stopFN2, stopFHe);
-        stopT += holdStep; rt += holdStep;
-      }
-      if (isFirstDecoStop) {
-        // First stop: always use RT-snap (fractional) — both ApexDeco and MultiDeco
-        // keep the exact first-stop time (e.g. 0:33, 0:27) regardless of rounding mode.
-        const rawRounded = Math.round(stopT * 60) / 60;
-        const minFirstStop = Math.round((Math.ceil(rtOnArrival / minStopT) * minStopT - rtOnArrival) * 60) / 60;
-        const actualStop = Math.max(rawRounded, minFirstStop);
-        if (actualStop > stopT) {
-          const extra = actualStop - stopT;
-          tissues = saturate(tissues, cur, extra, stopFN2, stopFHe);
-          rt += extra; stopT = actualStop;
-        }
-        if (stopT < 1/60) { tissues = saturate(tissues, cur, 1/60 - stopT, stopFN2, stopFHe); rt += 1/60 - stopT; stopT = 1/60; }
-      } else {
-        let roundedStop;
-        {
-          const totalAtLevel = Math.max(minStopT, Math.ceil((transitDur + stopT) / minStopT) * minStopT);
-          roundedStop = totalAtLevel - transitDur;
-        }
-        if (roundedStop > stopT) {
-          const extra = roundedStop - stopT;
-          tissues = saturate(tissues, cur, extra, stopFN2, stopFHe);
-          rt += extra; stopT = roundedStop;
-        }
-        // Enforce minimum stop time — every non-first deco stop gets at least minStopT
-        if (stopT < minStopT) {
-          const extra = minStopT - stopT;
-          tissues = saturate(tissues, cur, extra, stopFN2, stopFHe);
-          rt += extra; stopT = minStopT;
-        }
-      }
-      const mustStopDisplay = (mdCompatMode && !isFirstDecoStop) ? stopT + transitDur : stopT;
-      steps.push({ type: 'deco', depth: cur, dur: mustStopDisplay, gas: gasLabel, pO2: ppO2Check(cur, stopFN2, stopFHe), fN2: stopFN2, fHe: stopFHe, _tissues: tissues.map(t => ({ pN2: t.pN2, pHe: t.pHe })) });
-    } else if (minStopT > 0 && minStopZoneDepth !== null && cur <= minStopZoneDepth && cur !== lastStop) {
-      decoZoneEntered = true;
-      let stopT = 0;
-      if (isFirstDecoStop) {
-        if (firstDecoDepth === null) firstDecoDepth = cur;
-        const minFirstStop = Math.ceil(rt / minStopT) * minStopT - rt;
-        const snapped = Math.max(0, Math.round(minFirstStop * 60) / 60);
-        // Always keep meaningful fractional first stop (RT-snap). MultiDeco behaviour.
-        // Never pad first stop to full minStopT — only enforce 1-sec minimum.
-        stopT = Math.max(snapped, 1/60);
-      } else {
-        const needed = Math.max(0, minStopT - transitDur);
-        stopT = needed;
-      }
-      if (stopT > 0) {
-        tissues = saturate(tissues, cur, stopT, stopFN2, stopFHe);
-        rt += stopT;
-      }
-      while (ceiling(tissues, gfForClear) > ceilTarget && stopT < 360) {
-        tissues = saturate(tissues, cur, minStopT, stopFN2, stopFHe);
-        stopT += minStopT; rt += minStopT;
-      }
-      if (!isFirstDecoStop) {
-        // Round up and enforce minimum — only for non-first stops
-        const totalAtLevel = Math.max(minStopT, Math.ceil((transitDur + stopT) / minStopT) * minStopT);
-        const roundedStop = totalAtLevel - transitDur;
-        if (roundedStop > stopT) {
-          const extra = roundedStop - stopT;
-          tissues = saturate(tissues, cur, extra, stopFN2, stopFHe);
-          rt += extra; stopT = roundedStop;
-        }
-        if (stopT < minStopT) {
-          const extra = minStopT - stopT;
-          tissues = saturate(tissues, cur, extra, stopFN2, stopFHe);
-          rt += extra; stopT = minStopT;
-        }
-      }
-      if (stopT > 0) {
-        const minStopDisplay = (mdCompatMode && !isFirstDecoStop) ? stopT + transitDur : stopT;
-        steps.push({ type: 'deco', depth: cur, dur: minStopDisplay, gas: gasLabel, pO2: ppO2Check(cur, stopFN2, stopFHe), fN2: stopFN2, fHe: stopFHe, _tissues: tissues.map(t => ({ pN2: t.pN2, pHe: t.pHe })) });
-      }
-    } else if (cur === lastStop) {
-      const isDecoNeeded = steps.some(s => s.type === 'deco');
-      const stopType = isDecoNeeded ? 'deco' : 'safety';
-      let stopT = 0;
-      let transitToLastStop = 0;
-      if (isDecoNeeded) {
-        transitToLastStop = (stopDepths.length > 1) ? (stopDepths[stopDepths.length - 2] - lastStop) / decoRate : 0;
-        while (ceiling(tissues, gfAt(0)) > 0.01 && stopT < 180) {
-          tissues = saturate(tissues, cur, minStopT, stopFN2, stopFHe);
-          stopT += minStopT; rt += minStopT;
-        }
-        let roundedLastStop;
-        {
-          const totalAtLevel = Math.max(minStopT, Math.ceil((transitToLastStop + stopT) / minStopT) * minStopT);
-          roundedLastStop = totalAtLevel - transitToLastStop;
-        }
-        if (roundedLastStop > stopT) {
-          const extra = roundedLastStop - stopT;
-          tissues = saturate(tissues, cur, extra, stopFN2, stopFHe);
-          stopT += extra; rt += extra;
-        }
-        if (stopT < minStopT) {
-          const extra = minStopT - stopT;
-          tissues = saturate(tissues, cur, extra, stopFN2, stopFHe);
-          stopT += extra; rt += extra;
-        }
-      } else {
-        stopT = Math.max(3, minStopT);
-        tissues = saturate(tissues, cur, stopT, stopFN2, stopFHe);
-        rt += stopT;
-      }
-      const lastStopDisplay = mdCompatMode ? stopT + transitToLastStop : stopT;
-      steps.push({ type: stopType, depth: cur, dur: lastStopDisplay, gas: gasLabel, pO2: ppO2Check(cur, stopFN2, stopFHe), fN2: stopFN2, fHe: stopFHe, _tissues: tissues.map(t => ({ pN2: t.pN2, pHe: t.pHe })) });
-    }
-    // No stop needed and not lastStop — continue ascending
-    if (_zhlAscentFloor > 0 && cur <= _zhlAscentFloor && stopDepth <= _zhlAscentFloor) break;
-  }
-
-  if (_zhlAscentFloor > 0 && cur > _zhlAscentFloor) {
-    const travelRate = decoZoneEntered ? decoRate : rate;
-    const travelDur = (cur - _zhlAscentFloor) / travelRate;
-    const travelGas = getActiveGas(cur, bottomFN2, decoGases, getPPO2Limit, bottomMixLabel);
-    tissues = saturateLinear(tissues, cur, _zhlAscentFloor, travelDur, travelGas.fN2, travelGas.fHe || 0);
-    steps.push({
-      type: 'ascent', from: cur, to: _zhlAscentFloor,
-      dur: travelDur, gas: travelGas.label,
-      pO2: ppO2Check(cur, travelGas.fN2, travelGas.fHe || 0), fN2: travelGas.fN2, fHe: travelGas.fHe || 0,
-    });
-    rt += travelDur;
-    cur = _zhlAscentFloor;
-  } else if (_zhlAscentFloor === 0 && cur > 0) {
-    const finalAscentDur = cur / surfaceRate;
-    const finalGas = getActiveGas(cur, bottomFN2, decoGases, getPPO2Limit, bottomMixLabel);
-    tissues = saturateLinear(tissues, cur, 0, finalAscentDur, finalGas.fN2, finalGas.fHe || 0);
-    steps.push({
-      type: 'ascent', from: cur, to: 0,
-      dur: finalAscentDur, gas: finalGas.label,
-      pO2: ppO2Check(cur, finalGas.fN2, finalGas.fHe || 0), fN2: finalGas.fN2, fHe: finalGas.fHe || 0,
-    });
-    rt += finalAscentDur;
-    cur = 0;
-  }
-
-  if (_zhlPhaseIdx < _zhlContLevels.length) {
-    const cont = _zhlContLevels[_zhlPhaseIdx];
-    cur = cont.depth;
-    const cO2 = cont.o2 / 100;
-    const cHe = (cont.he || 0) / 100;
-    const cN2 = Math.max(0, 1 - cO2 - cHe);
-    tissues = saturate(tissues, cur, cont.time, cN2, cHe);
-    rt += cont.time;
-    steps.push({
-      type: 'bottom', depth: cur, dur: cont.time,
-      gas: getGasLabel(cO2, cHe), pO2: ppO2Check(cur, cN2, cHe),
-      fN2: cN2, fHe: cHe,
-    });
-  }
-
-  } // end multi-level ascent phase
-
-  // Collapse consecutive ascent steps with the same gas into single rows
-  const collapsed = [];
-  for (const s of steps) {
-    const prev = collapsed[collapsed.length - 1];
-    if (s.type === 'ascent' && prev && prev.type === 'ascent' && prev.gas === s.gas) {
-      prev.to   = s.to;
-      prev.dur += s.dur;
-      prev.pO2  = s.pO2; // keep last ppO2
-    } else {
-      collapsed.push({ ...s });
-    }
-  }
-
-  // ── Min Deco Profile enforcement ──────────────
-  const _mdpEnabled   = document.getElementById('minDecoProfileEnable')?.value === 'yes';
-  const _mdp9m        = parseFloat(document.getElementById('minDeco9m')?.value) || 1;
-  const _mdp6m        = parseFloat(document.getElementById('minDeco6m')?.value) || 3;
-  const _mdpIsMetric  = document.getElementById('unitSel')?.value !== 'imperial';
-  const collapsedMDP  = enforceMinDecoProfile(collapsed, _mdpEnabled, _mdp9m, _mdp6m, _mdpIsMetric, bottomMixLabel, bottomFN2, bottomFHe);
-
-  const decoStops = collapsedMDP.filter(s => s.type === 'deco');
-  const decoTime  = Math.round(decoStops.reduce((a, s) => a + s.dur, 0) * 60) / 60;
-  const hasDeco   = decoStops.length > 0;
-  const gasUsed   = [...new Set(collapsed.map(s => s.gas))];
-
-  // ── Headless hook: store plan for Node testing ──
-  const runTimeMin = Math.round(rt);
-  // TTS (time-to-surface): ascent+deco only. rt was initialized to bt (the full
-  // descent-inclusive bottom-time input) and only grows via ascent/deco `rt +=`
-  // additions in the loop above, so `rt - bt` is exactly the ascent+deco portion —
-  // matches MultiDeco/DiveKit's published TTS definition. Computed here (before
-  // the headless early-return below) so it's available in both headless tests
-  // and the live DOM-rendered footer.
-  const ttsMin = Math.max(0, rt - bt);
-  window._lastPlan = {
-    rt: runTimeMin,
-    tts: Math.round(ttsMin * 10) / 10,
-    decoTime: Math.round(decoTime),
-    stops: decoStops.map(s => ({ depth: s.depth, dur: s.dur, gas: s.gas })),
-    steps: collapsed,
-    decoZoneStart: trueDecoZoneStart,
-    firstStopDepth: firstStopDepth || 0,
-    finalTissues: tissues.map(t => ({ pN2: t.pN2, pHe: t.pHe || 0 })),  // for ZHL repetitive dive carry
-    surfaceGF: computeSurfaceGF(tissues),
-  };
+  const tissues = (zhlCore.lastPlan.finalTissues || []).map(t => ({ pN2: t.pN2, pHe: t.pHe || 0 }));
 
   // ── Headless mode early return: skip ceiling/graph/DOM work ─────────────
-  // Guard moved before ceiling waypoints — the intermediate saturate() calls
-  // for graph smoothing are expensive and unnecessary in headless engine tests.
   if (window._zhlHeadless) return;
+
 
   // ── Store ceiling waypoints for graph overlay ──
   // Sample ceiling at finer resolution for smooth overlay line
@@ -10239,24 +9878,7 @@ function runDecoSchedule() {
 
 /** Deepest level + monotonic-shallower continuation (matches VPMEngine profile split). */
 function splitZhlProfileLevels(levels) {
-  if (!levels || levels.length <= 1) return { primary: levels || [], continuation: [] };
-  let deepest = 0;
-  for (let i = 1; i < levels.length; i++) {
-    if (levels[i].depth > levels[deepest].depth) deepest = i;
-  }
-  let continuation = [];
-  let primary = levels;
-  if (deepest < levels.length - 1) {
-    let monotonic = true;
-    for (let i = deepest + 1; i < levels.length; i++) {
-      if (levels[i].depth > levels[i - 1].depth) { monotonic = false; break; }
-    }
-    if (monotonic) {
-      continuation = levels.slice(deepest + 1);
-      primary = levels.slice(0, deepest + 1);
-    }
-  }
-  return { primary, continuation };
+  return ZhlEngineBundle.splitZhlProfileLevels(levels);
 }
 
 /** ZHL headless API: deepest segment first, then optional monotonic-shallower holds only. */
@@ -10290,342 +9912,43 @@ if (typeof window !== 'undefined') window.validateZhlHeadlessProfile = validateZ
 
 // ═══════════════════════════════════════════════
 // ZHL ENGINE — headless Bühlmann interface for test harnesses
-// Mirrors VPMEngine.calculate(levels, gases, settings, 'ZHLC_GF')
-// so Tier 1 tests can directly call the Bühlmann engine.
+// Tier 3: ZhlEngineBundle (sync) + ZhlWorkerBridge (async worker)
+// Mirrors VPMEngine.calculate(levels, gases, settings, 'ZHLC_GF').
 // ═══════════════════════════════════════════════
 const ZHLEngine = (() => {
-  function setEl(id, val) {
-    const el = document.getElementById(id);
-    if (el) el.value = val;
-  }
-
-  function saveFieldValues(ids) {
-    return ids.map(id => ({ id, val: document.getElementById(id)?.value }));
-  }
-
-  function restoreFieldValues(saved) {
-    saved.forEach(({ id, val }) => {
-      const el = document.getElementById(id);
-      if (el && val != null) el.value = val;
-    });
-  }
-
   function calculate(levels, decoGases, settings) {
     const validation = validateEngineInputs(levels, decoGases);
     if (!validation.ok) return engineValidationError(validation);
-    const s = settings || {};
-    const isMetric = s.metric !== false;
     const profileVal = validateZhlHeadlessProfile(levels);
     if (!profileVal.ok) {
       return engineValidationError({ ok: false, errors: [profileVal] });
     }
-    const profileSplit = splitZhlProfileLevels(levels);
-    const level = levels[0];
-
-    // ── Temporarily wire DOM to match settings ──────────────────────────────
-    const prevDecoDepth = document.getElementById('decoDepth')?.value;
-    const prevDecoBT = document.getElementById('decoBT')?.value;
-    const prevHeadlessFields = saveFieldValues([
-      'ascentRate', 'decoAscentRate', 'surfaceAscentRate', 'descentRate',
-      'minStopTime', 'decoStep', 'lastDecoStop', 'ppo2Bottom', 'ppo2Deco'
-    ]);
-    const prevContLevels = window._zhlContinuationLevels;
-    window._zhlContinuationLevels = profileSplit.continuation.length ? profileSplit.continuation : null;
-    setEl('decoDepth', isMetric ? level.depth : Math.round(level.depth * 3.28084));
-    setEl('decoBT',    level.time);
-    setEl('ascentRate',      s.ascentRate      || 10);
-    setEl('decoAscentRate',  s.decoAscentRate  || 3);
-    setEl('surfaceAscentRate', s.surfaceAscentRate || 3);
-    setEl('descentRate',     s.descentRate     || 20);
-    setEl('minStopTime',     s.minStopTime     || 1);
-    setEl('decoStep',        s.stepSize        || 3);
-    setEl('lastDecoStop',    s.lastStop        || 3);
-    setEl('ppo2Bottom',      s.ppO2Bottom      || 1.4);
-    setEl('ppo2Deco',        s.ppO2Deco        || 1.6);
-
-    // ── GF: set via mGF global (Bühlmann reads from mGF, not settings) ──────
-    const prevGF = { low: mGF.low, high: mGF.high };
-    mGF.low  = s.gfLo  || s.gfLow  || 30;
-    mGF.high = s.gfHi  || s.gfHigh || 85;
-
-    // ── Units ─────────────────────────────────────────────────────────────────
-    // Only call setUnits if we actually need to switch — avoids heavy DOM walk on every call
-    const prevUnits = units;
-    const needUnits = s.metric === false ? 'imperial' : 'metric';
-    if (units !== needUnits) setUnits(needUnits);
-
-    // ── Algorithm: force ZHLC_GF (no DOM event — headless mode skips UI update) ─
-    const algoEl = document.getElementById('algorithmSelect');
-    const prevAlgo = algoEl ? algoEl.value : 'ZHLC_GF';
-    if (algoEl) algoEl.value = 'ZHLC_GF';
-    // Don't dispatchEvent — setDecoAlgorithm() triggers heavy UI updates.
-    // runDecoSchedule reads algorithmSelect.value directly, so just setting .value is enough.
-
-    // ── Bottom gas (first level's o2/he) ────────────────────────────────────
-    const fO2bot = level.o2 / 100;
-    const fHeBot = (level.he || 0) / 100;
-    const fN2bot = Math.max(0, 1 - fO2bot - fHeBot);
-    // Set bottom gas — must use 'trimix' mode when He > 0 so getBottomGasFractions() reads He correctly
-    const decoGasEl = document.getElementById('decoGas');
-    let prevDecoGasVal = decoGasEl ? decoGasEl.value : 'air';
-    if (decoGasEl) {
-      if (fHeBot > 0) {
-        decoGasEl.value = 'trimix';  // BUGFIX: was 'custom' — custom branch in getBottomGasFractions() sets fHe:0
-        setEl('botTrimixO2', Math.round(fO2bot * 100));
-        setEl('botTrimixHe', Math.round(fHeBot * 100));
-      } else if (Math.round(fO2bot * 100) === 21) {
-        decoGasEl.value = 'air';
-      } else if (Math.round(fO2bot * 100) === 32) {
-        decoGasEl.value = 'ean32';
-      } else {
-        decoGasEl.value = 'custom';
-        setEl('decoCustomO2', Math.round(fO2bot * 100));
-      }
-    }
-
-    // ── Deco gases ──────────────────────────────────────────────────────────
-    // Collect current card indices (pre-built slots 1 and 2, plus any dynamic ones)
-    // and record their current state for restore.
-    const prevDGVals = [];
-    const _prevDGCards = [];
-    {
-      const container = document.getElementById('decoGasCards');
-      if (container) {
-        container.querySelectorAll('.deco-gas-card').forEach(card => {
-          const idMatch = card.id.match(/dgCard_(\d+)/);
-          if (idMatch) _prevDGCards.push(parseInt(idMatch[1]));
-        });
-      } else {
-        // fallback: pre-built slots 1 and 2
-        _prevDGCards.push(1, 2);
-      }
-    }
-    // Save and clear all current slots
-    _prevDGCards.forEach(idx => {
-      const mixEl = document.getElementById(`dg${idx}Mix`);
-      if (mixEl) {
-        prevDGVals.push({ id: `dg${idx}Mix`, val: mixEl.value });
-        prevDGVals.push({ id: `dg${idx}CustomO2`, val: document.getElementById(`dg${idx}CustomO2`)?.value });
-        prevDGVals.push({ id: `dg${idx}TrimixO2`, val: document.getElementById(`dg${idx}TrimixO2`)?.value });
-        prevDGVals.push({ id: `dg${idx}TrimixHe`, val: document.getElementById(`dg${idx}TrimixHe`)?.value });
-        mixEl.value = 'none';
-      }
-    });
-    // Track any dynamic cards we add so we can remove them on restore
-    const _addedDGIdxs = [];
-    (decoGases || []).forEach((g, i) => {
-      const n = i + 1;
-      // Resolve the card idx for position n (pre-built cards 1&2 have idx==n; dynamic cards use _dgNextIdx)
-      let cardIdx;
-      const existingMix = document.getElementById(`dg${n}Mix`);
-      if (existingMix) {
-        cardIdx = n;  // pre-built card — slot index matches card number
-      } else {
-        // Add a dynamic card for this extra gas
-        if (typeof addDecoGasCard === 'function') {
-          addDecoGasCard();
-          cardIdx = _dgNextIdx - 1;  // addDecoGasCard increments _dgNextIdx before returning
-          _addedDGIdxs.push(cardIdx);
-        } else {
-          return;  // can't add more slots
-        }
-      }
-      const mixEl = document.getElementById(`dg${cardIdx}Mix`);
-      if (!mixEl) return;
-      const o2pct = g.o2;
-      const hePct = g.he || 0;
-      if (o2pct === 100) {
-        mixEl.value = 'o2';
-      } else if (o2pct === 50 && hePct === 0) {
-        mixEl.value = 'ean50';
-      } else if (o2pct === 80 && hePct === 0) {
-        mixEl.value = 'ean80';
-      } else if (hePct > 0) {
-        // BUGFIX: trimix deco gas — must use 'trimix' mode, NOT 'custom'.
-        // 'custom' branch in getDecoGasFractions() sets fHe:0 unconditionally.
-        mixEl.value = 'trimix';
-        setEl(`dg${cardIdx}TrimixO2`, o2pct);
-        setEl(`dg${cardIdx}TrimixHe`, hePct);
-      } else {
-        mixEl.value = 'custom';
-        setEl(`dg${cardIdx}CustomO2`, o2pct);
-      }
-    });
-
-    // ── Set up repetitive-dive tissue state for headless run ────────────────
-    // BUGFIX (v2.10.12): ZHLEngine.calculate() never forwarded _preTissues /
-    // _surfaceInterval to runDecoSchedule. The hook uses window._zhlRepState
-    // (set here, cleared after restore) so runDecoSchedule can pick it up.
-    window._zhlRepState = (s._preTissues && s._preTissues.length)
-      ? { tissues: s._preTissues, surfaceIntervalMin: s._surfaceInterval || 0 }
-      : null;
-
-    // ── Forward prior-dive O₂ carry into headless run if set (v2.20.0) ───────
-    // The live-app path picks this up via window._priorDiveCarry in runDecoSchedule.
-    // For headless calls we mirror it from the settings object so test harnesses
-    // that pass _preOTU/_preCNS get the same carry behaviour as the live app.
-    const _prevPriorDiveCarry = window._priorDiveCarry;
-    if ((s._preOTU != null && s._preOTU > 0) || (s._preCNS != null && s._preCNS > 0)) {
-      window._priorDiveCarry = {
-        otuCarry: s._preOTU || 0,
-        cnsCarry: s._preCNS || 0,
-      };
-    }
-
-    // ── Run the Bühlmann engine (headless — skip DOM rendering) ─────────────
-    const _headlessEntry = window._zhlHeadlessDepth || 0;
-    window._zhlHeadlessDepth = _headlessEntry + 1;
-    window._zhlHeadless = true;
-    window._lastPlan = null;
-    try {
-      runDecoSchedule();
-    } catch(e) {
-      window._zhlHeadlessDepth = _headlessEntry;
-      window._zhlHeadless = _headlessEntry > 0;
-      window._zhlRepState = null;
-      window._zhlContinuationLevels = prevContLevels;
-      window._priorDiveCarry = _prevPriorDiveCarry;
-      if (prevDecoDepth != null) setEl('decoDepth', prevDecoDepth);
-      if (prevDecoBT != null) setEl('decoBT', prevDecoBT);
-      restoreFieldValues(prevHeadlessFields);
-      mGF.low = prevGF.low; mGF.high = prevGF.high;
-      if (units !== prevUnits) setUnits(prevUnits);
-      if (algoEl) algoEl.value = prevAlgo;
-      return { error: e.message, stops: [], plan: [], totalRuntime: 0 };
-    }
-    window._zhlHeadlessDepth = _headlessEntry;
-    window._zhlHeadless = _headlessEntry > 0;
-
-    if (window._zhlEngineValidation && !window._zhlEngineValidation.ok) {
-      const errOut = engineValidationError(window._zhlEngineValidation);
-      window._zhlEngineValidation = null;
-      mGF.low = prevGF.low; mGF.high = prevGF.high;
-      if (units !== prevUnits) setUnits(prevUnits);
-      if (algoEl) algoEl.value = prevAlgo;
-      if (decoGasEl) decoGasEl.value = prevDecoGasVal;
-      prevDGVals.forEach(({ id, val }) => { const el = document.getElementById(id); if (el && val != null) el.value = val; });
-      _addedDGIdxs.forEach(idx => { const card = document.getElementById(`dgCard_${idx}`); if (card) card.remove(); });
-      if (_addedDGIdxs.length > 0 && typeof renumberDecoGasCards === 'function') renumberDecoGasCards();
-      window._zhlRepState = null;
-      window._priorDiveCarry = _prevPriorDiveCarry;
-      restoreFieldValues(prevHeadlessFields);
-      return errOut;
-    }
-
-    const lp = window._lastPlan;
-
-    // ── Compute CNS/OTU from steps (not available from DOM-skipped render) ──
-    // BUGFIX (found via DiveKit 3-way comparison, June 2026): window._lastPlan.steps
-    // only contains ascent/deco segments — descent and bottom time are rendered
-    // straight to DOM in the live app and never pushed into `steps`. The original
-    // fallback below summed only `lp.steps`, silently omitting the largest share
-    // of O2 exposure on every dive (descent + full bottom time). Live-app DOM
-    // rendering (runDecoSchedule's non-headless path) computes this correctly by
-    // accumulating across the rendered table; this headless fallback now matches
-    // it by adding descent + bottom segments explicitly before summing steps.
-    if (lp && lp.totalCNS == null) {
-      let hCNSfrac = 0, hOTU = 0;
-      const hAltP = altSurfaceP || 1.01325;
-      const hBAR  = BAR_PER_METRE || 0.1;
-      function addExposure(ppO2, dur) {
-        if (ppO2 > 0.5 && dur > 0) {
-          hOTU += dur * Math.pow((ppO2 - 0.5) / 0.5, OTU_EXPONENT);
-          const lims = {6:720,7:570,8:450,9:360,10:300,11:240,12:210,13:180,14:150,15:120,16:45};
-          const lo = Math.floor(ppO2 * 10), hi = lo + 1;
-          const lim = (lims[lo] || 0) + ((lims[hi] || 0) - (lims[lo] || 0)) * (ppO2 * 10 - lo);
-          const safeLim = lim > 0 ? lim : 45; // ppO2>1.6: clamp to 45-min limit (matches segCNSfrac fix)
-          hCNSfrac += dur / safeLim;
-        }
-      }
-      // Descent: average depth = half of bottom depth (linear descent from surface)
-      const hDescentRate = s.descentRate || 20;
-      const hDescentTime = level.depth / hDescentRate;
-      addExposure((hAltP + (level.depth / 2) * hBAR) * fO2bot, hDescentTime);
-      // Bottom: full level.time at full depth, on bottom gas
-      addExposure((hAltP + level.depth * hBAR) * fO2bot, level.time);
-      // Ascent/deco steps (unchanged from original — already correct for these segments)
-      (lp.steps || []).forEach(seg => {
-        const d   = seg.depth != null ? seg.depth : (seg.type === 'ascent' ? (seg.from + seg.to) / 2 : 0);
-        const fO2s = seg.fN2 !== undefined ? Math.max(0, 1 - seg.fN2 - (seg.fHe || 0)) : fO2bot;
-        const pAmb = hAltP + d * hBAR;
-        const ppO2 = fO2s * pAmb;
-        addExposure(ppO2, seg.dur || 0);
-      });
-      lp.totalCNS = parseFloat((hCNSfrac * 100).toFixed(1));
-      lp.totalOTU = Math.round(hOTU);
-    }
-
-    // ── Restore DOM state ─────────────────────────────────────────────────────
-    mGF.low = prevGF.low; mGF.high = prevGF.high;
-    if (units !== prevUnits) setUnits(prevUnits);
-    if (algoEl) algoEl.value = prevAlgo;
-    // Don't fire change event on restore — avoids unnecessary UI repaint after each test call.
-    if (decoGasEl) decoGasEl.value = prevDecoGasVal;
-    prevDGVals.forEach(({ id, val }) => { const el = document.getElementById(id); if (el && val != null) el.value = val; });
-    // Remove any dynamic deco gas cards we added for this headless call
-    _addedDGIdxs.forEach(idx => { const card = document.getElementById(`dgCard_${idx}`); if (card) card.remove(); });
-    if (_addedDGIdxs.length > 0 && typeof renumberDecoGasCards === 'function') renumberDecoGasCards();
-
-    // Clear repetitive state — must not leak into subsequent calls
-    window._zhlRepState = null;
-    window._zhlContinuationLevels = prevContLevels;
-    window._priorDiveCarry = _prevPriorDiveCarry; // restore prior-dive carry to pre-call state
-    if (prevDecoDepth != null) setEl('decoDepth', prevDecoDepth);
-    if (prevDecoBT != null) setEl('decoBT', prevDecoBT);
-    restoreFieldValues(prevHeadlessFields);
-
-    if (!lp) return { error: 'No plan generated', stops: [], plan: [], totalRuntime: 0 };
-
-    // ── Map _lastPlan to VPMEngine-compatible result interface ────────────────
-    const stops = (lp.stops || []).map(s => ({
-      depth: s.depth, time: s.dur, gas: s.gas, type: 'stop'
-    }));
-    const plan = (lp.steps || []).map(s => ({
-      type: s.type === 'deco' ? 'stop' : s.type === 'safety' ? 'stop' : s.type,
-      depth: s.type === 'ascent' ? s.to : s.depth,
-      time:  s.dur,
-      run:   null,   // not tracked by Bühlmann steps
-      gas:   s.gas,
-      o2:    Math.round((s.fN2 !== undefined ? (1 - s.fN2 - (s.fHe||0)) : fO2bot) * 100),
-      he:    Math.round((s.fHe || 0) * 100)
-    }));
-    // Inject descent and bottom segments at front if missing
-    // (Bühlmann steps array only has ascent/deco/safety — descent and bottom are
-    // rendered directly to DOM, not stored in steps. Add them so assertIntegrity passes.)
-    if (plan.length === 0 || plan[0].type !== 'descent') {
-      const descentTime = level.depth / (s.descentRate || 20);
-      const bottomGasLabel = plan.length > 0 ? (plan[0].gas || 'bottom') : 'bottom';
-      const bottomSeg = { type: 'bottom', depth: level.depth, time: level.time, run: descentTime + level.time, gas: bottomGasLabel, o2: level.o2, he: level.he || 0 };
-      const descentSeg = { type: 'descent', depth: level.depth, time: descentTime, run: descentTime, gas: bottomGasLabel, o2: level.o2, he: level.he || 0 };
-      plan.unshift(bottomSeg);   // goes to index 0 first
-      plan.unshift(descentSeg);  // then pushed to index 0, bottomSeg moves to 1
-    }
-    // Patch run times into remaining segments (needed by assertIntegrity run-time monotonicity check)
-    let runAccum = 0;
-    plan.forEach(seg => {
-      if (seg.run == null) {
-        runAccum += (seg.time || 0);
-        seg.run = Math.round(runAccum * 10) / 10;
-      } else {
-        runAccum = seg.run;
-      }
-    });
-
-    return {
-      plan,
-      stops,
-      totalRuntime: lp.rt || 0,
-      tts: lp.tts || 0,
-      totalOTU: lp.totalOTU || 0,
-      totalCNS: lp.totalCNS || 0,
-      finalTissues: lp.finalTissues || null,   // for ZHL repetitive dive carry
-      depthUnit: isMetric ? 'm' : 'ft',
-      error: null
-    };
+    const s = settings || {};
+    const profileSplit = ZhlEngineBundle.splitZhlProfileLevels(levels);
+    return ZhlEngineBundle.calculate(levels, decoGases, s, profileSplit, getZhlEnvironment());
   }
 
-  return { calculate, MODEL: 'ZHLC_GF' };
+  async function calculateInWorker(levels, decoGases, settings) {
+    const validation = validateEngineInputs(levels, decoGases);
+    if (!validation.ok) return engineValidationError(validation);
+    const profileVal = validateZhlHeadlessProfile(levels);
+    if (!profileVal.ok) {
+      return engineValidationError({ ok: false, errors: [profileVal] });
+    }
+    const s = settings || {};
+    const profileSplit = ZhlEngineBundle.splitZhlProfileLevels(levels);
+    try {
+      return await ZhlWorkerBridge.calculateInWorker(
+        levels, decoGases, s, profileSplit, getZhlEnvironment()
+      );
+    } catch (e) {
+      return { error: e.message, stops: [], plan: [], totalRuntime: 0 };
+    }
+  }
+
+  return { calculate, calculateInWorker, MODEL: 'ZHLC_GF' };
 })();
+
 if (typeof window !== 'undefined') window.ZHLEngine = ZHLEngine; // expose for test harnesses
 
 // ═══════════════════════════════════════════════
