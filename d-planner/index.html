@@ -3345,7 +3345,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.30';
+const APP_VERSION = '2.20.31';
 window.APP_VERSION = APP_VERSION;
 // Test harness: skip DOM recalc storms when loaded inside tests-massive.html iframe
 (function() {
@@ -10302,7 +10302,6 @@ const ZHLEngine = (() => {
   function calculate(levels, decoGases, settings) {
     const validation = validateEngineInputs(levels, decoGases);
     if (!validation.ok) return engineValidationError(validation);
-    if (!levels || levels.length === 0) return { error: 'No levels', stops: [], plan: [], totalRuntime: 0 };
     const s = settings || {};
     const isMetric = s.metric !== false;
     const profileVal = validateZhlHeadlessProfile(levels);
