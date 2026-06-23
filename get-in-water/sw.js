@@ -1,4 +1,4 @@
-const CACHE_NAME = 'giw-v1.3.2';
+const CACHE_NAME = 'giw-v1.4.0';
 const ASSETS = [
   '/get-in-water/',
   '/get-in-water/index.html',
@@ -6,6 +6,11 @@ const ASSETS = [
   '/get-in-water/sw.js',
   '/get-in-water/capacitor-bridge.js',
   '/get-in-water/backup-sanitize.js',
+  '/get-in-water/firebase-config.js',
+  '/get-in-water/sync.js',
+  '/get-in-water/vendor/firebase/firebase-app-compat.js',
+  '/get-in-water/vendor/firebase/firebase-auth-compat.js',
+  '/get-in-water/vendor/firebase/firebase-firestore-compat.js',
   '/get-in-water/vendor/jspdf.umd.min.js',
   '/get-in-water/vendor/fonts/DejaVuSans.ttf',
   '/get-in-water/vendor/fonts/DejaVuSans-Bold.ttf',
@@ -14,6 +19,17 @@ const ASSETS = [
   '/get-in-water/icon-192-light.png',
   '/get-in-water/icon-512-light.png'
 ];
+
+const NETWORK_ONLY = [
+  'firebaseapp.com',
+  'googleapis.com',
+  'gstatic.com',
+  'google.com'
+];
+
+function isFirebaseRequest(url) {
+  return NETWORK_ONLY.some(host => url.hostname.includes(host));
+}
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -32,6 +48,11 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+  if (isFirebaseRequest(url)) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );

@@ -16,6 +16,11 @@
 <link href="icon-192.png" rel="apple-touch-icon" id="apple-touch-icon"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Noto+Sans:wght@400;500;600;700&amp;family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <script src="backup-sanitize.js"></script>
+<script src="firebase-config.js"></script>
+<script src="vendor/firebase/firebase-app-compat.js"></script>
+<script src="vendor/firebase/firebase-auth-compat.js"></script>
+<script src="vendor/firebase/firebase-firestore-compat.js"></script>
+<script src="sync.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
 <script>
   if (!window.Capacitor) {
@@ -285,7 +290,13 @@ body.light-theme .btn-export.btn-reset-red:hover { background: rgba(255,49,49,0.
 .card-caret svg { width: 11px; height: 11px; color: var(--muted); }
 .theme-toggle svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); }
 .btn-back svg { width: 12px; height: 12px; }
-.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+.icon-btn.sync-pending { position: relative; }
+.icon-btn.sync-pending::after {
+  content: ''; position: absolute; top: 4px; right: 4px; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent);
+}
+@keyframes giw-sync-spin { to { transform: rotate(360deg); } }
+.icon-btn.sync-spin svg { animation: giw-sync-spin 0.9s linear infinite; }
 .icon-btn.danger:hover { border-color: var(--red); color: var(--red); }
 .empty-state { text-align: center; padding: 32px 16px; color: var(--muted); }
 .empty-state p { font-size: 14px; line-height: 1.5; margin-top: 8px; }
@@ -505,7 +516,7 @@ body.light-theme .about-tab-btn.active { color: #fff; }
 </div>
 <script src="capacitor-bridge.js"></script>
 <script>
-const APP_VERSION = '1.3.2';
+const APP_VERSION = '1.4.0';
 const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 const STORAGE_KEY = 'giw_v1';
 
@@ -811,9 +822,15 @@ function formatTripDateRange(trip) {
   }
 }
 
-function saveState() {
+function persistLocalOnly() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   updateWidgetSnapshot();
+}
+
+function saveState() {
+  if (window.GIW_SYNC) GIW_SYNC.touchSyncMeta(state);
+  persistLocalOnly();
+  if (window.GIW_SYNC) GIW_SYNC.schedulePush();
 }
 
 function widgetModeLabel(trip) {
@@ -957,7 +974,8 @@ const ICON_PATHS = {
   help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
   menu: '<line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>',
   edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
-  reset: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>'
+  reset: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  sync: '<path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>'
 };
 
 function iconMerge(size) {
@@ -1083,6 +1101,93 @@ function openModal(html, onMount) {
 
 function closeModal() {
   document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function getSyncUiState() {
+  if (!window.GIW_SYNC) {
+    return { configured: false, signedIn: false, syncing: false, pendingPush: false, statusLabel: 'Sync unavailable', syncButtonTitle: 'Sync unavailable', lastSyncLabel: '', user: null };
+  }
+  return GIW_SYNC.getStatus();
+}
+
+function renderHomeSyncButton() {
+  const s = getSyncUiState();
+  if (!s.configured) return '';
+  const spin = s.syncing ? ' sync-spin' : '';
+  const pending = s.pendingPush && s.signedIn && !s.syncing ? ' sync-pending' : '';
+  const title = esc(s.syncButtonTitle);
+  return `<button class="btn-secondary btn-icon-only${spin}${pending}" onclick="handleSyncClick()" title="${title}" id="home-sync-btn">${icon('sync', 18)}</button>`;
+}
+
+function renderAccountSyncCard() {
+  const s = getSyncUiState();
+  if (!s.configured) {
+    return `<div class="card">
+      <div class="card-title">Account &amp; sync</div>
+      <p style="font-size:13px;color:var(--tip);line-height:1.55;margin:0">Cloud sync is not configured in this build.</p>
+    </div>`;
+  }
+  if (!s.signedIn) {
+    return `<div class="card">
+      <div class="card-title">Account &amp; sync</div>
+      <p style="font-size:13px;color:var(--tip);line-height:1.55;margin:0 0 12px">Optional — sync trips between phone and browser. Works offline without an account.</p>
+      <button class="btn-primary" onclick="giwSignIn()">Sign in with Google</button>
+    </div>`;
+  }
+  const user = s.user || {};
+  const name = esc(user.displayName || user.email || 'Signed in');
+  const email = user.email && user.displayName ? `<p style="font-size:12px;color:var(--muted);margin:4px 0 0">${esc(user.email)}</p>` : '';
+  const last = s.lastSyncLabel ? `<p style="font-size:12px;color:var(--muted);margin:8px 0 0">Last synced ${esc(s.lastSyncLabel)}</p>` : '';
+  return `<div class="card">
+      <div class="card-title">Account &amp; sync</div>
+      <p style="font-size:14px;margin:0 0 4px">${name}</p>
+      ${email}
+      <p style="font-size:13px;color:var(--tip);margin:10px 0 0">${esc(s.statusLabel)}</p>
+      ${last}
+      <div class="action-row" style="margin-top:12px;margin-bottom:0">
+        <button class="btn-secondary" onclick="giwSignOut()">Sign out</button>
+      </div>
+    </div>`;
+}
+
+async function handleSyncClick() {
+  if (!window.GIW_SYNC) { showToast('Sync unavailable'); return; }
+  try {
+    await GIW_SYNC.syncNow();
+  } catch (e) {}
+  render();
+}
+
+async function giwSignIn() {
+  if (!window.GIW_SYNC) return;
+  try {
+    await GIW_SYNC.signInWithGoogle();
+    showToast('Signed in');
+  } catch (e) {
+    showToast('Sign-in failed');
+  }
+  render();
+}
+
+async function giwSignOut() {
+  if (!window.GIW_SYNC) return;
+  await GIW_SYNC.signOut();
+  showToast('Signed out');
+  render();
+}
+
+function onSyncStatusChange() {
+  const btn = document.getElementById('home-sync-btn');
+  if (btn && screen === 'home') {
+    const row = btn.parentElement;
+    if (row) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = renderHomeSyncButton();
+      const fresh = tmp.firstElementChild;
+      if (fresh) btn.replaceWith(fresh);
+    }
+  }
+  if (screen === 'about' && aboutTab === 'about') render();
 }
 
 function nextTripCopyName(baseName) {
@@ -1462,6 +1567,7 @@ function renderHome() {
     ${renderHeader('GET IN WATER', 'Trip Packing Checklist', false)}
     <div class="action-row">
       <button class="btn-primary btn-icon-only" onclick="promptNewTrip()" title="New trip">${icon('plus', 18)}</button>
+      ${renderHomeSyncButton()}
     </div>
     <div class="home-toolbar">
       <input type="search" id="home-search" placeholder="Search trips, tags, gear…" value="${esc(homeSearch)}" oninput="setHomeSearch(this.value)"/>
@@ -1651,6 +1757,7 @@ function renderSavedTemplateEditor() {
 
 function renderAboutTab() {
   return `
+    ${renderAccountSyncCard()}
     <div class="card">
       <div class="card-title">Companion to LSP D-Planner</div>
       <p style="font-size:14px;line-height:1.6;color:var(--tip)">
@@ -2930,13 +3037,40 @@ state = loadState();
 ensureSettingsFromData(state);
 initBubbles();
 updateWidgetSnapshot();
-render();
+
+function startApp() {
+  render();
+}
+
+if (window.GIW_SYNC) {
+  GIW_SYNC.init({
+    getState: () => state,
+    setState: (s) => { state = s; },
+    persistLocal: persistLocalOnly,
+    saveState,
+    render,
+    migrateState,
+    showToast,
+    openModal,
+    closeModal,
+    uid,
+    isNative: IS_NATIVE,
+    onStatusChange: onSyncStatusChange
+  }).then(startApp).catch(startApp);
+} else {
+  startApp();
+}
 
 if (window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) {
   const appPlugin = Capacitor.Plugins && Capacitor.Plugins.App;
   if (appPlugin && appPlugin.addListener) {
     appPlugin.addListener('appStateChange', ({ isActive }) => {
-      if (isActive) updateWidgetSnapshot();
+      if (isActive) {
+        updateWidgetSnapshot();
+        if (window.GIW_SYNC && GIW_SYNC.isSignedIn()) {
+          GIW_SYNC.pullIfNewer().catch(() => {});
+        }
+      }
     });
   }
   document.addEventListener('visibilitychange', () => {

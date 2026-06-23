@@ -32,7 +32,7 @@
 <p>Maintain a <strong>master gear list</strong>, create <strong>per-trip checklists</strong>, tick items off as you pack, and export TXT or PDF for printing or sharing. Use it alongside <a href="https://threecats-lsp.com/d-planner/">LSP D-Planner</a> — plan the dive, then pack for it.</p>
 <p>🌐 <strong>Live app:</strong> https://threecats-lsp.com/get-in-water/</p>
 <p>📲 <strong>Android APK:</strong> https://threecats-lsp.com/get-in-water/download.html</p>
-<p><strong>Current version: 1.3.0</strong></p>
+<p><strong>Current version: 1.4.0</strong></p>
 <hr>
 <h2>Diver&#x27;s Toolkit</h2>
 <p>All apps at the <a href="https://threecats-lsp.com">Diver&#x27;s Toolkit hub</a>.</p>
@@ -56,9 +56,18 @@
 <li><strong>PDF</strong> — formatted packing list with trip name, date, and item notes</li>
 <li>Share via any Android share target (WhatsApp, email, etc.)</li>
 </ul>
+<h3>Cloud sync (optional)</h3>
+<ul>
+<li><strong>Sign in with Google</strong> to sync checklists between the web app and Android</li>
+<li><strong>Offline-first</strong> — works fully without an account; sync when signed in</li>
+<li><strong>Home screen Sync button</strong> — manual sync without reloading the app</li>
+<li>Start packing on your phone, finish on desktop (or vice versa)</li>
+<li>Configure Firebase once — see <a href="#cloud-sync-setup">Cloud sync setup</a> for contributors</li>
+</ul>
 <h3>Android Native Features</h3>
 <ul>
 <li>Full offline support — no internet needed after install</li>
+<li>Home-screen launcher name <strong>GiW</strong> (short label under the icon)</li>
 <li>Edge-to-edge layout, light/dark theme</li>
 <li>Export TXT/PDF to app storage, then share via the system sheet (Downloads when the device allows)</li>
 </ul>
@@ -82,8 +91,20 @@
 <li>Open the downloaded APK and install</li>
 </ol>
 <hr>
+<h2>Cloud sync setup</h2>
+<p>Optional Google sign-in uses <a href="https://firebase.google.com">Firebase</a> (Auth + Firestore). See <a href=".env.example"><code>.env.example</code></a> for one-time console steps:</p>
+<ol>
+<li>Create a Firebase project and enable <strong>Google</strong> sign-in</li>
+<li>Create Firestore and deploy <a href="firestore.rules"><code>firestore.rules</code></a></li>
+<li>Copy web config into <a href="firebase-config.js"><code>firebase-config.js</code></a></li>
+<li>Add Android app → <code>google-services.json</code> in <code>android/app/</code> (not committed)</li>
+<li>Register SHA-1 fingerprints for debug/release keystores</li>
+<li>For CI APK builds: GitHub secret <code>GOOGLE_SERVICES_JSON</code> (base64 of <code>google-services.json</code>)</li>
+</ol>
+<p><strong>Manual test checklist</strong></p>
+<hr>
 <h2>License</h2>
-<p>MIT — free to use, modify, and distribute. No account, no ads, no subscription.</p>
+<p>MIT — free to use, modify, and distribute. Optional Google account for cloud sync; no ads, no subscription.</p>
 <hr>
 <p><em>Three Cats LSP · <a href="https://threecats-lsp.com">threecats-lsp.com</a></em></p>
       </article>

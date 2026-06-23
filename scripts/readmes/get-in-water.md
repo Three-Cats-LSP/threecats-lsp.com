@@ -7,7 +7,7 @@ Maintain a **master gear list**, create **per-trip checklists**, tick items off 
 🌐 **Live app:** https://threecats-lsp.com/get-in-water/  
 📲 **Android APK:** https://threecats-lsp.com/get-in-water/download.html  
 
-**Current version: 1.3.0**
+**Current version: 1.4.0**
 
 ---
 
@@ -41,8 +41,16 @@ All apps at the [Diver's Toolkit hub](https://threecats-lsp.com).
 - **PDF** — formatted packing list with trip name, date, and item notes
 - Share via any Android share target (WhatsApp, email, etc.)
 
+### Cloud sync (optional)
+- **Sign in with Google** to sync checklists between the web app and Android
+- **Offline-first** — works fully without an account; sync when signed in
+- **Home screen Sync button** — manual sync without reloading the app
+- Start packing on your phone, finish on desktop (or vice versa)
+- Configure Firebase once — see [Cloud sync setup](#cloud-sync-setup) for contributors
+
 ### Android Native Features
 - Full offline support — no internet needed after install
+- Home-screen launcher name **GiW** (short label under the icon)
 - Edge-to-edge layout, light/dark theme
 - Export TXT/PDF to app storage, then share via the system sheet (Downloads when the device allows)
 
@@ -72,9 +80,34 @@ Built with [Capacitor](https://capacitorjs.com). Direct APK — no Play Store re
 
 ---
 
+## Cloud sync setup
+
+Optional Google sign-in uses [Firebase](https://firebase.google.com) (Auth + Firestore). See [`.env.example`](.env.example) for one-time console steps:
+
+1. Create a Firebase project and enable **Google** sign-in
+2. Create Firestore and deploy [`firestore.rules`](firestore.rules)
+3. Copy web config into [`firebase-config.js`](firebase-config.js)
+4. Add Android app → `google-services.json` in `android/app/` (not committed)
+5. Register SHA-1 fingerprints for debug/release keystores
+6. For CI APK builds: GitHub secret `GOOGLE_SERVICES_JSON` (base64 of `google-services.json`)
+
+**Manual test checklist**
+
+| Test | Expected |
+|------|----------|
+| Signed out | All features work locally; no cloud calls |
+| Web sign-in | Trip created on desktop appears on phone after sync |
+| Android sign-in | Ticked items on phone visible on web |
+| Offline edit | Changes push when back online |
+| First sign-in conflict | Dialog: keep device / use cloud / merge trips |
+| Home Sync button | Pulls/pushes without app reload |
+| Sign out | Local data kept; cloud listener stops |
+
+---
+
 ## License
 
-MIT — free to use, modify, and distribute. No account, no ads, no subscription.
+MIT — free to use, modify, and distribute. Optional Google account for cloud sync; no ads, no subscription.
 
 ---
 
