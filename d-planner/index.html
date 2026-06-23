@@ -1278,11 +1278,11 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 .u20{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
 .u21{margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- Capacitor filesystem save bridge (Android app only — no-op on web/PWA) -->
+<!-- jsPDF: vendored locally (Issue #10) — defer so app startup is not blocked on CDN -->
 <script src="capacitor-bridge.js"></script>
 <script src="zhl-engine-bundle.js"></script>
 <script src="zhl-worker-bridge.js"></script>
+<script defer src="vendor/jspdf.umd.min.js"></script>
 </head>
 <body>
 <!-- Bubbles (PADI mode) -->
@@ -3347,7 +3347,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.40.00';
+const APP_VERSION = '2.40.01';
 window.APP_VERSION = APP_VERSION;
 // Test harness: skip DOM recalc storms when loaded inside tests-massive.html iframe
 (function() {

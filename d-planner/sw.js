@@ -2,7 +2,7 @@
 // Network-first for HTML (always fresh), cache-first for static assets.
 // Bump CACHE_VERSION on every deploy to force old SW replacement.
 
-const CACHE_VERSION = 'lsp-dplanner-v2.40.00';
+const CACHE_VERSION = 'lsp-dplanner-v2.40.01';
 
 // These are never cached — always fetched live or passed through
 const NEVER_CACHE = [
@@ -31,11 +31,24 @@ function getAppBasePath() {
 const APP_BASE = getAppBasePath();
 const OFFLINE_INDEX = APP_BASE + 'index.html';
 
+// Required for offline/PWA startup after v2.40.00 Tier-3 split (Issue #10)
+const PRECACHE_ASSETS = [
+  OFFLINE_INDEX,
+  APP_BASE + 'capacitor-bridge.js',
+  APP_BASE + 'zhl-engine-bundle.js',
+  APP_BASE + 'zhl-worker-bridge.js',
+  APP_BASE + 'zhl-schedule-worker.js',
+  APP_BASE + 'vendor/jspdf.umd.min.js',
+  APP_BASE + 'manifest.json',
+  APP_BASE + 'icon-192.png',
+  APP_BASE + 'icon-512.png',
+];
+
 // Install — skip waiting immediately so new SW takes over fast
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_VERSION)
-      .then(cache => cache.addAll([OFFLINE_INDEX]))
+      .then(cache => cache.addAll(PRECACHE_ASSETS))
       .then(() => self.skipWaiting())
   );
 });
