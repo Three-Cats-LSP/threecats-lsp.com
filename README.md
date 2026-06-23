@@ -10,34 +10,35 @@ Homepage and deployment hub for the **Three Cats LSP Diver's Toolkit** — free,
 
 | App | Web | APK | GitHub |
 |-----|-----|-----|--------|
-| **[LSP D-Planner](https://threecats-lsp.com/d-planner/)** | [Open](https://threecats-lsp.com/d-planner/) | [Download](https://threecats-lsp.com/d-planner/download.html) | [LSP_D-planner](https://github.com/Three-Cats-LSP/LSP_D-planner) |
-| **[LSP D-Planner + CCR](https://threecats-lsp.com/d-planner-ccr/)** | [Open](https://threecats-lsp.com/d-planner-ccr/) | [Download](https://threecats-lsp.com/d-planner-ccr/download.html) | [LSP_D-planner-CCR](https://github.com/Three-Cats-LSP/LSP_D-planner-CCR) |
+| **[LSP D-Planner+](https://threecats-lsp.com/d-planner-plus/)** | [Open](https://threecats-lsp.com/d-planner-plus/) | [Download](https://threecats-lsp.com/d-planner-plus/download.html) | [LSP_D-planner-plus](https://github.com/Three-Cats-LSP/LSP_D-planner-plus) |
 | **[T-Viewer](https://threecats-lsp.com/t-viewer/)** | [Open](https://threecats-lsp.com/t-viewer/) | [Download](https://threecats-lsp.com/t-viewer/download.html) | [T-Viewer](https://github.com/Three-Cats-LSP/T-Viewer) |
 | **[Get In Water](https://threecats-lsp.com/get-in-water/)** | [Open](https://threecats-lsp.com/get-in-water/) | [Download](https://threecats-lsp.com/get-in-water/download.html) | [Get-In-Water](https://github.com/Three-Cats-LSP/Get-In-Water) |
 
-### LSP D-Planner
-Technical and recreational decompression planner. Bühlmann ZHL-16C + GF, VPM-B, VPM-B/GFS, trimix, multi-gas, Rec/Tec modes. Export dive plans as TXT or PDF.
+### LSP D-Planner+
+Unified open-circuit and rebreather decompression planner. Bühlmann ZHL-16C + GF, VPM-B, VPM-B/GFS, CCR, pSCR, bailout, trimix, multi-gas, Rec/Tec modes. Tier 3 ZHL engine. Export dive plans as TXT or PDF. Android launcher label **LSP+**.
 
-**Current version: 2.20.21**
-
-### LSP D-Planner + CCR
-Rebreather edition — CCR, passive SCR (pSCR), bailout, and descent setpoint. Separate app from open-circuit D-Planner.
-
-**Current version: 2.30.0**
+**Current version: 2.50.00**
 
 ### T-Viewer
-Companion for LSP D-Planner exports. Open, read, edit, and share dive plan TXT/PDF files on Android or in the browser — syntax highlighting for deco schedules, gas labels, and warnings.
+Companion for LSP D-Planner+ exports. Open, read, edit, and share dive plan TXT/PDF files on Android or in the browser — syntax highlighting for deco schedules, gas labels, and warnings.
 
 ### Get In Water
 Dive trip packing checklist. Master gear list, starter templates, per-trip checklists with quantities, notes, critical items, packing phases, tags, unpack mode, buddy copy, JSON backup, and TXT/PDF export. Android home-screen widget for pinned trip progress.
 
 **Current version: 1.3.0**
 
+### Legacy (archived, still hosted)
+
+| App | URL | Status |
+|-----|-----|--------|
+| LSP D-Planner (OC) | https://threecats-lsp.com/d-planner/ | Frozen v2.40.02-final |
+| LSP D-Planner + CCR | https://threecats-lsp.com/d-planner-ccr/ | Frozen v2.30.31-final |
+
 ---
 
 ## Typical workflow
 
-1. **Plan** — build a dive profile in LSP D-Planner (or **LSP D-Planner + CCR** for rebreather dives)
+1. **Plan** — build a dive profile in **LSP D-Planner+** (OC, CCR, or pSCR)
 2. **Export** — save the plan as TXT or PDF
 3. **Review** — open the file in T-Viewer on your phone
 4. **Pack** — use Get In Water to checklist your gear for the trip
@@ -50,19 +51,20 @@ Dive trip packing checklist. Master gear list, starter templates, per-trip check
 |------|---------|
 | `index.html` | Diver's Toolkit homepage |
 | `gadgets.html` | 3D-printed dive gadgets |
-| `d-planner/` | Synced LSP D-Planner web app + APK |
-| `d-planner-ccr/` | Synced LSP D-Planner + CCR web app + APK |
+| `d-planner-plus/` | Synced LSP D-Planner+ web app + APK |
+| `d-planner/` | Archived OC edition (frozen) |
+| `d-planner-ccr/` | Archived CCR edition (frozen) |
 | `t-viewer/` | Synced T-Viewer web app + APK |
 | `get-in-water/` | Synced Get In Water web app + APK |
 | `.github/workflows/sync-apps.yml` | Pulls latest apps from upstream repos |
 
-App folders are updated automatically when upstream repositories push to `main`. The workflow can also be triggered manually from the Actions tab (`sync-d-planner`, `sync-d-planner-ccr`, `sync-t-viewer`, `sync-get-in-water`, and APK sync jobs).
+App folders are updated automatically when upstream repositories push to `main`. The workflow can also be triggered manually from the Actions tab (`sync-d-planner-plus`, `sync-t-viewer`, `sync-get-in-water`, and APK sync jobs). Legacy `sync-d-planner` / `sync-d-planner-ccr` remain for one-off archive deploys.
 
 ---
 
 ## Install any app on your phone
 
-All three apps are progressive web apps (PWAs) and can be added to your home screen:
+All apps are progressive web apps (PWAs) and can be added to your home screen:
 
 1. Open the app URL in your mobile browser
 2. **Safari (iPhone / iPad):** Share → **Add to Home Screen**
@@ -74,16 +76,6 @@ Or install the Android APK from each app's download page for native features (fi
 
 ## Support
 
-LSP D-Planner, LSP D-Planner + CCR, T-Viewer, and Get In Water are free and open-source. If they help your diving, consider [supporting development via PayPal](https://paypal.me/ThreeCatsLSP).
+LSP D-Planner+, T-Viewer, and Get In Water are free and open-source. If they help your diving, consider [supporting development via PayPal](https://paypal.me/ThreeCatsLSP).
 
 Follow [@threecats_lsp](https://www.instagram.com/threecats_lsp) on Instagram for updates.
-
----
-
-## Disclaimer
-
-These tools are aids for trained divers. They do not replace formal dive training, certification, or a calibrated dive computer. Always verify your own plans and gear. Use at your own risk.
-
----
-
-*Three Cats LSP · Precision tools for scuba divers*

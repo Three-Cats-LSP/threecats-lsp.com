@@ -12,8 +12,17 @@ README_DIR = ROOT / "scripts" / "readmes"
 
 APPS = [
     {
+        "slug": "d-planner-plus",
+        "title": "LSP D-Planner+",
+        "icon_src": "/d-planner-plus/icon-192.png",
+        "app_url": "/d-planner-plus/",
+        "readme_names": ("d-planner-plus.md",),
+        "sibling_readme": ROOT.parent / "LSP_D-planner-plus" / "README.md",
+        "out": ROOT / "d-planner-plus" / "about.html",
+    },
+    {
         "slug": "d-planner",
-        "title": "LSP D-Planner",
+        "title": "LSP D-Planner (archived)",
         "icon_src": "/d-planner/icon-192.png",
         "app_url": "/d-planner/",
         "readme_names": ("d-planner.md",),
@@ -22,7 +31,7 @@ APPS = [
     },
     {
         "slug": "d-planner-ccr",
-        "title": "LSP D-Planner + CCR",
+        "title": "LSP D-Planner + CCR (archived)",
         "icon_src": "/d-planner-ccr/icon-192.png",
         "app_url": "/d-planner-ccr/",
         "readme_names": ("d-planner-ccr.md",),

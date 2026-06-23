@@ -1,17 +1,13 @@
-# LSP D-Planner
-
-> **Archived — development continues in [LSP D-Planner+](https://github.com/Three-Cats-LSP/LSP_D-planner-plus)** ([live app](https://threecats-lsp.com/d-planner-plus/)). This open-circuit edition is frozen at **v2.40.02-final**.
+# LSP D-Planner+
 
 Free open-source decompression planner for recreational and technical divers. Runs entirely in the browser — no install, no build step, no server, no account.
 
 Part of the [Three Cats LSP](https://threecats-lsp.com) **Diver's Toolkit**.
 
-🌐 **Live app:** https://threecats-lsp.com/d-planner/  
-📲 **Android APK:** https://threecats-lsp.com/d-planner/download.html  
+🌐 **Live app:** https://threecats-lsp.com/d-planner-plus/  
+📲 **Android APK:** https://threecats-lsp.com/d-planner-plus/download.html  
 
-**Current version: 2.40.02 (final)**
-
-> **Unified app:** See [LSP D-Planner+](https://github.com/Three-Cats-LSP/LSP_D-planner-plus) — OC + CCR + Tier 3 engine in one app.
+**Current version: 2.50.00**
 
 ---
 
@@ -19,8 +15,7 @@ Part of the [Three Cats LSP](https://threecats-lsp.com) **Diver's Toolkit**.
 
 | App | Description | Link |
 |-----|-------------|------|
-| **LSP D-Planner** ← *this app* | Open-circuit decompression planning — Bühlmann, VPM-B, Rec/Tec | [Repo](https://github.com/Three-Cats-LSP/LSP_D-planner) |
-| **[LSP D-Planner + CCR](https://threecats-lsp.com/d-planner-ccr/)** | Rebreather planning — CCR, pSCR, bailout | [Repo](https://github.com/Three-Cats-LSP/LSP_D-planner-CCR) |
+| **LSP D-Planner+** ← *this app* | Unified OC + CCR/pSCR decompression planning — Bühlmann, VPM-B, Rec/Tec | [Repo](https://github.com/Three-Cats-LSP/LSP_D-planner-plus) |
 | **[T-Viewer](https://threecats-lsp.com/t-viewer/)** | Open and share exported dive plan TXT/PDF files | — |
 | **[Get In Water](https://threecats-lsp.com/get-in-water/)** | Dive trip packing checklists | [Repo](https://github.com/Three-Cats-LSP/Get-In-Water) |
 
@@ -48,6 +43,7 @@ All apps at the [Diver's Toolkit hub](https://threecats-lsp.com).
 - Average depth converter
 
 ### Technical Mode
+- **CCR / pSCR** — circuit select, setpoint scheduling, diluent & bailout gases, on-loop Bühlmann + VPM
 - Full trimix entry (O₂ / He / N₂) for bottom gas and all deco gases
 - Travel gas card with auto-switch depth by MOD
 - Altitude support — surface pressure presets to 3000 m, acclimatization toggle
@@ -82,7 +78,7 @@ All apps at the [Diver's Toolkit hub](https://threecats-lsp.com).
 
 ## Web App
 
-Open https://threecats-lsp.com/d-planner/ in any modern browser — no install required.
+Open https://threecats-lsp.com/d-planner-plus/ in any modern browser — no install required.
 
 **Install as PWA:**
 1. **Safari (iPhone/iPad):** Share → Add to Home Screen → Add
@@ -98,7 +94,7 @@ Built with [Capacitor](https://capacitorjs.com). Direct APK — no Play Store re
 **Requirements:** Android 5.0+ (API 21)
 
 **Install:**
-1. Download APK from https://threecats-lsp.com/d-planner/download.html
+1. Download APK from https://threecats-lsp.com/d-planner-plus/download.html
 2. Allow "Install from unknown sources" in Android settings
 3. Open the downloaded APK and install
 

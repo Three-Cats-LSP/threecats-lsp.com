@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
-<title>LSP D-Planner + CCR · Rec &amp; Tec</title>
+<title>LSP D-Planner+ · Rec &amp; Tec</title>
 <!-- PWA -->
 <link href="manifest.json" rel="manifest"/>
 <meta content="#030c18" media="(prefers-color-scheme: dark)" name="theme-color"/>
@@ -12,13 +12,13 @@
 <meta content="#030c18" id="theme-color-active" name="theme-color"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<meta content="D-Planner+CCR" name="apple-mobile-web-app-title"/>
+<meta content="LSP+" name="apple-mobile-web-app-title"/>
 <!-- Description -->
-<meta content="Professional CCR/pSCR dive planner with Bühlmann ZH-L16C decompression, setpoint scheduling, and OC bailout gas management." name="description"/>
+<meta content="Unified open-circuit and CCR/pSCR dive planner — Bühlmann ZHL-16C + VPM-B decompression, setpoint scheduling, and bailout gas management." name="description"/>
 <!-- Favicon (inline SVG) -->
 <link href="icon-192.png" rel="icon" type="image/png"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=JetBrains+Mono:wght@300;400;500;700&amp;family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="vendor/fonts/fonts.css" rel="stylesheet"/>
 <style>
 /* ═══════════════════════════════════════════
  SHARED DESIGN TOKENS
@@ -1294,15 +1294,13 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 .u20{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
 .u21{margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- Capacitor filesystem save bridge (Android app only — no-op on web/PWA) -->
+<!-- jsPDF: vendored locally — defer so app startup is not blocked on CDN -->
 <script src="capacitor-bridge.js"></script>
+<script src="zhl-engine-bundle.js"></script>
+<script src="zhl-worker-bridge.js"></script>
+<script defer src="vendor/jspdf.umd.min.js"></script>
 </head>
 <body>
-<div id="archiveBanner" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:#1a0e04;border-bottom:1px solid #ff8c42;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:system-ui,sans-serif;font-size:13px;color:#ffe8d6;box-sizing:border-box;">
-<span>This edition is <strong>archived</strong>. Use <a href="https://threecats-lsp.com/d-planner-plus/" rel="noopener noreferrer" style="color:#ff8c42">LSP D-Planner+</a> for ongoing updates (OC + CCR, new engine).</span>
-<button onclick="document.getElementById('archiveBanner').remove()" style="background:none;border:1px solid #ff8c42;color:#ff8c42;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:12px;flex-shrink:0;">Dismiss</button>
-</div>
 <!-- Bubbles (PADI mode) -->
 <div class="bubbles" id="bubbles"></div>
 <div class="app">
@@ -2906,19 +2904,19 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 </div>
 <!-- ── LSP Documentation ─────────────────────────────────── -->
 <div class="u21">
-<div class="u18">LSP D-Planner + CCR Documentation</div>
+<div class="u18">LSP D-Planner+ Documentation</div>
 <div style="font-size:12px;line-height:1.8;color:var(--text);">
 <div style="margin-bottom:10px;">Full technical documentation, algorithm notes, and knowledge base PDF available in the open-source repository.</div>
-<a href="https://github.com/Three-Cats-LSP/LSP_D-planner-CCR" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank">
+<a href="https://github.com/Three-Cats-LSP/LSP_D-planner-plus" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank">
 <svg fill="currentColor" height="16" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"></path></svg>
-            GitHub · Three-Cats-LSP/LSP_D-planner-CCR
+            GitHub · Three-Cats-LSP/LSP_D-planner-plus
           </a>
 </div>
 </div>
 <!-- ── Support Development ─────────────────────────────────── -->
 <div class="u21">
 <div class="u18">Support Development</div>
-<div style="font-size:12px;line-height:1.8;color:var(--text);margin-bottom:12px;">LSP D-Planner + CCR is free and open-source. If it helps your diving, consider supporting its continued development.</div>
+<div style="font-size:12px;line-height:1.8;color:var(--text);margin-bottom:12px;">LSP D-Planner+ is free and open-source. If it helps your diving, consider supporting its continued development.</div>
 <a href="https://paypal.me/ThreeCatsLSP" onmouseout="this.style.borderColor='rgba(0,112,186,0.4)';this.style.background='linear-gradient(135deg,rgba(0,112,186,0.12),rgba(0,145,220,0.16))'" onmouseover="this.style.borderColor='#0070ba';this.style.background='rgba(0,112,186,0.22)'" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:9px 16px;background:linear-gradient(135deg,rgba(0,112,186,0.12),rgba(0,145,220,0.16));border:1px solid rgba(0,112,186,0.4);border-radius:8px;color:var(--text);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,background 0.2s;" target="_blank">
 <svg fill="none" height="16" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828L8.293 21H12.5c.524 0 .968-.381 1.05-.9l.437-2.786h1.8c3.476 0 5.893-1.408 6.656-5.49.343-1.818.044-3.145-.22-4.907z" fill="#009cde"></path><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z" fill="#003087" opacity="0.8"></path></svg>
           Donate via PayPal
@@ -3315,7 +3313,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <div style="background:rgba(204,0,0,0.05);border:1px solid #cc0000;border-radius:8px;padding:16px 18px;font-size:12px;line-height:1.75;color:var(--text);">
 <p style="margin:0 0 12px 0;">The program authors do not warrant that this program accurately reflects the Varying Permeability Model or ZHL-16 algorithms, <strong>that it won't get you bent or dead</strong>, or that it will produce safe, reliable results.</p>
 <p style="margin:0 0 12px 0;">This dive schedule is <strong>experimental</strong> and you use it <strong>at your own risk</strong>. Diving in general is fraught with risk, and decompression diving adds significantly more risk. Deep diving utilizing multiple gases, including helium, or rebreathers is about as risky as it gets.</p>
-<p style="margin:0 0 12px 0;">LSP D-Planner + CCR and the decompression schedules it produces are tools for <strong>experienced mixed-gas decompression divers ONLY</strong>. If you have not been properly trained in mixed-gas decompression diving by an internationally recognized technical certification agency and/or don't have a firm handle on decompression planning and mixed-gas diving, then <strong>DO NOT use this software</strong>.</p>
+<p style="margin:0 0 12px 0;">LSP D-Planner+ and the decompression schedules it produces are tools for <strong>experienced mixed-gas decompression divers ONLY</strong>. If you have not been properly trained in mixed-gas decompression diving by an internationally recognized technical certification agency and/or don't have a firm handle on decompression planning and mixed-gas diving, then <strong>DO NOT use this software</strong>.</p>
 <p style="margin:0;color:rgba(255,150,80,0.85);font-size:11px;">In no event will the program authors be liable for any indirect, punitive, special, incidental or consequential damages however they may arise and even if program authors have been previously advised of the possibility of such damages.</p>
 </div>
 <div style="text-align:center;margin-top:18px;">
@@ -3368,11 +3366,11 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <div class="card-title">Links</div>
 <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
 <a href="https://threecats-lsp.com" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Three Cats LSP · Diver's Toolkit</span></a>
-<a href="https://github.com/Three-Cats-LSP/LSP_D-planner-CCR" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank">
+<a href="https://github.com/Three-Cats-LSP/LSP_D-planner-plus" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank">
 <svg fill="currentColor" height="16" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"></path></svg>
-          LSP D-Planner + CCR · Open Source on GitHub
+          LSP D-Planner+ · Open Source on GitHub
         </a>
-<a href="https://threecats-lsp.com/d-planner-ccr/download.html" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">LSP D-Planner + CCR · Download Android APK</span></a>
+<a href="https://threecats-lsp.com/d-planner-plus/download.html" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">LSP D-Planner+ · Download Android APK</span></a>
 <a href="https://www.thingiverse.com/Roman_Markovtsev/designs" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank"><img alt="Thingiverse" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHIAAAByCAMAAAC4A3VPAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABpUExURStS/gAAADBY/yhY/zBQ/yhQ/yxT/yxT/ipT/ipR/ixT/itT/ixS/itS/v////H1//L0/8rU/8rT/73J/73J/rzJ/6++/6++/qKz/pWp/5Wo/oid/nuT/nuS/m2I/mB9/lNz/kZo/jld/g0+l6gAAAAOdFJOU/8AICAgIK+vr7C/v+/vniJZ+QAAAKhJREFUeNrt2ckNwjAARNFxFpbENmELO4T0XyQV2DJI9gH938DTnEem6a3KtaqMGquiuUoLFa5X8ZyIiIjo26ZHht6KtfMZ2kJCQkJCQkJCQkLmJZ9jpP3Ghxpj3fR755B4UK6uIfIECQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQn5d6QrT3ZK7xi+ftNbq02fOflgL6Vma5l2qaTmyxAmh/ucBna1+QBeIOmb8eOcqAAAAABJRU5ErkJggg==" style="width:16px;height:16px;object-fit:contain;border-radius:2px;flex-shrink:0;"/><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">My Designs · Thingiverse</span></a>
 <a href="https://www.instagram.com/threecats_lsp" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='#d92e7f';this.style.color='#d92e7f'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;color:var(--muted);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:11px;transition:border-color 0.2s,color 0.2s;" target="_blank">
 <svg fill="none" height="16" viewbox="0 0 50 50" width="16" xmlns="http://www.w3.org/2000/svg"><defs><lineargradient id="igAbout" x1="0%" x2="100%" y1="100%" y2="0%"><stop offset="0%" style="stop-color:#feda75"></stop><stop offset="5%" style="stop-color:#fa7e1e"></stop><stop offset="45%" style="stop-color:#d92e7f"></stop><stop offset="60%" style="stop-color:#9b36b7"></stop><stop offset="90%" style="stop-color:#515bd4"></stop></lineargradient></defs><rect fill="none" height="40" rx="10" stroke="url(#igAbout)" stroke-width="2.5" width="40" x="5" y="5"></rect><circle cx="25" cy="25" fill="none" r="8" stroke="url(#igAbout)" stroke-width="2"></circle><circle cx="36" cy="13" fill="url(#igAbout)" r="2"></circle></svg>
@@ -3406,11 +3404,11 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <circle cx="36" cy="12" fill="url(#instaGradient)" r="1.8"></circle>
 </svg>
 </a>
-<a href="https://github.com/Three-Cats-LSP/LSP_D-planner-CCR" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'" onmouseover="this.style.opacity='1';this.style.transform='scale(1.15)'" rel="noopener noreferrer" style="display:flex;align-items:center;opacity:0.7;transition:opacity 0.2s,transform 0.2s;" target="_blank" title="View source on GitHub">
+<a href="https://github.com/Three-Cats-LSP/LSP_D-planner-plus" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'" onmouseover="this.style.opacity='1';this.style.transform='scale(1.15)'" rel="noopener noreferrer" style="display:flex;align-items:center;opacity:0.7;transition:opacity 0.2s,transform 0.2s;" target="_blank" title="View source on GitHub">
 <svg fill="var(--muted)" height="36" viewbox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"></path></svg>
 </a><a href="https://www.thingiverse.com/Roman_Markovtsev/designs" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'" onmouseover="this.style.opacity='1';this.style.transform='scale(1.15)'" rel="noopener noreferrer" style="display:flex;align-items:center;opacity:0.7;transition:opacity 0.2s,transform 0.2s;" target="_blank" title="My designs on Thingiverse"><img alt="Thingiverse" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHIAAAByCAMAAAC4A3VPAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABpUExURStS/gAAADBY/yhY/zBQ/yhQ/yxT/yxT/ipT/ipR/ixT/itT/ixS/itS/v////H1//L0/8rU/8rT/73J/73J/rzJ/6++/6++/qKz/pWp/5Wo/oid/nuT/nuS/m2I/mB9/lNz/kZo/jld/g0+l6gAAAAOdFJOU/8AICAgIK+vr7C/v+/vniJZ+QAAAKhJREFUeNrt2ckNwjAARNFxFpbENmELO4T0XyQV2DJI9gH938DTnEem6a3KtaqMGquiuUoLFa5X8ZyIiIjo26ZHht6KtfMZ2kJCQkJCQkJCQkLmJZ9jpP3Ghxpj3fR755B4UK6uIfIECQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQn5d6QrT3ZK7xi+ftNbq02fOflgL6Vma5l2qaTmyxAmh/ucBna1+QBeIOmb8eOcqAAAAABJRU5ErkJggg==" style="width:36px;height:36px;object-fit:contain;border-radius:4px;flex-shrink:0;"/></a>
-<a href="https://threecats-lsp.com/d-planner-ccr/download.html" id="apkDownloadIcon" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'" onmouseover="this.style.opacity='1';this.style.transform='scale(1.15)'" style="display:flex;align-items:center;opacity:0.7;transition:opacity 0.2s,transform 0.2s;" title="Download LSP D-Planner + CCR APK">
-<img alt="LSP D-Planner + CCR" height="36" src="icon-192.png" style="display:block;width:36px;height:36px;border-radius:8px;border:1px solid var(--border-hi);object-fit:contain;" width="36"/>
+<a href="https://threecats-lsp.com/d-planner-plus/download.html" id="apkDownloadIcon" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'" onmouseover="this.style.opacity='1';this.style.transform='scale(1.15)'" style="display:flex;align-items:center;opacity:0.7;transition:opacity 0.2s,transform 0.2s;" title="Download LSP D-Planner+ APK">
+<img alt="LSP D-Planner+" height="36" src="icon-192.png" style="display:block;width:36px;height:36px;border-radius:8px;border:1px solid var(--border-hi);object-fit:contain;" width="36"/>
 </a>
 <a href="https://threecats-lsp.com/t-viewer/" id="tvAppIcon" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'" onmouseover="this.style.opacity='1';this.style.transform='scale(1.15)'" rel="noopener noreferrer" style="display:flex;align-items:center;opacity:0.7;transition:opacity 0.2s,transform 0.2s;" target="_blank" title="T-Viewer">
 <svg fill="none" height="36" viewbox="0 0 500 500" width="36" xmlns="http://www.w3.org/2000/svg">
@@ -3433,7 +3431,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 </svg>
 </a>
 <a href="https://threecats-lsp.com/get-in-water/" id="giwAppIcon" onmouseout="this.style.opacity='0.7';this.style.transform='scale(1)'" onmouseover="this.style.opacity='1';this.style.transform='scale(1.15)'" rel="noopener noreferrer" style="display:flex;align-items:center;opacity:0.7;transition:opacity 0.2s,transform 0.2s;" target="_blank" title="Get In Water">
-<img alt="Get In Water" height="36" src="https://threecats-lsp.com/get-in-water/icon-192.png" style="display:block;width:36px;height:36px;border-radius:8px;border:1px solid var(--border-hi);object-fit:contain;" width="36"/>
+<img alt="Get In Water" height="36" src="vendor/icons/giw-icon-192.png" style="display:block;width:36px;height:36px;border-radius:8px;border:1px solid var(--border-hi);object-fit:contain;" width="36"/>
 </a>
 </div>
 <div style="margin-top:10px;display:flex;align-items:center;justify-content:center;">
@@ -3464,7 +3462,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.30.31';
+const APP_VERSION = '2.50.00';
 window.APP_VERSION = APP_VERSION;
 // Test harness: skip DOM recalc storms when loaded inside tests-massive.html iframe
 (function() {
@@ -9875,6 +9873,137 @@ function validateDecoInputs() {
   return validateDiveInputs('decoDepth', 'decoBT', { metric: 120, imperial: 394, maxBt: 300 });
 }
 
+// ═══════════════════════════════════════════════
+// ZHL SCHEDULE CORE — Tier 3 (bundle + DOM param builder)
+// ═══════════════════════════════════════════════
+
+function getZhlEnvironment() {
+  return {
+    altSurfaceP: typeof altSurfaceP !== 'undefined' ? altSurfaceP : 1.01325,
+    barPerMetre: BAR_PER_METRE,
+    waterVapor: WATER_VAPOR,
+    altAcclimatized: typeof altAcclimatized !== 'undefined' ? altAcclimatized : true,
+    allowO2AtMOD: typeof allowO2AtMOD !== 'undefined' ? allowO2AtMOD : true,
+  };
+}
+
+function zhlOptimalSwitchDepth(fO2, ctx) {
+  ZhlEngineBundle.applyEnvironment(getZhlEnvironment());
+  return ZhlEngineBundle.zhlOptimalSwitchDepth(fO2, ctx);
+}
+
+function buildZhlScheduleParamsFromEngine(levels, decoGases, settings, profileSplit) {
+  return ZhlEngineBundle.buildZhlScheduleParamsFromEngine(
+    levels, decoGases, settings, profileSplit, getZhlEnvironment()
+  );
+}
+
+function buildZhlScheduleParamsFromDom(rawD, depthM, bt) {
+  const rate = Math.max(1, parseInt(document.getElementById('ascentRate').value) || 9);
+  const decoRate = Math.max(1, parseInt(document.getElementById('decoAscentRate').value) || 9);
+  const surfaceRate = Math.max(1, parseInt(document.getElementById('surfaceAscentRate').value) || 9);
+  const descentRate = Math.max(1, parseInt(document.getElementById('descentRate').value) || 22);
+  const ppo2Bottom = parseFloat(document.getElementById('ppo2Bottom').value) || 1.4;
+  const ppo2Deco = parseFloat(document.getElementById('ppo2Deco').value) || 1.6;
+  const minStopTime = parseFloat(document.getElementById('minStopTime').value) || 1;
+  const lastStop = parseInt(document.getElementById('lastDecoStop').value) || 3;
+  const decoStep = parseInt(document.getElementById('decoStep').value) || 3;
+  const metric = units === 'metric';
+  const switchCtx = { ppo2Bottom, ppo2Deco, lastStop, decoStep, metric };
+  const _botFracs = getBottomGasFractions();
+  const bottomFN2 = _botFracs.fN2;
+  const bottomFHe = _botFracs.fHe;
+  const bottomFO2 = _botFracs.fO2;
+  const bottomMixLabel = getGasLabel(bottomFO2, bottomFHe);
+  const dU = metric;
+  const decoGases = [];
+  const switchDisplays = [];
+  for (const idx of getAllDecoGasIds()) {
+    const dgf = getDecoCardFractions(idx);
+    const fN2 = dgf ? dgf.fN2 : getDecoGasFrac(`dg${idx}Mix`, `dg${idx}CustomO2`);
+    const fHe = dgf ? (dgf.fHe || 0) : 0;
+    const fO2 = dgf ? dgf.fO2 : (fN2 != null ? Math.max(0, 1 - fN2 - fHe) : null);
+    const label = getDecoGasLabel(`dg${idx}Mix`, `dg${idx}CustomO2`);
+    const depth = fN2 !== null ? zhlOptimalSwitchDepth(fO2 ?? Math.max(0, 1 - fN2 - fHe), switchCtx) : null;
+    if (depth !== null && fN2 !== null) {
+      switchDisplays.push({
+        idx,
+        text: (dU ? depth + 'm' : mToFt(depth) + 'ft') + '  (ppO₂ ' +
+          ((altSurfaceP + depth * BAR_PER_METRE) * (fO2 != null ? fO2 : (1 - fN2))).toFixed(2) + ')',
+      });
+      decoGases.push({ depth, fN2, fHe, fO2: fO2 ?? Math.max(0, 1 - fN2 - fHe), label });
+    } else {
+      switchDisplays.push({ idx, text: '—' });
+    }
+  }
+  decoGases.sort((a, b) => b.depth - a.depth);
+  const travelInfo = getTravelGasInfo();
+  if (travelInfo) {
+    const botMODm = bottomFO2 > 0
+      ? Math.floor((ppo2Bottom / bottomFO2 - altSurfaceP) / BAR_PER_METRE)
+      : depthM;
+    const travelFO2 = 1 - travelInfo.fN2;
+    const ppO2AtBotMOD = (altSurfaceP + botMODm * BAR_PER_METRE) * travelFO2;
+    if (ppO2AtBotMOD <= ppo2Bottom + 0.01) {
+      decoGases.push({
+        depth: botMODm,
+        fN2: travelInfo.fN2,
+        fHe: 0,
+        fO2: travelFO2,
+        label: travelInfo.label,
+        isTravelGas: true,
+      });
+      decoGases.sort((a, b) => b.depth - a.depth);
+    }
+  }
+  return {
+    params: {
+      depthM, bt, rawD, metric,
+      ascentRate: rate,
+      decoAscentRate: decoRate,
+      surfaceAscentRate: surfaceRate,
+      descentRate,
+      gfL: mGF.low / 100,
+      gfH: mGF.high / 100,
+      ppo2Bottom, ppo2Deco,
+      minStopTime,
+      switchPauseT: 0,
+      mdCompatMode: (document.getElementById('decoTransitMode')?.value || 'multideco') === 'multideco',
+      lastStop, decoStep,
+      shallowGradient: document.getElementById('shallowGradient')?.value === 'on',
+      bottomFN2, bottomFHe, bottomFO2, bottomMixLabel,
+      travelInfo,
+      repState: (window._zhlRepState && Array.isArray(window._zhlRepState.tissues)) ? window._zhlRepState : null,
+      continuationLevels: (window._zhlHeadless && Array.isArray(window._zhlContinuationLevels))
+        ? window._zhlContinuationLevels : [],
+      minDecoProfile: {
+        enabled: document.getElementById('minDecoProfileEnable')?.value === 'yes',
+        m9: parseFloat(document.getElementById('minDeco9m')?.value) || 1,
+        m6: parseFloat(document.getElementById('minDeco6m')?.value) || 3,
+        isMetric: document.getElementById('unitSel')?.value !== 'imperial',
+      },
+      decoGases,
+      environment: getZhlEnvironment(),
+    },
+    switchDisplays,
+  };
+}
+
+function applyZhlSwitchDepthDisplays(switchDisplays) {
+  if (!switchDisplays || window._zhlHeadless) return;
+  switchDisplays.forEach(({ idx, text }) => {
+    const swEl = document.getElementById(`dg${idx}SwitchDepthDisplay`);
+    if (swEl) swEl.value = text;
+  });
+}
+
+function runZhlScheduleCore(params) {
+  if (!params.environment) {
+    params = Object.assign({}, params, { environment: getZhlEnvironment() });
+  }
+  return ZhlEngineBundle.runZhlScheduleCore(params);
+}
+
 function runDecoSchedule() {
   let _zhlPrevGF = null;
   try {
@@ -11444,24 +11573,7 @@ if (typeof window !== 'undefined') window.validateCcrCalculationInputs = validat
 
 /** Deepest level + monotonic-shallower continuation (matches VPMEngine profile split). */
 function splitZhlProfileLevels(levels) {
-  if (!levels || levels.length <= 1) return { primary: levels || [], continuation: [] };
-  let deepest = 0;
-  for (let i = 1; i < levels.length; i++) {
-    if (levels[i].depth > levels[deepest].depth) deepest = i;
-  }
-  let continuation = [];
-  let primary = levels;
-  if (deepest < levels.length - 1) {
-    let monotonic = true;
-    for (let i = deepest + 1; i < levels.length; i++) {
-      if (levels[i].depth > levels[i - 1].depth) { monotonic = false; break; }
-    }
-    if (monotonic) {
-      continuation = levels.slice(deepest + 1);
-      primary = levels.slice(0, deepest + 1);
-    }
-  }
-  return { primary, continuation };
+  return ZhlEngineBundle.splitZhlProfileLevels(levels);
 }
 
 /** ZHL headless API: deepest segment first, then optional monotonic-shallower holds only. */
@@ -11495,8 +11607,9 @@ if (typeof window !== 'undefined') window.validateZhlHeadlessProfile = validateZ
 
 // ═══════════════════════════════════════════════
 // ZHL ENGINE — headless Bühlmann interface for test harnesses
-// Mirrors VPMEngine.calculate(levels, gases, settings, 'ZHLC_GF')
-// so Tier 1 tests can directly call the Bühlmann engine.
+// Tier 3: ZhlEngineBundle (sync OC) + ZhlWorkerBridge (async OC)
+// CCR/pSCR: DOM-based path via runDecoSchedule (full CCR loop physics)
+// Mirrors VPMEngine.calculate(levels, gases, settings, 'ZHLC_GF').
 // ═══════════════════════════════════════════════
 const ZHLEngine = (() => {
   function setEl(id, val) {
@@ -11504,342 +11617,389 @@ const ZHLEngine = (() => {
     if (el) el.value = val;
   }
 
-  function calculate(levels, decoGases, settings) {
-    if (!levels || levels.length === 0) {
-      return engineValidationError({
-        ok: false,
-        errors: [{ code: 'INVALID_PROFILE', field: 'levels', message: 'No levels' }],
+  function calculateCcrViaDom(levels, decoGases, settings) {
+      if (!levels || levels.length === 0) {
+        return engineValidationError({
+          ok: false,
+          errors: [{ code: 'INVALID_PROFILE', field: 'levels', message: 'No levels' }],
+        });
+      }
+      const s = settings || {};
+      const ccrVal = validateCcrCalculationInputs(levels, s, decoGases);
+      if (!ccrVal.ok) return engineValidationError(ccrVal);
+      const isMetric = s.metric !== false;
+      const profileVal = validateZhlHeadlessProfile(levels);
+      if (!profileVal.ok) {
+        return engineValidationError({ ok: false, errors: [profileVal] });
+      }
+      const profileSplit = splitZhlProfileLevels(levels);
+      const level = levels[0];
+
+      // ── Temporarily wire DOM to match settings ──────────────────────────────
+      const prevDecoDepth = document.getElementById('decoDepth')?.value;
+      const prevDecoBT = document.getElementById('decoBT')?.value;
+      const prevContLevels = window._zhlContinuationLevels;
+      window._zhlContinuationLevels = profileSplit.continuation.length ? profileSplit.continuation : null;
+      setEl('decoDepth', isMetric ? level.depth : Math.round(level.depth * 3.28084));
+      setEl('decoBT',    level.time);
+      setEl('ascentRate',      s.ascentRate      || 10);
+      setEl('decoAscentRate',  s.decoAscentRate  || 3);
+      setEl('surfaceAscentRate', s.surfaceAscentRate || 3);
+      setEl('descentRate',     s.descentRate     || 20);
+      setEl('minStopTime',     s.minStopTime     || 1);
+      setEl('decoStep',        s.stepSize        || 3);
+      setEl('lastDecoStop',    s.lastStop        || 3);
+      const stopRndEl = document.getElementById('stopRounding');
+      const prevStopRounding = stopRndEl ? stopRndEl.value : 'fractional';
+      if (s.stopRounding === 'wholeminute') {
+        setEl('stopRounding', 'wholeminute');
+      } else {
+        setEl('stopRounding', 'fractional');
+      }
+      const prevAlt = { altitudeM, altSurfaceP, altAcclimatized };
+      if (s.altitude != null) {
+        altitudeM = Math.max(0, Math.min(5000, Number(s.altitude) || 0));
+        altSurfaceP = altToPressure(altitudeM);
+      }
+      if (s.acclimatized != null) altAcclimatized = !!s.acclimatized;
+      setEl('ppo2Bottom',      s.ppO2Bottom      || 1.4);
+      setEl('ppo2Deco',        s.ppO2Deco        || 1.6);
+      const prevCCR = {
+        circuit: document.getElementById('circuitSelect')?.value,
+        setpoint: document.getElementById('ccrDecoSetpoint')?.value || document.getElementById('ccrSetpoint')?.value,
+        descentSetpoint: document.getElementById('ccrDescentSetpoint')?.value,
+        bottomSetpoint: document.getElementById('ccrBottomSetpoint')?.value,
+        bailout: document.getElementById('ccrBailoutToggle')?.value,
+        bailoutGfLow: document.getElementById('ccrBailoutGfLow')?.value,
+        bailoutGfHigh: document.getElementById('ccrBailoutGfHigh')?.value,
+        scrLoopVolume: document.getElementById('ccrLoopVolume')?.value || document.getElementById('scrLoopVolume')?.value,
+        scrMetabolicO2: document.getElementById('ccrMetabolicO2')?.value || document.getElementById('scrMetabolicO2')?.value,
+        sacStress: document.getElementById('ccrSacStress')?.value,
+        sacDecoCcr: document.getElementById('ccrSacDeco')?.value,
+        stressTimeMin: document.getElementById('ccrStressTime')?.value,
+        problemSolveMin: document.getElementById('ccrProblemSolve')?.value,
+        diluentUseAsBailout: document.getElementById('diluentUseAsBailout')?.value,
+      };
+      if (s.circuit) setEl('circuitSelect', s.circuit);
+      if (s.setpoint != null) {
+        setEl('ccrDecoSetpoint', s.setpoint);
+        setEl('ccrSetpoint', s.setpoint);
+      }
+      if (s.descentSetpoint != null) setEl('ccrDescentSetpoint', s.descentSetpoint);
+      if (s.bottomSetpoint != null) setEl('ccrBottomSetpoint', s.bottomSetpoint);
+      if (s.bailout != null) setEl('ccrBailoutToggle', s.bailout ? 'on' : 'off');
+      if (s.bailoutGfLow != null) setEl('ccrBailoutGfLow', s.bailoutGfLow);
+      if (s.bailoutGfHigh != null) setEl('ccrBailoutGfHigh', s.bailoutGfHigh);
+      if (s.scrLoopVolume != null) { setEl('ccrLoopVolume', s.scrLoopVolume); setEl('scrLoopVolume', s.scrLoopVolume); }
+      if (s.scrMetabolicO2 != null) { setEl('ccrMetabolicO2', s.scrMetabolicO2); setEl('scrMetabolicO2', s.scrMetabolicO2); }
+      if (s.sacStress != null) setEl('ccrSacStress', s.sacStress);
+      if (s.sacDecoCcr != null) setEl('ccrSacDeco', s.sacDecoCcr);
+      if (s.stressTimeMin != null) setEl('ccrStressTime', s.stressTimeMin);
+      if (s.problemSolveMin != null) setEl('ccrProblemSolve', s.problemSolveMin);
+
+      // ── GF: set via mGF global (Bühlmann reads from mGF, not settings) ──────
+      const prevGF = { low: mGF.low, high: mGF.high };
+      mGF.low  = s.gfLo  || s.gfLow  || 30;
+      mGF.high = s.gfHi  || s.gfHigh || 85;
+
+      // ── Units ─────────────────────────────────────────────────────────────────
+      // Only call setUnits if we actually need to switch — avoids heavy DOM walk on every call
+      const prevUnits = units;
+      const needUnits = s.metric === false ? 'imperial' : 'metric';
+      if (units !== needUnits) setUnits(needUnits);
+
+      // ── Algorithm: force ZHLC_GF (no DOM event — headless mode skips UI update) ─
+      const algoEl = document.getElementById('algorithmSelect');
+      const prevAlgo = algoEl ? algoEl.value : 'ZHLC_GF';
+      if (algoEl) algoEl.value = 'ZHLC_GF';
+      // Don't dispatchEvent — setDecoAlgorithm() triggers heavy UI updates.
+      // runDecoSchedule reads algorithmSelect.value directly, so just setting .value is enough.
+
+      // ── Bottom gas (first level's o2/he) ────────────────────────────────────
+      const fO2bot = level.o2 / 100;
+      const fHeBot = (level.he || 0) / 100;
+      const fN2bot = Math.max(0, 1 - fO2bot - fHeBot);
+      // Set bottom gas — must use 'trimix' mode when He > 0 so getBottomGasFractions() reads He correctly
+      const decoGasEl = document.getElementById('decoGas');
+      let prevDecoGasVal = decoGasEl ? decoGasEl.value : 'air';
+      if (decoGasEl) {
+        if (fHeBot > 0) {
+          decoGasEl.value = 'trimix';  // BUGFIX: was 'custom' — custom branch in getBottomGasFractions() sets fHe:0
+          setEl('botTrimixO2', Math.round(fO2bot * 100));
+          setEl('botTrimixHe', Math.round(fHeBot * 100));
+        } else if (Math.round(fO2bot * 100) === 21) {
+          decoGasEl.value = 'air';
+        } else if (Math.round(fO2bot * 100) === 32) {
+          decoGasEl.value = 'ean32';
+        } else {
+          decoGasEl.value = 'custom';
+          setEl('decoCustomO2', Math.round(fO2bot * 100));
+        }
+      }
+
+      // ── Deco gases ──────────────────────────────────────────────────────────
+      // Collect current card indices (pre-built slots 1 and 2, plus any dynamic ones)
+      // and record their current state for restore.
+      const prevDGVals = [];
+      const _prevDGCards = [];
+      {
+        const container = document.getElementById('decoGasCards');
+        if (container) {
+          container.querySelectorAll('.deco-gas-card').forEach(card => {
+            const idMatch = card.id.match(/dgCard_(\d+)/);
+            if (idMatch) _prevDGCards.push(parseInt(idMatch[1]));
+          });
+        } else {
+          // fallback: pre-built slots 1 and 2
+          _prevDGCards.push(1, 2);
+        }
+      }
+      // Save and clear all current slots
+      _prevDGCards.forEach(idx => {
+        const mixEl = document.getElementById(`dg${idx}Mix`);
+        if (mixEl) {
+          prevDGVals.push({ id: `dg${idx}Mix`, val: mixEl.value });
+          prevDGVals.push({ id: `dg${idx}CustomO2`, val: document.getElementById(`dg${idx}CustomO2`)?.value });
+          prevDGVals.push({ id: `dg${idx}TrimixO2`, val: document.getElementById(`dg${idx}TrimixO2`)?.value });
+          prevDGVals.push({ id: `dg${idx}TrimixHe`, val: document.getElementById(`dg${idx}TrimixHe`)?.value });
+          mixEl.value = 'none';
+        }
       });
-    }
+      // Track any dynamic cards we add so we can remove them on restore
+      const _addedDGIdxs = [];
+      (decoGases || []).forEach((g, i) => {
+        const n = i + 1;
+        // Resolve the card idx for position n (pre-built cards 1&2 have idx==n; dynamic cards use _dgNextIdx)
+        let cardIdx;
+        const existingMix = document.getElementById(`dg${n}Mix`);
+        if (existingMix) {
+          cardIdx = n;  // pre-built card — slot index matches card number
+        } else {
+          // Add a dynamic card for this extra gas
+          if (typeof addDecoGasCard === 'function') {
+            addDecoGasCard();
+            cardIdx = _dgNextIdx - 1;  // addDecoGasCard increments _dgNextIdx before returning
+            _addedDGIdxs.push(cardIdx);
+          } else {
+            return;  // can't add more slots
+          }
+        }
+        const mixEl = document.getElementById(`dg${cardIdx}Mix`);
+        if (!mixEl) return;
+        const o2pct = g.o2;
+        const hePct = g.he || 0;
+        if (o2pct === 100) {
+          mixEl.value = 'o2';
+        } else if (o2pct === 50 && hePct === 0) {
+          mixEl.value = 'ean50';
+        } else if (o2pct === 80 && hePct === 0) {
+          mixEl.value = 'ean80';
+        } else if (hePct > 0) {
+          // BUGFIX: trimix deco gas — must use 'trimix' mode, NOT 'custom'.
+          // 'custom' branch in getDecoGasFractions() sets fHe:0 unconditionally.
+          mixEl.value = 'trimix';
+          setEl(`dg${cardIdx}TrimixO2`, o2pct);
+          setEl(`dg${cardIdx}TrimixHe`, hePct);
+        } else {
+          mixEl.value = 'custom';
+          setEl(`dg${cardIdx}CustomO2`, o2pct);
+        }
+      });
+
+      // Repetitive carry: settings._preTissues only — never leak stale state between calls
+      if (s._preTissues && s._preTissues.length) {
+        window._zhlRepState = {
+          tissues: s._preTissues,
+          surfaceIntervalMin: s._surfaceInterval || 0,
+        };
+      } else {
+        window._zhlRepState = null;
+      }
+
+      // ── Forward prior-dive O₂ carry into headless run if set (v2.20.0) ───────
+      // The live-app path picks this up via window._priorDiveCarry in runDecoSchedule.
+      // For headless calls we mirror it from the settings object so test harnesses
+      // that pass _preOTU/_preCNS get the same carry behaviour as the live app.
+      const _prevPriorDiveCarry = window._priorDiveCarry;
+      if ((s._preOTU != null && s._preOTU > 0) || (s._preCNS != null && s._preCNS > 0)) {
+        window._priorDiveCarry = {
+          otuCarry: s._preOTU || 0,
+          cnsCarry: s._preCNS || 0,
+        };
+      }
+
+      // ── Run the Bühlmann engine (headless — skip DOM rendering) ─────────────
+      const _headlessEntry = window._zhlHeadlessDepth || 0;
+      window._zhlHeadlessDepth = _headlessEntry + 1;
+      window._zhlHeadless = true;
+      window._lastPlan = null;
+      try {
+        runDecoSchedule();
+      } catch(e) {
+        window._zhlHeadlessDepth = _headlessEntry;
+        window._zhlHeadless = _headlessEntry > 0;
+        window._zhlRepState = null;
+        window._zhlContinuationLevels = prevContLevels;
+        window._priorDiveCarry = _prevPriorDiveCarry;
+        if (prevDecoDepth != null) setEl('decoDepth', prevDecoDepth);
+        if (prevDecoBT != null) setEl('decoBT', prevDecoBT);
+        mGF.low = prevGF.low; mGF.high = prevGF.high;
+        if (units !== prevUnits) setUnits(prevUnits);
+        if (algoEl) algoEl.value = prevAlgo;
+        return { error: e.message, stops: [], plan: [], totalRuntime: 0 };
+      }
+      window._zhlHeadlessDepth = _headlessEntry;
+      window._zhlHeadless = _headlessEntry > 0;
+
+      const lp = window._lastPlan;
+
+      // ── Restore DOM state ─────────────────────────────────────────────────────
+      mGF.low = prevGF.low; mGF.high = prevGF.high;
+      if (units !== prevUnits) setUnits(prevUnits);
+      if (algoEl) algoEl.value = prevAlgo;
+      // Don't fire change event on restore — avoids unnecessary UI repaint after each test call.
+      if (decoGasEl) decoGasEl.value = prevDecoGasVal;
+      prevDGVals.forEach(({ id, val }) => { const el = document.getElementById(id); if (el && val != null) el.value = val; });
+      if (prevCCR.circuit != null) setEl('circuitSelect', prevCCR.circuit);
+      if (prevCCR.setpoint != null) { setEl('ccrDecoSetpoint', prevCCR.setpoint); setEl('ccrSetpoint', prevCCR.setpoint); }
+      if (prevCCR.descentSetpoint != null) setEl('ccrDescentSetpoint', prevCCR.descentSetpoint);
+      if (prevCCR.bottomSetpoint != null) setEl('ccrBottomSetpoint', prevCCR.bottomSetpoint);
+      if (prevCCR.bailout != null) setEl('ccrBailoutToggle', prevCCR.bailout);
+      if (prevCCR.bailoutGfLow != null) setEl('ccrBailoutGfLow', prevCCR.bailoutGfLow);
+      if (prevCCR.bailoutGfHigh != null) setEl('ccrBailoutGfHigh', prevCCR.bailoutGfHigh);
+      if (prevCCR.scrLoopVolume != null) { setEl('ccrLoopVolume', prevCCR.scrLoopVolume); setEl('scrLoopVolume', prevCCR.scrLoopVolume); }
+      if (prevCCR.scrMetabolicO2 != null) { setEl('ccrMetabolicO2', prevCCR.scrMetabolicO2); setEl('scrMetabolicO2', prevCCR.scrMetabolicO2); }
+      if (prevCCR.sacStress != null) setEl('ccrSacStress', prevCCR.sacStress);
+      if (prevCCR.sacDecoCcr != null) setEl('ccrSacDeco', prevCCR.sacDecoCcr);
+      if (prevCCR.stressTimeMin != null) setEl('ccrStressTime', prevCCR.stressTimeMin);
+      if (prevCCR.problemSolveMin != null) setEl('ccrProblemSolve', prevCCR.problemSolveMin);
+      if (prevCCR.diluentUseAsBailout != null) setEl('diluentUseAsBailout', prevCCR.diluentUseAsBailout);
+      if (stopRndEl) stopRndEl.value = prevStopRounding;
+      altitudeM = prevAlt.altitudeM;
+      altSurfaceP = prevAlt.altSurfaceP;
+      altAcclimatized = prevAlt.altAcclimatized;
+      if (typeof toggleCircuitFields === 'function') toggleCircuitFields();
+      // Remove any dynamic deco gas cards we added for this headless call
+      _addedDGIdxs.forEach(idx => { const card = document.getElementById(`dgCard_${idx}`); if (card) card.remove(); });
+      if (_addedDGIdxs.length > 0 && typeof renumberDecoGasCards === 'function') renumberDecoGasCards();
+
+      // Clear repetitive state — must not leak into subsequent calls
+      window._zhlRepState = null;
+      window._zhlContinuationLevels = prevContLevels;
+      window._priorDiveCarry = _prevPriorDiveCarry; // restore prior-dive carry to pre-call state
+      if (prevDecoDepth != null) setEl('decoDepth', prevDecoDepth);
+      if (prevDecoBT != null) setEl('decoBT', prevDecoBT);
+
+      if (!lp) return { error: 'No plan generated', stops: [], plan: [], totalRuntime: 0 };
+
+      // ── Map _lastPlan to VPMEngine-compatible result interface ────────────────
+      const stops = (lp.stops || []).map(s => ({
+        depth: s.depth, time: s.dur, gas: s.gas, type: 'stop'
+      }));
+      const plan = (lp.steps || []).map(s => ({
+        type: s.type === 'deco' ? 'stop' : s.type === 'safety' ? 'stop' : s.type,
+        depth: s.type === 'ascent' ? s.to : s.depth,
+        from: s.type === 'ascent' ? s.from : undefined,
+        to: s.type === 'ascent' ? s.to : undefined,
+        time:  s.dur,
+        run:   null,   // patched below
+        gas:   s.gas,
+        pO2:   s.pO2,
+        o2:    Math.round((s.fN2 !== undefined ? (1 - s.fN2 - (s.fHe||0)) : fO2bot) * 100),
+        he:    Math.round((s.fHe || 0) * 100)
+      }));
+      // Inject descent and bottom segments at front if missing
+      // (Bühlmann steps array only has ascent/deco/safety — descent and bottom are
+      // rendered directly to DOM, not stored in steps. Add them so assertIntegrity passes.)
+      if (plan.length === 0 || plan[0].type !== 'descent') {
+        const descentTime = level.depth / (s.descentRate || 20);
+        const btAtDepth = Math.max(0, level.time - descentTime);
+        const bottomGasLabel = plan.length > 0 ? (plan[0].gas || 'bottom') : 'bottom';
+        const bottomSeg = { type: 'bottom', depth: level.depth, time: btAtDepth, run: descentTime + btAtDepth, gas: bottomGasLabel, o2: level.o2, he: level.he || 0 };
+        const descentSeg = { type: 'descent', depth: level.depth, time: descentTime, run: descentTime, gas: bottomGasLabel, o2: level.o2, he: level.he || 0 };
+        plan.unshift(bottomSeg);   // goes to index 0 first
+        plan.unshift(descentSeg);  // then pushed to index 0, bottomSeg moves to 1
+      }
+      // Patch run times into remaining segments (needed by assertIntegrity run-time monotonicity check)
+      let runAccum = 0;
+      plan.forEach(seg => {
+        if (seg.run == null) {
+          runAccum += (seg.time || 0);
+          seg.run = Math.round(runAccum * 10) / 10;
+        } else {
+          runAccum = seg.run;
+        }
+      });
+
+      const exposure = computePlanExposureTotals(
+        plan, s, fO2bot, fHeBot, altSurfaceP || 1.01325, BAR_PER_METRE || 0.1
+      );
+      const _pdCarry = window._priorDiveCarry;
+      const otuCarry = _pdCarry ? (_pdCarry.otuCarry || 0) : 0;
+      const cnsCarry = _pdCarry ? (_pdCarry.cnsCarry || 0) : 0;
+
+      return {
+        plan,
+        stops,
+        totalRuntime: lp.rt || 0,
+        tts: lp.tts || 0,
+        totalOTU: Math.round(exposure.totalOTU + otuCarry),
+        totalCNS: parseFloat((exposure.totalCNS + cnsCarry).toFixed(1)),
+        finalTissues: lp.finalTissues || null,   // for ZHL repetitive dive carry
+        depthUnit: isMetric ? 'm' : 'ft',
+        error: null
+      };
+  }
+
+  function isCcrCircuit(settings) {
+    const s = settings || {};
+    const circuit = s.circuit || 'OC';
+    return typeof isRebreatherCircuit === 'function' && isRebreatherCircuit(circuit);
+  }
+
+  function calculate(levels, decoGases, settings) {
     const s = settings || {};
     const ccrVal = validateCcrCalculationInputs(levels, s, decoGases);
     if (!ccrVal.ok) return engineValidationError(ccrVal);
-    const isMetric = s.metric !== false;
+    if (isCcrCircuit(s)) {
+      return calculateCcrViaDom(levels, decoGases, settings);
+    }
+    const validation = validateEngineInputs(levels, decoGases);
+    if (!validation.ok) return engineValidationError(validation);
     const profileVal = validateZhlHeadlessProfile(levels);
     if (!profileVal.ok) {
       return engineValidationError({ ok: false, errors: [profileVal] });
     }
-    const profileSplit = splitZhlProfileLevels(levels);
-    const level = levels[0];
-
-    // ── Temporarily wire DOM to match settings ──────────────────────────────
-    const prevDecoDepth = document.getElementById('decoDepth')?.value;
-    const prevDecoBT = document.getElementById('decoBT')?.value;
-    const prevContLevels = window._zhlContinuationLevels;
-    window._zhlContinuationLevels = profileSplit.continuation.length ? profileSplit.continuation : null;
-    setEl('decoDepth', isMetric ? level.depth : Math.round(level.depth * 3.28084));
-    setEl('decoBT',    level.time);
-    setEl('ascentRate',      s.ascentRate      || 10);
-    setEl('decoAscentRate',  s.decoAscentRate  || 3);
-    setEl('surfaceAscentRate', s.surfaceAscentRate || 3);
-    setEl('descentRate',     s.descentRate     || 20);
-    setEl('minStopTime',     s.minStopTime     || 1);
-    setEl('decoStep',        s.stepSize        || 3);
-    setEl('lastDecoStop',    s.lastStop        || 3);
-    const stopRndEl = document.getElementById('stopRounding');
-    const prevStopRounding = stopRndEl ? stopRndEl.value : 'fractional';
-    if (s.stopRounding === 'wholeminute') {
-      setEl('stopRounding', 'wholeminute');
-    } else {
-      setEl('stopRounding', 'fractional');
-    }
-    const prevAlt = { altitudeM, altSurfaceP, altAcclimatized };
-    if (s.altitude != null) {
-      altitudeM = Math.max(0, Math.min(5000, Number(s.altitude) || 0));
-      altSurfaceP = altToPressure(altitudeM);
-    }
-    if (s.acclimatized != null) altAcclimatized = !!s.acclimatized;
-    setEl('ppo2Bottom',      s.ppO2Bottom      || 1.4);
-    setEl('ppo2Deco',        s.ppO2Deco        || 1.6);
-    const prevCCR = {
-      circuit: document.getElementById('circuitSelect')?.value,
-      setpoint: document.getElementById('ccrDecoSetpoint')?.value || document.getElementById('ccrSetpoint')?.value,
-      descentSetpoint: document.getElementById('ccrDescentSetpoint')?.value,
-      bottomSetpoint: document.getElementById('ccrBottomSetpoint')?.value,
-      bailout: document.getElementById('ccrBailoutToggle')?.value,
-      bailoutGfLow: document.getElementById('ccrBailoutGfLow')?.value,
-      bailoutGfHigh: document.getElementById('ccrBailoutGfHigh')?.value,
-      scrLoopVolume: document.getElementById('ccrLoopVolume')?.value || document.getElementById('scrLoopVolume')?.value,
-      scrMetabolicO2: document.getElementById('ccrMetabolicO2')?.value || document.getElementById('scrMetabolicO2')?.value,
-      sacStress: document.getElementById('ccrSacStress')?.value,
-      sacDecoCcr: document.getElementById('ccrSacDeco')?.value,
-      stressTimeMin: document.getElementById('ccrStressTime')?.value,
-      problemSolveMin: document.getElementById('ccrProblemSolve')?.value,
-      diluentUseAsBailout: document.getElementById('diluentUseAsBailout')?.value,
-    };
-    if (s.circuit) setEl('circuitSelect', s.circuit);
-    if (s.setpoint != null) {
-      setEl('ccrDecoSetpoint', s.setpoint);
-      setEl('ccrSetpoint', s.setpoint);
-    }
-    if (s.descentSetpoint != null) setEl('ccrDescentSetpoint', s.descentSetpoint);
-    if (s.bottomSetpoint != null) setEl('ccrBottomSetpoint', s.bottomSetpoint);
-    if (s.bailout != null) setEl('ccrBailoutToggle', s.bailout ? 'on' : 'off');
-    if (s.bailoutGfLow != null) setEl('ccrBailoutGfLow', s.bailoutGfLow);
-    if (s.bailoutGfHigh != null) setEl('ccrBailoutGfHigh', s.bailoutGfHigh);
-    if (s.scrLoopVolume != null) { setEl('ccrLoopVolume', s.scrLoopVolume); setEl('scrLoopVolume', s.scrLoopVolume); }
-    if (s.scrMetabolicO2 != null) { setEl('ccrMetabolicO2', s.scrMetabolicO2); setEl('scrMetabolicO2', s.scrMetabolicO2); }
-    if (s.sacStress != null) setEl('ccrSacStress', s.sacStress);
-    if (s.sacDecoCcr != null) setEl('ccrSacDeco', s.sacDecoCcr);
-    if (s.stressTimeMin != null) setEl('ccrStressTime', s.stressTimeMin);
-    if (s.problemSolveMin != null) setEl('ccrProblemSolve', s.problemSolveMin);
-
-    // ── GF: set via mGF global (Bühlmann reads from mGF, not settings) ──────
-    const prevGF = { low: mGF.low, high: mGF.high };
-    mGF.low  = s.gfLo  || s.gfLow  || 30;
-    mGF.high = s.gfHi  || s.gfHigh || 85;
-
-    // ── Units ─────────────────────────────────────────────────────────────────
-    // Only call setUnits if we actually need to switch — avoids heavy DOM walk on every call
-    const prevUnits = units;
-    const needUnits = s.metric === false ? 'imperial' : 'metric';
-    if (units !== needUnits) setUnits(needUnits);
-
-    // ── Algorithm: force ZHLC_GF (no DOM event — headless mode skips UI update) ─
-    const algoEl = document.getElementById('algorithmSelect');
-    const prevAlgo = algoEl ? algoEl.value : 'ZHLC_GF';
-    if (algoEl) algoEl.value = 'ZHLC_GF';
-    // Don't dispatchEvent — setDecoAlgorithm() triggers heavy UI updates.
-    // runDecoSchedule reads algorithmSelect.value directly, so just setting .value is enough.
-
-    // ── Bottom gas (first level's o2/he) ────────────────────────────────────
-    const fO2bot = level.o2 / 100;
-    const fHeBot = (level.he || 0) / 100;
-    const fN2bot = Math.max(0, 1 - fO2bot - fHeBot);
-    // Set bottom gas — must use 'trimix' mode when He > 0 so getBottomGasFractions() reads He correctly
-    const decoGasEl = document.getElementById('decoGas');
-    let prevDecoGasVal = decoGasEl ? decoGasEl.value : 'air';
-    if (decoGasEl) {
-      if (fHeBot > 0) {
-        decoGasEl.value = 'trimix';  // BUGFIX: was 'custom' — custom branch in getBottomGasFractions() sets fHe:0
-        setEl('botTrimixO2', Math.round(fO2bot * 100));
-        setEl('botTrimixHe', Math.round(fHeBot * 100));
-      } else if (Math.round(fO2bot * 100) === 21) {
-        decoGasEl.value = 'air';
-      } else if (Math.round(fO2bot * 100) === 32) {
-        decoGasEl.value = 'ean32';
-      } else {
-        decoGasEl.value = 'custom';
-        setEl('decoCustomO2', Math.round(fO2bot * 100));
-      }
-    }
-
-    // ── Deco gases ──────────────────────────────────────────────────────────
-    // Collect current card indices (pre-built slots 1 and 2, plus any dynamic ones)
-    // and record their current state for restore.
-    const prevDGVals = [];
-    const _prevDGCards = [];
-    {
-      const container = document.getElementById('decoGasCards');
-      if (container) {
-        container.querySelectorAll('.deco-gas-card').forEach(card => {
-          const idMatch = card.id.match(/dgCard_(\d+)/);
-          if (idMatch) _prevDGCards.push(parseInt(idMatch[1]));
-        });
-      } else {
-        // fallback: pre-built slots 1 and 2
-        _prevDGCards.push(1, 2);
-      }
-    }
-    // Save and clear all current slots
-    _prevDGCards.forEach(idx => {
-      const mixEl = document.getElementById(`dg${idx}Mix`);
-      if (mixEl) {
-        prevDGVals.push({ id: `dg${idx}Mix`, val: mixEl.value });
-        prevDGVals.push({ id: `dg${idx}CustomO2`, val: document.getElementById(`dg${idx}CustomO2`)?.value });
-        prevDGVals.push({ id: `dg${idx}TrimixO2`, val: document.getElementById(`dg${idx}TrimixO2`)?.value });
-        prevDGVals.push({ id: `dg${idx}TrimixHe`, val: document.getElementById(`dg${idx}TrimixHe`)?.value });
-        mixEl.value = 'none';
-      }
-    });
-    // Track any dynamic cards we add so we can remove them on restore
-    const _addedDGIdxs = [];
-    (decoGases || []).forEach((g, i) => {
-      const n = i + 1;
-      // Resolve the card idx for position n (pre-built cards 1&2 have idx==n; dynamic cards use _dgNextIdx)
-      let cardIdx;
-      const existingMix = document.getElementById(`dg${n}Mix`);
-      if (existingMix) {
-        cardIdx = n;  // pre-built card — slot index matches card number
-      } else {
-        // Add a dynamic card for this extra gas
-        if (typeof addDecoGasCard === 'function') {
-          addDecoGasCard();
-          cardIdx = _dgNextIdx - 1;  // addDecoGasCard increments _dgNextIdx before returning
-          _addedDGIdxs.push(cardIdx);
-        } else {
-          return;  // can't add more slots
-        }
-      }
-      const mixEl = document.getElementById(`dg${cardIdx}Mix`);
-      if (!mixEl) return;
-      const o2pct = g.o2;
-      const hePct = g.he || 0;
-      if (o2pct === 100) {
-        mixEl.value = 'o2';
-      } else if (o2pct === 50 && hePct === 0) {
-        mixEl.value = 'ean50';
-      } else if (o2pct === 80 && hePct === 0) {
-        mixEl.value = 'ean80';
-      } else if (hePct > 0) {
-        // BUGFIX: trimix deco gas — must use 'trimix' mode, NOT 'custom'.
-        // 'custom' branch in getDecoGasFractions() sets fHe:0 unconditionally.
-        mixEl.value = 'trimix';
-        setEl(`dg${cardIdx}TrimixO2`, o2pct);
-        setEl(`dg${cardIdx}TrimixHe`, hePct);
-      } else {
-        mixEl.value = 'custom';
-        setEl(`dg${cardIdx}CustomO2`, o2pct);
-      }
-    });
-
-    // Repetitive carry: settings._preTissues only — never leak stale state between calls
-    if (s._preTissues && s._preTissues.length) {
-      window._zhlRepState = {
-        tissues: s._preTissues,
-        surfaceIntervalMin: s._surfaceInterval || 0,
-      };
-    } else {
-      window._zhlRepState = null;
-    }
-
-    // ── Forward prior-dive O₂ carry into headless run if set (v2.20.0) ───────
-    // The live-app path picks this up via window._priorDiveCarry in runDecoSchedule.
-    // For headless calls we mirror it from the settings object so test harnesses
-    // that pass _preOTU/_preCNS get the same carry behaviour as the live app.
-    const _prevPriorDiveCarry = window._priorDiveCarry;
-    if ((s._preOTU != null && s._preOTU > 0) || (s._preCNS != null && s._preCNS > 0)) {
-      window._priorDiveCarry = {
-        otuCarry: s._preOTU || 0,
-        cnsCarry: s._preCNS || 0,
-      };
-    }
-
-    // ── Run the Bühlmann engine (headless — skip DOM rendering) ─────────────
-    const _headlessEntry = window._zhlHeadlessDepth || 0;
-    window._zhlHeadlessDepth = _headlessEntry + 1;
-    window._zhlHeadless = true;
-    window._lastPlan = null;
-    try {
-      runDecoSchedule();
-    } catch(e) {
-      window._zhlHeadlessDepth = _headlessEntry;
-      window._zhlHeadless = _headlessEntry > 0;
-      window._zhlRepState = null;
-      window._zhlContinuationLevels = prevContLevels;
-      window._priorDiveCarry = _prevPriorDiveCarry;
-      if (prevDecoDepth != null) setEl('decoDepth', prevDecoDepth);
-      if (prevDecoBT != null) setEl('decoBT', prevDecoBT);
-      mGF.low = prevGF.low; mGF.high = prevGF.high;
-      if (units !== prevUnits) setUnits(prevUnits);
-      if (algoEl) algoEl.value = prevAlgo;
-      return { error: e.message, stops: [], plan: [], totalRuntime: 0 };
-    }
-    window._zhlHeadlessDepth = _headlessEntry;
-    window._zhlHeadless = _headlessEntry > 0;
-
-    const lp = window._lastPlan;
-
-    // ── Restore DOM state ─────────────────────────────────────────────────────
-    mGF.low = prevGF.low; mGF.high = prevGF.high;
-    if (units !== prevUnits) setUnits(prevUnits);
-    if (algoEl) algoEl.value = prevAlgo;
-    // Don't fire change event on restore — avoids unnecessary UI repaint after each test call.
-    if (decoGasEl) decoGasEl.value = prevDecoGasVal;
-    prevDGVals.forEach(({ id, val }) => { const el = document.getElementById(id); if (el && val != null) el.value = val; });
-    if (prevCCR.circuit != null) setEl('circuitSelect', prevCCR.circuit);
-    if (prevCCR.setpoint != null) { setEl('ccrDecoSetpoint', prevCCR.setpoint); setEl('ccrSetpoint', prevCCR.setpoint); }
-    if (prevCCR.descentSetpoint != null) setEl('ccrDescentSetpoint', prevCCR.descentSetpoint);
-    if (prevCCR.bottomSetpoint != null) setEl('ccrBottomSetpoint', prevCCR.bottomSetpoint);
-    if (prevCCR.bailout != null) setEl('ccrBailoutToggle', prevCCR.bailout);
-    if (prevCCR.bailoutGfLow != null) setEl('ccrBailoutGfLow', prevCCR.bailoutGfLow);
-    if (prevCCR.bailoutGfHigh != null) setEl('ccrBailoutGfHigh', prevCCR.bailoutGfHigh);
-    if (prevCCR.scrLoopVolume != null) { setEl('ccrLoopVolume', prevCCR.scrLoopVolume); setEl('scrLoopVolume', prevCCR.scrLoopVolume); }
-    if (prevCCR.scrMetabolicO2 != null) { setEl('ccrMetabolicO2', prevCCR.scrMetabolicO2); setEl('scrMetabolicO2', prevCCR.scrMetabolicO2); }
-    if (prevCCR.sacStress != null) setEl('ccrSacStress', prevCCR.sacStress);
-    if (prevCCR.sacDecoCcr != null) setEl('ccrSacDeco', prevCCR.sacDecoCcr);
-    if (prevCCR.stressTimeMin != null) setEl('ccrStressTime', prevCCR.stressTimeMin);
-    if (prevCCR.problemSolveMin != null) setEl('ccrProblemSolve', prevCCR.problemSolveMin);
-    if (prevCCR.diluentUseAsBailout != null) setEl('diluentUseAsBailout', prevCCR.diluentUseAsBailout);
-    if (stopRndEl) stopRndEl.value = prevStopRounding;
-    altitudeM = prevAlt.altitudeM;
-    altSurfaceP = prevAlt.altSurfaceP;
-    altAcclimatized = prevAlt.altAcclimatized;
-    if (typeof toggleCircuitFields === 'function') toggleCircuitFields();
-    // Remove any dynamic deco gas cards we added for this headless call
-    _addedDGIdxs.forEach(idx => { const card = document.getElementById(`dgCard_${idx}`); if (card) card.remove(); });
-    if (_addedDGIdxs.length > 0 && typeof renumberDecoGasCards === 'function') renumberDecoGasCards();
-
-    // Clear repetitive state — must not leak into subsequent calls
-    window._zhlRepState = null;
-    window._zhlContinuationLevels = prevContLevels;
-    window._priorDiveCarry = _prevPriorDiveCarry; // restore prior-dive carry to pre-call state
-    if (prevDecoDepth != null) setEl('decoDepth', prevDecoDepth);
-    if (prevDecoBT != null) setEl('decoBT', prevDecoBT);
-
-    if (!lp) return { error: 'No plan generated', stops: [], plan: [], totalRuntime: 0 };
-
-    // ── Map _lastPlan to VPMEngine-compatible result interface ────────────────
-    const stops = (lp.stops || []).map(s => ({
-      depth: s.depth, time: s.dur, gas: s.gas, type: 'stop'
-    }));
-    const plan = (lp.steps || []).map(s => ({
-      type: s.type === 'deco' ? 'stop' : s.type === 'safety' ? 'stop' : s.type,
-      depth: s.type === 'ascent' ? s.to : s.depth,
-      from: s.type === 'ascent' ? s.from : undefined,
-      to: s.type === 'ascent' ? s.to : undefined,
-      time:  s.dur,
-      run:   null,   // patched below
-      gas:   s.gas,
-      pO2:   s.pO2,
-      o2:    Math.round((s.fN2 !== undefined ? (1 - s.fN2 - (s.fHe||0)) : fO2bot) * 100),
-      he:    Math.round((s.fHe || 0) * 100)
-    }));
-    // Inject descent and bottom segments at front if missing
-    // (Bühlmann steps array only has ascent/deco/safety — descent and bottom are
-    // rendered directly to DOM, not stored in steps. Add them so assertIntegrity passes.)
-    if (plan.length === 0 || plan[0].type !== 'descent') {
-      const descentTime = level.depth / (s.descentRate || 20);
-      const btAtDepth = Math.max(0, level.time - descentTime);
-      const bottomGasLabel = plan.length > 0 ? (plan[0].gas || 'bottom') : 'bottom';
-      const bottomSeg = { type: 'bottom', depth: level.depth, time: btAtDepth, run: descentTime + btAtDepth, gas: bottomGasLabel, o2: level.o2, he: level.he || 0 };
-      const descentSeg = { type: 'descent', depth: level.depth, time: descentTime, run: descentTime, gas: bottomGasLabel, o2: level.o2, he: level.he || 0 };
-      plan.unshift(bottomSeg);   // goes to index 0 first
-      plan.unshift(descentSeg);  // then pushed to index 0, bottomSeg moves to 1
-    }
-    // Patch run times into remaining segments (needed by assertIntegrity run-time monotonicity check)
-    let runAccum = 0;
-    plan.forEach(seg => {
-      if (seg.run == null) {
-        runAccum += (seg.time || 0);
-        seg.run = Math.round(runAccum * 10) / 10;
-      } else {
-        runAccum = seg.run;
-      }
-    });
-
-    const exposure = computePlanExposureTotals(
-      plan, s, fO2bot, fHeBot, altSurfaceP || 1.01325, BAR_PER_METRE || 0.1
-    );
-    const _pdCarry = window._priorDiveCarry;
-    const otuCarry = _pdCarry ? (_pdCarry.otuCarry || 0) : 0;
-    const cnsCarry = _pdCarry ? (_pdCarry.cnsCarry || 0) : 0;
-
-    return {
-      plan,
-      stops,
-      totalRuntime: lp.rt || 0,
-      tts: lp.tts || 0,
-      totalOTU: Math.round(exposure.totalOTU + otuCarry),
-      totalCNS: parseFloat((exposure.totalCNS + cnsCarry).toFixed(1)),
-      finalTissues: lp.finalTissues || null,   // for ZHL repetitive dive carry
-      depthUnit: isMetric ? 'm' : 'ft',
-      error: null
-    };
+    const profileSplit = ZhlEngineBundle.splitZhlProfileLevels(levels);
+    return ZhlEngineBundle.calculate(levels, decoGases, s, profileSplit, getZhlEnvironment());
   }
 
-  return { calculate, MODEL: 'ZHLC_GF' };
+  async function calculateInWorker(levels, decoGases, settings) {
+    const s = settings || {};
+    const ccrVal = validateCcrCalculationInputs(levels, s, decoGases);
+    if (!ccrVal.ok) return engineValidationError(ccrVal);
+    if (isCcrCircuit(s)) {
+      return calculateCcrViaDom(levels, decoGases, settings);
+    }
+    const validation = validateEngineInputs(levels, decoGases);
+    if (!validation.ok) return engineValidationError(validation);
+    const profileVal = validateZhlHeadlessProfile(levels);
+    if (!profileVal.ok) {
+      return engineValidationError({ ok: false, errors: [profileVal] });
+    }
+    const profileSplit = ZhlEngineBundle.splitZhlProfileLevels(levels);
+    try {
+      return await ZhlWorkerBridge.calculateInWorker(
+        levels, decoGases, s, profileSplit, getZhlEnvironment()
+      );
+    } catch (e) {
+      return { error: e.message, stops: [], plan: [], totalRuntime: 0 };
+    }
+  }
+
+  return { calculate, calculateInWorker, MODEL: 'ZHLC_GF' };
 })();
+
 if (typeof window !== 'undefined') window.ZHLEngine = ZHLEngine; // expose for test harnesses
 
 // ═══════════════════════════════════════════════
@@ -14549,7 +14709,7 @@ function buildGasPlanText() {
     L.push('');
   });
 
-  L.push('LSP D-Planner + CCR — threecats-lsp.com/d-planner-ccr');
+  L.push('LSP D-Planner+ — threecats-lsp.com/d-planner-plus');
   return L.join('\n');
 }
 
@@ -15154,7 +15314,7 @@ function buildExportText(mode) {
   lines.push(hr);
   lines.push('Planning Aid Only - Not a substitute for training, certification, or a dive computer.');
   lines.push(`Generated by LSP D-PLANNER + CCR  ${dateStr} ${timeStr}`);
-  lines.push('https://threecats-lsp.com/d-planner-ccr/');
+  lines.push('https://threecats-lsp.com/d-planner-plus/');
   lines.push('');
   lines.push('*'.repeat(43));
   lines.push('*       WARNING & DISCLAIMER              *');
@@ -18907,7 +19067,7 @@ window.addEventListener('load', function() {
     banner.id = 'pwaBanner';
     banner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border-hi);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.4);font-family:Outfit,sans-serif;max-width:340px;width:90%;';
     banner.innerHTML = '<span style="font-size:28px;">\uD83E\uDD3F</span>'
-      + '<div style="flex:1;"><div style="color:var(--text);font-weight:600;font-size:14px;">Install LSP D-Planner + CCR</div>'
+      + '<div style="flex:1;"><div style="color:var(--text);font-weight:600;font-size:14px;">Install LSP D-Planner+</div>'
       + '<div style="color:var(--muted);font-size:12px;margin-top:2px;">Add to home screen for offline use</div></div>'
       + '<button onclick="_pwaPrompt.prompt();_pwaPrompt.userChoice.then(()=>{_pwaPrompt=null;document.getElementById(\'pwaBanner\').remove();})" style="background:linear-gradient(135deg,#00d9ff,#00b8a0);border:none;border-radius:8px;padding:8px 14px;color:#030c18;font-weight:700;font-size:12px;cursor:pointer;">INSTALL</button>'
       + '<button onclick="this.parentNode.remove()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0;line-height:1;">&times;</button>';

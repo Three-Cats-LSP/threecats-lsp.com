@@ -3,7 +3,7 @@ name: Sync Apps
 on:
   workflow_dispatch:
   repository_dispatch:
-    types: [sync-d-planner, sync-d-planner-ccr, sync-t-viewer, sync-get-in-water, sync-apk-d-planner, sync-apk-d-planner-ccr, sync-apk-t-viewer, sync-apk-get-in-water]
+    types: [sync-d-planner, sync-d-planner-ccr, sync-d-planner-plus, sync-t-viewer, sync-get-in-water, sync-apk-d-planner, sync-apk-d-planner-ccr, sync-apk-d-planner-plus, sync-apk-t-viewer, sync-apk-get-in-water]
 
 jobs:
   sync:
@@ -19,8 +19,14 @@ jobs:
       - name: Pull latest D-Planner files
         if: github.event.action == 'sync-d-planner' || github.event_name == 'workflow_dispatch'
         run: |
-          mkdir -p d-planner scripts/readmes
-          for f in index.html download.html manifest.json sw.js capacitor-bridge.js tests.html tests-extended.html tests-massive.html tests-massive-main.html tests-verify.html; do
+          mkdir -p d-planner/vendor/fonts d-planner/vendor/icons scripts/readmes
+          for f in index.html download.html manifest.json sw.js capacitor-bridge.js icon-192.png icon-512.png zhl-engine-bundle.js zhl-schedule-worker.js zhl-worker-bridge.js tests.html tests-extended.html tests-massive.html tests-massive-main.html tests-verify.html; do
+            curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+                 -H "Accept: application/vnd.github.v3.raw" \
+                 "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner/contents/${f}" \
+                 -o "d-planner/${f}" || echo "skip ${f}"
+          done
+          for f in vendor/jspdf.umd.min.js vendor/offline-manifest.txt vendor/fonts/fonts.css vendor/fonts/DejaVuSans.ttf vendor/fonts/DejaVuSans-Bold.ttf vendor/icons/giw-icon-192.png; do
             curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                  -H "Accept: application/vnd.github.v3.raw" \
                  "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner/contents/${f}" \
@@ -50,6 +56,28 @@ jobs:
             sed -i 's|/LSP_D-planner-CCR/|/d-planner-ccr/|g' d-planner-ccr/manifest.json
           fi
           echo "D-Planner + CCR synced"
+
+      - name: Pull latest LSP D-Planner+ files
+        if: github.event.action == 'sync-d-planner-plus' || github.event_name == 'workflow_dispatch'
+        run: |
+          mkdir -p d-planner-plus/vendor/fonts d-planner-plus/vendor/icons scripts/readmes
+          for f in index.html download.html manifest.json sw.js capacitor-bridge.js icon-192.png icon-512.png zhl-engine-bundle.js zhl-schedule-worker.js zhl-worker-bridge.js tests.html tests-extended.html tests-massive.html tests-massive-main.html tests-verify.html tests-pscr-otu-cns.html tests-ccr-differential.html; do
+            curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+                 -H "Accept: application/vnd.github.v3.raw" \
+                 "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/${f}" \
+                 -o "d-planner-plus/${f}" || echo "skip ${f}"
+          done
+          for f in vendor/jspdf.umd.min.js vendor/offline-manifest.txt vendor/fonts/fonts.css vendor/fonts/DejaVuSans.ttf vendor/fonts/DejaVuSans-Bold.ttf vendor/icons/giw-icon-192.png; do
+            curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+                 -H "Accept: application/vnd.github.v3.raw" \
+                 "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/${f}" \
+                 -o "d-planner-plus/${f}" || echo "skip ${f}"
+          done
+          curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/README.md" \
+               -o "scripts/readmes/d-planner-plus.md" || echo "skip README"
+          echo "LSP D-Planner+ synced"
 
       - name: Pull latest T-Viewer files
         if: github.event.action == 'sync-t-viewer' || github.event_name == 'workflow_dispatch'
@@ -86,6 +114,16 @@ jobs:
                -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-CCR/contents/Android%20Apk/LSP_D-planner-CCR.apk" \
                -o d-planner-ccr/LSP_D-planner-CCR.apk || echo "APK not yet built — skip"
           echo "D-Planner + CCR APK synced"
+
+      - name: Pull latest LSP D-Planner+ APK
+        if: github.event.action == 'sync-apk-d-planner-plus' || github.event_name == 'workflow_dispatch'
+        run: |
+          mkdir -p d-planner-plus
+          curl -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/Android%20Apk/LSP_D-planner-plus.apk" \
+               -o d-planner-plus/LSP_D-planner-plus.apk || echo "APK not yet built — skip"
+          echo "LSP D-Planner+ APK synced"
 
       - name: Pull latest T-Viewer APK
         if: github.event.action == 'sync-apk-t-viewer' || github.event_name == 'workflow_dispatch'
@@ -150,5 +188,5 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add d-planner/ d-planner-ccr/ t-viewer/ get-in-water/ scripts/readmes/ about.css
+          git add d-planner/ d-planner-ccr/ d-planner-plus/ t-viewer/ get-in-water/ scripts/readmes/ about.css
           git diff --staged --quiet || (git commit -m "Sync apps from upstream repos" && git pull --rebase && git push)
