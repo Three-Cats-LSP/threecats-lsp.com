@@ -1,9 +1,8 @@
 /**
- * Firebase web config — giw-threecats-lsp
- * apiKey is public; access is restricted by Auth + Firestore rules + authorized domains.
+ * Firebase web config — giw-threecats-lsp (local only, gitignored)
  */
 window.GIW_FIREBASE_CONFIG = {
-  apiKey: 'AIzaSyDRIckjnGgSTwXKbk6fApRmikCXu080N8A',
+  apiKey: 'AIzaSyCHmG7_E_gYgsfFywVe-XEMenE_E_zkO5M',
   authDomain: 'giw-threecats-lsp.firebaseapp.com',
   projectId: 'giw-threecats-lsp',
   storageBucket: 'giw-threecats-lsp.firebasestorage.app',
