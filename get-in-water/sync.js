@@ -202,6 +202,12 @@
     applyingRemote = true;
     try {
       const data = JSON.parse(JSON.stringify(payload));
+      if (meta) {
+        data.syncMeta = {
+          updatedAt: meta.updatedAt || new Date().toISOString(),
+          revision: meta.revision || 0
+        };
+      }
       if (hooks.migrateState) hooks.migrateState(data);
       hooks.setState(data);
       hooks.persistLocal();
