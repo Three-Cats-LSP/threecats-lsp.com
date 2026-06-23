@@ -1,6 +1,6 @@
 # T-Viewer
 
-A companion app for **[LSP D-Planner](https://github.com/Three-Cats-LSP/LSP_D-planner)** — open, read, edit, and share dive plan **TXT** and **PDF** files exported by LSP D-Planner on your phone or in the browser.
+A companion app for **[LSP D-Planner+](https://github.com/Three-Cats-LSP/LSP_D-planner-plus)** — open, read, edit, and share dive plan **TXT** and **PDF** files exported by LSP D-Planner+ on your phone or in the browser.
 
 Part of the [Three Cats LSP](https://threecats-lsp.com) **Diver's Toolkit**.
 
@@ -14,7 +14,7 @@ Also runs in any browser — no install required.
 
 | App | Purpose |
 |-----|---------|
-| **[LSP D-Planner](https://threecats-lsp.com/d-planner/)** | Decompression planning (Bühlmann, VPM-B, Rec/Tec) |
+| **[LSP D-Planner+](https://threecats-lsp.com/d-planner-plus/)** | Decompression planning (Bühlmann, VPM-B, Rec/Tec, CCR/pSCR) |
 | **T-Viewer** | Open and share exported dive plan TXT/PDF files (this app) |
 | **[Get In Water](https://threecats-lsp.com/get-in-water/)** | Trip packing checklists |
 
