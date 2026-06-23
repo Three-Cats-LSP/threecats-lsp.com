@@ -96,10 +96,11 @@
 <ol>
 <li>Create a Firebase project and enable <strong>Google</strong> sign-in</li>
 <li>Create Firestore and deploy <a href="firestore.rules"><code>firestore.rules</code></a></li>
-<li>Copy web config into <a href="firebase-config.js"><code>firebase-config.js</code></a></li>
+<li>Copy web config into local <code>firebase-config.js</code> (from <a href="firebase-config.example.js"><code>firebase-config.example.js</code></a>; file is gitignored)</li>
 <li>Add Android app → <code>google-services.json</code> in <code>android/app/</code> (not committed)</li>
+<li>Ensure <code>android/variables.gradle</code> has <code>rgcfaIncludeGoogle = true</code> (required for Google Sign-In in APK)</li>
 <li>Register SHA-1 fingerprints for debug/release keystores</li>
-<li>For CI APK builds: GitHub secret <code>GOOGLE_SERVICES_JSON</code> (base64 of <code>google-services.json</code>)</li>
+<li>GitHub secrets: <code>GOOGLE_SERVICES_JSON</code> (base64 of <code>google-services.json</code>), <code>FIREBASE_WEB_CONFIG</code> (base64 of <code>firebase-config.js</code>)</li>
 </ol>
 <p><strong>Manual test checklist</strong></p>
 <hr>
