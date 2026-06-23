@@ -2,7 +2,7 @@
 
 Dive trip packing checklist app — part of the [Three Cats LSP](https://threecats-lsp.com) **Diver's Toolkit**.
 
-Maintain a **master gear list**, create **per-trip checklists**, tick items off as you pack, and export TXT or PDF for printing or sharing. Use it alongside [LSP D-Planner](https://threecats-lsp.com/d-planner/) — plan the dive, then pack for it.
+Maintain a **master gear list**, create **per-trip checklists**, tick items off as you pack, and export TXT or PDF for printing or sharing. Use it alongside [LSP D-Planner+](https://threecats-lsp.com/d-planner-plus/) — plan the dive, then pack for it.
 
 🌐 **Live app:** https://threecats-lsp.com/get-in-water/  
 📲 **Android APK:** https://threecats-lsp.com/get-in-water/download.html  
@@ -15,8 +15,7 @@ Maintain a **master gear list**, create **per-trip checklists**, tick items off 
 
 | App | Description | Link |
 |-----|-------------|------|
-| **[LSP D-Planner](https://threecats-lsp.com/d-planner/)** | Open-circuit decompression planning — Bühlmann, VPM-B, Rec/Tec | [Repo](https://github.com/Three-Cats-LSP/LSP_D-planner) |
-| **[LSP D-Planner + CCR](https://threecats-lsp.com/d-planner-ccr/)** | Rebreather planning — CCR, pSCR, bailout | [Repo](https://github.com/Three-Cats-LSP/LSP_D-planner-CCR) |
+| **[LSP D-Planner+](https://threecats-lsp.com/d-planner-plus/)** | Unified OC + CCR decompression planning — Bühlmann, VPM-B, Rec/Tec | [Repo](https://github.com/Three-Cats-LSP/LSP_D-planner-plus) |
 | **[T-Viewer](https://threecats-lsp.com/t-viewer/)** | Open and share exported dive plan TXT/PDF files | — |
 | **Get In Water** ← *this app* | Dive trip packing checklists | [Repo](https://github.com/Three-Cats-LSP/Get-In-Water) |
 
