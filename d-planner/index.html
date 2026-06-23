@@ -3345,7 +3345,7 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
   }
 })();
 
-const APP_VERSION = '2.20.31';
+const APP_VERSION = '2.20.32';
 window.APP_VERSION = APP_VERSION;
 // Test harness: skip DOM recalc storms when loaded inside tests-massive.html iframe
 (function() {
@@ -10299,6 +10299,17 @@ const ZHLEngine = (() => {
     if (el) el.value = val;
   }
 
+  function saveFieldValues(ids) {
+    return ids.map(id => ({ id, val: document.getElementById(id)?.value }));
+  }
+
+  function restoreFieldValues(saved) {
+    saved.forEach(({ id, val }) => {
+      const el = document.getElementById(id);
+      if (el && val != null) el.value = val;
+    });
+  }
+
   function calculate(levels, decoGases, settings) {
     const validation = validateEngineInputs(levels, decoGases);
     if (!validation.ok) return engineValidationError(validation);
@@ -10314,6 +10325,10 @@ const ZHLEngine = (() => {
     // ── Temporarily wire DOM to match settings ──────────────────────────────
     const prevDecoDepth = document.getElementById('decoDepth')?.value;
     const prevDecoBT = document.getElementById('decoBT')?.value;
+    const prevHeadlessFields = saveFieldValues([
+      'ascentRate', 'decoAscentRate', 'surfaceAscentRate', 'descentRate',
+      'minStopTime', 'decoStep', 'lastDecoStop', 'ppo2Bottom', 'ppo2Deco'
+    ]);
     const prevContLevels = window._zhlContinuationLevels;
     window._zhlContinuationLevels = profileSplit.continuation.length ? profileSplit.continuation : null;
     setEl('decoDepth', isMetric ? level.depth : Math.round(level.depth * 3.28084));
@@ -10472,6 +10487,7 @@ const ZHLEngine = (() => {
       window._priorDiveCarry = _prevPriorDiveCarry;
       if (prevDecoDepth != null) setEl('decoDepth', prevDecoDepth);
       if (prevDecoBT != null) setEl('decoBT', prevDecoBT);
+      restoreFieldValues(prevHeadlessFields);
       mGF.low = prevGF.low; mGF.high = prevGF.high;
       if (units !== prevUnits) setUnits(prevUnits);
       if (algoEl) algoEl.value = prevAlgo;
@@ -10492,6 +10508,7 @@ const ZHLEngine = (() => {
       if (_addedDGIdxs.length > 0 && typeof renumberDecoGasCards === 'function') renumberDecoGasCards();
       window._zhlRepState = null;
       window._priorDiveCarry = _prevPriorDiveCarry;
+      restoreFieldValues(prevHeadlessFields);
       return errOut;
     }
 
@@ -10555,6 +10572,7 @@ const ZHLEngine = (() => {
     window._priorDiveCarry = _prevPriorDiveCarry; // restore prior-dive carry to pre-call state
     if (prevDecoDepth != null) setEl('decoDepth', prevDecoDepth);
     if (prevDecoBT != null) setEl('decoBT', prevDecoBT);
+    restoreFieldValues(prevHeadlessFields);
 
     if (!lp) return { error: 'No plan generated', stops: [], plan: [], totalRuntime: 0 };
 
