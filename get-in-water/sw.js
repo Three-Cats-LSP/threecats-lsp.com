@@ -1,4 +1,4 @@
-const CACHE_NAME = 'giw-v1.4.0';
+const CACHE_NAME = 'giw-v1.4.1';
 const ASSETS = [
   '/get-in-water/',
   '/get-in-water/index.html',
@@ -33,18 +33,24 @@ function isFirebaseRequest(url) {
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME)
+      .then(cache =>
+        Promise.allSettled(
+          ASSETS.map(url =>
+            cache.add(url).catch(err => console.warn('[SW] precache skipped:', url, err))
+          )
+        )
+      )
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', e => {
