@@ -61,7 +61,7 @@ jobs:
         if: github.event.action == 'sync-d-planner-plus' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p d-planner-plus/vendor/fonts d-planner-plus/vendor/icons scripts/readmes
-          for f in index.html app-version.js download.html manifest.json sw.js capacitor-bridge.js icon-192.png icon-512.png zhl-engine-bundle.js vpm-engine-bundle.js zhl-schedule-worker.js zhl-worker-bridge.js tests.html tests-extended.html tests-massive.html tests-massive-main.html tests-verify.html tests-pscr-otu-cns.html tests-ccr-differential.html; do
+          for f in index.html app-version.js download.html manifest.json sw.js capacitor-bridge.js icon-192.png icon-512.png zhl-engine-bundle.js vpm-engine-bundle.js zhl-schedule-worker.js zhl-worker-bridge.js site-assets-manifest.txt tests.html tests-extended.html tests-massive.html tests-massive-main.html tests-verify.html tests-pscr-otu-cns.html tests-ccr-differential.html; do
             curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                  -H "Accept: application/vnd.github.v3.raw" \
                  "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/${f}" \
@@ -84,6 +84,16 @@ jobs:
                  "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/${f}" \
                  -o "d-planner-plus/${f}" || echo "skip vendor ${f}"
           done < d-planner-plus/vendor/offline-manifest.txt
+          mkdir -p d-planner-plus/tests
+          tmpdir=$(mktemp -d)
+          curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/tarball/main" \
+               -o "$tmpdir/repo.tar.gz"
+          tar xzf "$tmpdir/repo.tar.gz" -C "$tmpdir"
+          root=$(find "$tmpdir" -maxdepth 1 -type d ! -path "$tmpdir" | head -1)
+          rsync -a --exclude='*.py' --exclude='__pycache__' "$root/tests/ccr-differential/" d-planner-plus/tests/ccr-differential/
+          rm -rf "$tmpdir"
+          python3 scripts/verify_d_planner_plus_deploy.py
           curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                -H "Accept: application/vnd.github.v3.raw" \
                "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/README.md" \

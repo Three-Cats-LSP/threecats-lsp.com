@@ -43,8 +43,9 @@ DEPLOYS = [
             "zhl-engine-bundle.js", "vpm-engine-bundle.js", "zhl-schedule-worker.js", "zhl-worker-bridge.js",
             "tests.html", "tests-extended.html", "tests-massive.html", "tests-massive-main.html",
             "tests-verify.html", "tests-pscr-otu-cns.html", "tests-ccr-differential.html",
+            "site-assets-manifest.txt",
         ],
-        "dirs": ["vendor"],
+        "dirs": ["vendor", "tests/ccr-differential"],
         "readme": "d-planner-plus.md",
     },
 ]
@@ -63,7 +64,8 @@ for spec in DEPLOYS:
         if sdir.is_dir():
             if ddir.exists():
                 shutil.rmtree(ddir)
-            shutil.copytree(sdir, ddir)
+            ignore = shutil.ignore_patterns("*.py", "__pycache__") if "ccr-differential" in dname else None
+            shutil.copytree(sdir, ddir, ignore=ignore)
     readme_src = src / "README.md"
     if readme_src.is_file():
         (ROOT / "scripts" / "readmes" / spec["readme"]).write_text(
