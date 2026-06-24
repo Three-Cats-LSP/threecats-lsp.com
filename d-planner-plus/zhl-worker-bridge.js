@@ -20,7 +20,8 @@
         else p.reject(new Error(error || 'Worker calculation failed'));
       };
       worker.onerror = function (err) {
-        pending.forEach(p => p.reject(err));
+        const error = new Error((err && err.message) || 'Worker error');
+        pending.forEach(p => p.reject(error));
         pending.clear();
         worker = null;
       };
@@ -36,5 +37,16 @@
     });
   }
 
-  global.ZhlWorkerBridge = { calculateInWorker };
+  function terminate() {
+    const err = new Error('ZHL worker terminated');
+    const rejects = [...pending.values()];
+    pending.clear();
+    rejects.forEach(p => p.reject(err));
+    if (worker) {
+      worker.terminate();
+      worker = null;
+    }
+  }
+
+  global.ZhlWorkerBridge = { calculateInWorker, terminate };
 })(typeof window !== 'undefined' ? window : self);
