@@ -31,11 +31,9 @@
       "kind": "resource",
       "category": "Learn",
       "title": "Knowledge Base",
-      "description": "Useful links and knowledge for divers to become a better diver — videos, reels, and reading for study and dive prep.",
+      "description": "Curated videos, reels, and reading for divers — study skills, signals, and gear know-how before your next dive. All links in one place.",
       "icon": { "type": "svg", "name": "book-open" },
-      "cta": { "label": "Browse resources", "href": "/knowledge-base/", "external": false },
-      "featured_from_kb": 3,
-      "featured_kb_skip_badges": ["Video"]
+      "cta": { "label": "Browse resources", "href": "/knowledge-base/", "external": false }
     },
     {
       "kind": "gear",
