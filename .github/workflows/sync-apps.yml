@@ -61,18 +61,29 @@ jobs:
         if: github.event.action == 'sync-d-planner-plus' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p d-planner-plus/vendor/fonts d-planner-plus/vendor/icons scripts/readmes
-          for f in index.html app-version.js download.html manifest.json sw.js capacitor-bridge.js icon-192.png icon-512.png zhl-engine-bundle.js zhl-schedule-worker.js zhl-worker-bridge.js tests.html tests-extended.html tests-massive.html tests-massive-main.html tests-verify.html tests-pscr-otu-cns.html tests-ccr-differential.html; do
+          for f in index.html app-version.js download.html manifest.json sw.js capacitor-bridge.js icon-192.png icon-512.png zhl-engine-bundle.js vpm-engine-bundle.js zhl-schedule-worker.js zhl-worker-bridge.js tests.html tests-extended.html tests-massive.html tests-massive-main.html tests-verify.html tests-pscr-otu-cns.html tests-ccr-differential.html; do
             curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                  -H "Accept: application/vnd.github.v3.raw" \
                  "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/${f}" \
                  -o "d-planner-plus/${f}" || echo "skip ${f}"
           done
-          for f in vendor/jspdf.umd.min.js vendor/offline-manifest.txt vendor/fonts/fonts.css vendor/fonts/DejaVuSans.ttf vendor/fonts/DejaVuSans-Bold.ttf vendor/icons/giw-icon-192.png; do
+          mkdir -p d-planner-plus/vendor/fonts d-planner-plus/vendor/icons
+          curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/vendor/jspdf.umd.min.js" \
+               -o "d-planner-plus/vendor/jspdf.umd.min.js" || echo "skip vendor/jspdf.umd.min.js"
+          curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/vendor/offline-manifest.txt" \
+               -o "d-planner-plus/vendor/offline-manifest.txt" || echo "skip vendor/offline-manifest.txt"
+          while IFS= read -r f || [ -n "$f" ]; do
+            [ -z "$f" ] && continue
+            mkdir -p "d-planner-plus/$(dirname "$f")"
             curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                  -H "Accept: application/vnd.github.v3.raw" \
                  "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/${f}" \
-                 -o "d-planner-plus/${f}" || echo "skip ${f}"
-          done
+                 -o "d-planner-plus/${f}" || echo "skip vendor ${f}"
+          done < d-planner-plus/vendor/offline-manifest.txt
           curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                -H "Accept: application/vnd.github.v3.raw" \
                "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/README.md" \

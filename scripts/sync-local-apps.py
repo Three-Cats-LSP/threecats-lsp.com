@@ -37,9 +37,10 @@ DEPLOYS = [
         "src": PARENT / "LSP_D-planner-plus",
         "dst": ROOT / "d-planner-plus",
         "files": [
-            "index.html", "download.html", "manifest.json", "sw.js", "capacitor-bridge.js",
+            "index.html", "download.html", "manifest.json", "sw.js", "app-version.js",
+            "capacitor-bridge.js",
             "icon-192.png", "icon-512.png",
-            "zhl-engine-bundle.js", "zhl-schedule-worker.js", "zhl-worker-bridge.js",
+            "zhl-engine-bundle.js", "vpm-engine-bundle.js", "zhl-schedule-worker.js", "zhl-worker-bridge.js",
             "tests.html", "tests-extended.html", "tests-massive.html", "tests-massive-main.html",
             "tests-verify.html", "tests-pscr-otu-cns.html", "tests-ccr-differential.html",
         ],
