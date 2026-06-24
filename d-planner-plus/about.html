@@ -97,8 +97,12 @@
 <h2>Test Suites</h2>
 <p>Open any HTML suite from a local HTTP server (or the <a href="https://threecats-lsp.com/d-planner-plus/">live app</a> path) so <code>index.html</code> loads correctly in the iframe.</p>
 <h3>Browser suites</h3>
-<h3>Python gates (CI: <a href=".github/workflows/audit.yml"><code>.github/workflows/audit.yml</code></a>)</h3>
-<p><strong>Quick local run:</strong> <code>python audit.py</code> then <code>python dev/run_browser_regression.py</code> (requires <code>pip install playwright &amp;&amp; playwright install chromium</code>).</p>
+<h3>Python gates (CI: <a href=".github/workflows/ci.yml"><code>.github/workflows/ci.yml</code></a> + release: <a href=".github/workflows/audit.yml"><code>.github/workflows/audit.yml</code></a>)</h3>
+<p><strong>Quick local run:</strong></p>
+<pre><code>python tools/build_pages_site.py
+python dev/run_all_regression.py              # CI tier
+python dev/run_all_regression.py --tier release  # full release gates</code></pre>
+<p>Requires <code>pip install playwright &amp;&amp; playwright install chromium</code> for browser/native suites.</p>
 <hr>
 <h2>License</h2>
 <p>MIT — free to use, modify, and distribute. No account, no ads, no subscription.</p>
