@@ -91,7 +91,134 @@ body {
   display: block;
 }
 
-.header-actions { display: flex; gap: 10px; flex-shrink: 0; }
+.header-actions { display: flex; gap: 10px; flex-shrink: 0; align-items: center; }
+
+.header-social {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.header-social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--muted);
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+
+.header-social-link:hover { color: var(--primary); }
+
+.header-social-icon-img {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  object-fit: contain;
+}
+
+@media (max-width: 640px) {
+  .header-social-link span { display: none; }
+  .site-header { flex-wrap: wrap; gap: 12px; }
+}
+
+.hub-promo {
+  position: relative;
+  z-index: 1;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 24px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .hub-promo { padding: 0 48px 48px; }
+}
+
+.hub-promo-card {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+  padding: 24px 28px;
+}
+
+.hub-promo-ig {
+  text-align: center;
+}
+
+.hub-promo-ig p {
+  color: var(--muted);
+  margin: 0 0 16px;
+  line-height: 1.6;
+}
+
+.hub-promo-ig a:not(.btn) {
+  color: var(--primary);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 140, 66, 0.35);
+}
+
+.hub-promo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hub-promo-donate {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: stretch;
+}
+
+@media (min-width: 640px) {
+  .hub-promo-donate {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+}
+
+.hub-promo-donate p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.hub-donate-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #0070ba;
+  background: linear-gradient(135deg, rgba(0, 112, 186, 0.15), rgba(0, 145, 220, 0.2));
+  border: 1px solid rgba(0, 112, 186, 0.4);
+  transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+
+.hub-donate-btn:hover {
+  background: rgba(0, 112, 186, 0.25);
+  border-color: #0070ba;
+}
 
 .btn {
   display: inline-flex;

@@ -26,6 +26,11 @@ RESOURCES = Path(__file__).resolve().parent / "knowledge-base-resources.json"
 OUT = ROOT / "knowledge-base" / "index.html"
 USER_AGENT = "Mozilla/5.0 (compatible; ThreeCatsLSP-KnowledgeBase/1.0)"
 
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from hub_chrome import HEADER_SOCIAL, PROMO_SECTION, SHARE_SCRIPT
+
 
 def fetch_bytes(url: str, timeout: int = 25) -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
@@ -225,6 +230,9 @@ def render_resource(item: dict[str, str]) -> str:
 def render_page(data: dict[str, Any], sections_html: list[str]) -> str:
     intro = html.escape(data.get("intro", ""))
     body_sections = "\n\n".join(sections_html)
+    header_social = HEADER_SOCIAL.strip()
+    promo_section = PROMO_SECTION.strip()
+    share_script = SHARE_SCRIPT.strip()
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -312,6 +320,7 @@ def render_page(data: dict[str, Any], sections_html: list[str]) -> str:
     </a>
     <div class="header-actions">
       <a class="btn btn-ghost" href="/">All apps</a>
+      {header_social}
     </div>
   </header>
   <main class="about-main">
@@ -328,7 +337,9 @@ def render_page(data: dict[str, Any], sections_html: list[str]) -> str:
       </article>
     </div>
   </main>
+  {promo_section}
   <footer class="site-footer">Three Cats LSP · Diver's Toolkit</footer>
+  {share_script}
 </body>
 </html>
 """
