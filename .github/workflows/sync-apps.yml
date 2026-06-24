@@ -140,11 +140,20 @@ jobs:
         if: github.event.action == 'sync-apk-d-planner-plus' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p d-planner-plus
-          curl -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+          rm -f d-planner-plus/LSP_D-planner-plus*.apk
+          APK_NAME=$(curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/Android%20Apk" \
+            | python3 -c "import sys,json; items=json.load(sys.stdin); apks=sorted(x['name'] for x in items if x['name'].endswith('.apk')); print(apks[-1] if apks else '')")
+          if [ -z "$APK_NAME" ]; then
+            echo "APK not yet built — skip"
+            exit 0
+          fi
+          curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                -H "Accept: application/vnd.github.v3.raw" \
-               -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/Android%20Apk/LSP_D-planner-plus.apk" \
-               -o d-planner-plus/LSP_D-planner-plus.apk || echo "APK not yet built — skip"
-          echo "LSP D-Planner+ APK synced"
+               -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/Android%20Apk/${APK_NAME}" \
+               -o "d-planner-plus/${APK_NAME}"
+          echo "LSP D-Planner+ APK synced: ${APK_NAME}"
 
       - name: Pull latest T-Viewer APK
         if: github.event.action == 'sync-apk-t-viewer' || github.event_name == 'workflow_dispatch'
@@ -211,5 +220,5 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add d-planner/ d-planner-ccr/ d-planner-plus/ t-viewer/ get-in-water/ knowledge-base/ scripts/readmes/ scripts/homepage-cards.json about.css
+          git add -A d-planner/ d-planner-ccr/ d-planner-plus/ t-viewer/ get-in-water/ knowledge-base/ scripts/readmes/ scripts/homepage-cards.json about.css
           git diff --staged --quiet || (git commit -m "Sync apps from upstream repos" && git pull --rebase && git push)

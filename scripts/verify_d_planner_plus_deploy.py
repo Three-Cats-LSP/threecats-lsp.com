@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "d-planner-plus"
 MANIFEST = APP / "site-assets-manifest.txt"
-SKIP = {".nojekyll", "about.html", "LSP_D-planner-plus.apk"}
+SKIP = {".nojekyll", "about.html"}
 
 
 def main() -> int:
@@ -18,7 +18,7 @@ def main() -> int:
     paths = [ln.strip() for ln in MANIFEST.read_text(encoding="utf-8").splitlines() if ln.strip()]
     missing = []
     for rel in paths:
-        if rel in SKIP:
+        if rel in SKIP or rel.endswith(".apk"):
             continue
         if not (APP / rel).is_file():
             missing.append(rel)
