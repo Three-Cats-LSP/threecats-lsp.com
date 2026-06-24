@@ -1,0 +1,69 @@
+{
+  "cards": [
+    {
+      "kind": "app",
+      "category": "App",
+      "title": "LSP D-Planner+",
+      "description": "Unified open-circuit and rebreather decompression planner — Bühlmann ZHL-16C + GF, VPM-B, CCR, pSCR, bailout, Tier 3 engine, offline PWA and Android.",
+      "icon": { "type": "img", "src": "/d-planner-plus/icon-192.png", "alt": "LSP D-Planner+" },
+      "about_href": "/d-planner-plus/about.html",
+      "cta": { "label": "Open App", "href": "/d-planner-plus/", "external": true }
+    },
+    {
+      "kind": "app",
+      "category": "App",
+      "title": "T-Viewer",
+      "description": "Companion app for LSP D-Planner+. Open, read, and share dive plan TXT and PDF files exported by LSP D-Planner+ on Android or in the browser — syntax highlighting for deco schedules, gas labels, and warnings.",
+      "icon": { "type": "img", "src": "/t-viewer/icon-192.png", "alt": "T-Viewer" },
+      "about_href": "/t-viewer/about.html",
+      "cta": { "label": "Open App", "href": "/t-viewer/", "external": true }
+    },
+    {
+      "kind": "app",
+      "category": "App",
+      "title": "Get In Water",
+      "description": "Pack your dive trip. Customizable master gear template, per-trip checklists, and TXT/PDF export. Install as a PWA or download the Android APK — companion to LSP D-Planner+.",
+      "icon": { "type": "img", "src": "/get-in-water/icon-192.png", "alt": "Get In Water" },
+      "about_href": "/get-in-water/about.html",
+      "cta": { "label": "Open App", "href": "/get-in-water/", "external": true }
+    },
+    {
+      "kind": "resource",
+      "category": "Learn",
+      "title": "Knowledge Base",
+      "description": "Useful links and knowledge for divers to become a better diver — videos, reels, and reading for study and dive prep.",
+      "icon": { "type": "svg", "name": "book-open" },
+      "cta": { "label": "Browse resources", "href": "/knowledge-base/", "external": false },
+      "featured_from_kb": 3,
+      "featured_kb_skip_badges": ["Video"]
+    },
+    {
+      "kind": "gear",
+      "category": "Gear",
+      "title": "3D Dive Gadgets",
+      "description": "Custom 3D-printed diving accessories — designed and built for real divers.",
+      "icon": { "type": "svg", "name": "layers" },
+      "cta": { "label": "View all gadgets", "href": "gadgets.html", "external": false },
+      "featured": [
+        {
+          "title": "360 Diving Mirror",
+          "description": "Convex wrist mirror for all-round underwater vision — monitor buddies, check valves, signal on the surface.",
+          "href": "https://www.instagram.com/p/CtBKDcpJv-Y/",
+          "badge": "Print"
+        },
+        {
+          "title": "WoW Plates",
+          "description": "Weight on Webbing plates — quick, secure way to add lead to any 2″ harness webbing without de-kitting.",
+          "href": "https://www.instagram.com/p/CtDULcovWI4/",
+          "badge": "Print"
+        },
+        {
+          "title": "Long Hose Retainer",
+          "description": "Triglide-based long hose holder that stays put on your harness, with an extra D-ring for fins or gear.",
+          "href": "https://www.instagram.com/p/DYB3avdj6Nm/",
+          "badge": "Print"
+        }
+      ]
+    }
+  ]
+}

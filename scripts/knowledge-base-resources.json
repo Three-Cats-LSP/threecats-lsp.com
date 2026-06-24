@@ -1,0 +1,42 @@
+{
+  "intro": "Useful links and knowledge for divers to become a better diver — videos, reels, and reading curated for study and weekend dive prep.",
+  "sections": [
+    {
+      "title": "YouTube",
+      "badge": "Video",
+      "items": [
+        {
+          "url": "https://www.youtube.com/watch?v=6ERgzNxt10U",
+          "title": "The Frog Kick",
+          "description": "Frog kick finning technique — efficient propulsion with less silt disturbance."
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=pP2f32RyETY",
+          "title": "SDI/TDI Finning — Frog Kick",
+          "description": "Instructional breakdown of frog kick finning for scuba divers."
+        }
+      ]
+    },
+    {
+      "title": "Instagram Reels",
+      "badge": "Reel",
+      "items": [
+        {
+          "url": "https://www.instagram.com/reel/DZ4vbAcomVo/",
+          "title": "Technical hand signals — part 4",
+          "description": "Hand signals for question, switch on lights, call the dive, and emergency exit swim."
+        },
+        {
+          "url": "https://www.instagram.com/reel/DZZ9eFxIhTc/",
+          "title": "Technical diving hand signals",
+          "description": "Guess-the-signal quiz — clear one-hand, one-message communication for tech diving."
+        },
+        {
+          "url": "https://www.instagram.com/reel/DZzwDYyBUR3/",
+          "title": "How to dump your BC",
+          "description": "The “official” way to vent your BC is the way that works best for you — know your equipment."
+        }
+      ]
+    }
+  ]
+}
