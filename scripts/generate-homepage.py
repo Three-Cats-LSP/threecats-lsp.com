@@ -19,6 +19,9 @@ CARDS_JSON = Path(__file__).resolve().parent / "homepage-cards.json"
 INDEX = ROOT / "index.html"
 
 GRID_MARKER = 'class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl"'
+GRID_MARKER_FIXED = (
+    'class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start w-full max-w-4xl"'
+)
 GRID_END_MARKER = '<div class="mt-20 w-full max-w-4xl"'
 
 CARD_SHELL = (
@@ -117,24 +120,25 @@ def render_card(card: dict[str, Any]) -> str:
     return f"""<div class="{CARD_SHELL}" style="opacity: 1; transform: none;">
 {about_html}
 <div class="w-12 h-12 rounded-lg flex items-center justify-center bg-primary/10 text-primary">{icon_html}</div>
-<div class="flex-1">
+<div>
 <h2 class="text-lg font-semibold text-foreground mb-1">{title}</h2>
 <p class="text-sm text-muted-foreground leading-relaxed">{description}</p>
 {featured_html}
 </div>
-<a class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors duration-200 mt-auto"{discover} href="{cta_href}"{cta_target}>{cta_label}{ICON_EXTERNAL}</a>
+<a class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors duration-200"{discover} href="{cta_href}"{cta_target}>{cta_label}{ICON_EXTERNAL}</a>
 </div>"""
 
 
 def replace_cards_grid(page: str, cards_html: str) -> str:
-    grid_pos = page.find(GRID_MARKER)
+    page = page.replace(GRID_MARKER, GRID_MARKER_FIXED, 1)
+    grid_pos = page.find(GRID_MARKER_FIXED)
     if grid_pos < 0:
         raise SystemExit("Homepage card grid not found")
     open_pos = page.find(">", grid_pos) + 1
     close_pos = page.find(GRID_END_MARKER, open_pos)
     if close_pos < 0:
         raise SystemExit("Homepage card grid end not found")
-    return page[:open_pos] + cards_html + page[close_pos:]
+    return page[:open_pos] + cards_html + "</div>" + page[close_pos:]
 
 
 def main() -> None:
