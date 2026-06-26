@@ -27,34 +27,30 @@
     <div class="about-card">
       <p class="about-eyebrow">About LSP D-Planner+</p>
       <article class="prose">
-<h1>LSP D-Planner+</h1>
-<blockquote><p><strong>Free, open-source decompression planner for recreational and technical divers.</strong></p></blockquote>
-<blockquote><p>Runs entirely in the browser — no install, no build step, no server, no account required.</p></blockquote>
-<p>Part of the <a href="https://threecats-lsp.com">Three Cats LSP <strong>Diver&#x27;s Toolkit</strong></a> — a suite of free open-source diving apps for every stage of your dive.</p>
-<p>🌐 <strong>Live app:</strong> https://threecats-lsp.com/d-planner-plus/</p>
-<p>📲 <strong>Android APK:</strong> https://threecats-lsp.com/d-planner-plus/download.html</p>
-<p>📦 <strong>Current version:</strong> 2.52.00 (stable)</p>
-<p>📄 <strong>License:</strong> MIT</p>
+<h1>Three Cats LSP — Diver&#x27;s Toolkit</h1>
+<blockquote><p><strong>Three free, open-source apps covering every stage of your dive — plan it, read it, pack for it.</strong></p></blockquote>
+<blockquote><p>No install required. No Play Store. No account. No ads.</p></blockquote>
+<p>🌐 <strong>Toolkit hub:</strong> https://threecats-lsp.com</p>
 <hr>
-<h2>🧰 Diver&#x27;s Toolkit</h2>
-<p>Three free apps covering everything from planning to packing.</p>
-<p>All apps run offline, install as PWA, and are available as direct Android APKs. No Play Store, no account, no ads.</p>
-<p><strong>Toolkit hub:</strong> https://threecats-lsp.com</p>
+<h2>🧰 The Apps</h2>
+<p>All apps run <strong>fully offline</strong> after first load, install as <strong>PWA</strong> from any browser, and are available as direct <strong>Android APKs</strong> (Android 5.0+ / API 21).</p>
 <hr>
-<h2>⚗️ Algorithms</h2>
+<h2>🤿 LSP D-Planner+ — Decompression Planner</h2>
+<blockquote><p>v2.52.00 · MIT · <a href="https://threecats-lsp.com/d-planner-plus/">Live app</a> · <a href="https://threecats-lsp.com/d-planner-plus/download.html">APK</a></p></blockquote>
+<p>The decompression engine at the core of the toolkit. Runs entirely in the browser — no server, no account, no build step.</p>
+<h3>⚗️ Algorithms</h3>
 <p>Engines run in an isolated <strong>Web Worker</strong> (ZHL Tier 3 bundle) and a dedicated IIFE bundle (<code>window.VPMEngine</code>) — no shared global state, deterministic output.</p>
-<hr>
-<h2>🤿 Features</h2>
-<h3>Recreational Mode</h3>
+<h3>🤿 Features</h3>
+<p><strong>Recreational mode</strong></p>
 <ul>
 <li>NDL tables (PADI RDP + Bühlmann) with GF-adjustable limits</li>
 <li>Multi-dive day planning — residual nitrogen tracking across up to 4 dives</li>
 <li>Surface interval calculator — controlling compartment, tissue loading, reverse-profile warning</li>
 <li>Average depth converter</li>
 </ul>
-<h3>Technical Mode</h3>
+<p><strong>Technical mode</strong></p>
 <ul>
-<li><strong>CCR / pSCR</strong> — circuit select, setpoint scheduling, diluent &amp; bailout gases, on-loop Bühlmann + VPM tissue loading, pSCR Baker steady-state loop model</li>
+<li>CCR / pSCR — circuit select, setpoint scheduling, diluent &amp; bailout gases, on-loop Bühlmann + VPM tissue loading, pSCR Baker steady-state loop model</li>
 <li>Full trimix entry (O₂ / He / N₂) for bottom gas and all deco gases</li>
 <li>Travel gas card with auto-switch depth by MOD</li>
 <li>Altitude support — surface pressure presets to 3 000 m, acclimatisation toggle</li>
@@ -62,64 +58,82 @@
 <li>Contingency plans — extended bottom time, went deeper (+3 m / +5 m)</li>
 <li>Surface GF footer metric</li>
 </ul>
-<h3>Gas Management</h3>
+<p><strong>Gas management</strong></p>
 <ul>
 <li>Gas consumption card — total volume, rule of thirds / half tank, turn pressure, reserve, sufficiency</li>
 <li>Up to 2 deco gas cards + travel gas (metric and imperial)</li>
 <li>SAC-based consumption in litres or cubic feet</li>
 </ul>
-<h3>Tools</h3>
+<p><strong>Tools</strong></p>
 <ul>
-<li><strong>MOD Calculator</strong> — ppO₂ limits, altitude-aware</li>
-<li><strong>Best Mix</strong> — optimal O₂% for target depth and ppO₂</li>
-<li><strong>END Calculator</strong> — narcotic equivalent depth</li>
-<li><strong>EAD Table</strong> — nitrox EAD at common depths</li>
-<li><strong>Gas Table</strong> — ppO₂, EAD, MOD for common mixes</li>
-<li><strong>Unit Converter</strong> — depth, pressure, volume, SAC rate</li>
-<li><strong>CNS / OTU Tracker</strong> — standalone oxygen toxicity calculator</li>
+<li>MOD Calculator — ppO₂ limits, altitude-aware</li>
+<li>Best Mix — optimal O₂% for target depth and ppO₂</li>
+<li>END Calculator — narcotic equivalent depth</li>
+<li>EAD Table — nitrox EAD at common depths</li>
+<li>Gas Table — ppO₂, EAD, MOD for common mixes</li>
+<li>Unit Converter — depth, pressure, volume, SAC rate</li>
+<li>CNS / OTU Tracker — standalone oxygen toxicity calculator</li>
 </ul>
-<h3>Export</h3>
-<hr>
-<h2>📱 Install</h2>
-<h3>Web / PWA</h3>
-<p>Open https://threecats-lsp.com/d-planner-plus/ in any modern browser — no install required.</p>
-<h3>Android APK</h3>
-<p>Built with <a href="https://capacitorjs.com">Capacitor</a>. Direct APK — no Play Store required.</p>
-<ul>
-<li><strong>Requirements:</strong> Android 5.0+ (API 21)</li>
-<li><strong>Download:</strong> https://threecats-lsp.com/d-planner-plus/download.html</li>
-</ul>
-<p>Install steps: download APK → allow &quot;Install from unknown sources&quot; in Android settings → open and install.</p>
-<hr>
-<h2>🧪 Test Suites</h2>
-<p>All browser suites must be opened from a local HTTP server (or the <a href="https://threecats-lsp.com/d-planner-plus/">live app path</a>) so <code>index.html</code> loads correctly inside the iframe.</p>
-<h3>Browser Suites</h3>
-<h3>Python / CI Gates</h3>
-<p><strong>Quick local run:</strong></p>
+<p><strong>Export</strong></p>
+<h3>📱 Install</h3>
+<h3>🧪 Test Suites</h3>
+<p>All browser suites run live from the deployed app — no local setup needed for smoke testing.</p>
+<p><strong>Python / CI gates</strong></p>
 <pre><code>pip install playwright &amp;&amp; playwright install chromium
 python tools/build_pages_site.py
 python dev/run_all_regression.py                   # CI tier (fast)
 python dev/run_all_regression.py --tier release    # full release gates</code></pre>
-<p>CI workflow: <a href=".github/workflows/ci.yml"><code>.github/workflows/ci.yml</code></a></p>
-<p>Release audit workflow: <a href=".github/workflows/audit.yml"><code>.github/workflows/audit.yml</code></a></p>
-<hr>
-<h2>🏛️ Engine Architecture</h2>
+<p>CI: <a href=".github/workflows/ci.yml"><code>.github/workflows/ci.yml</code></a> · Release audit: <a href=".github/workflows/audit.yml"><code>.github/workflows/audit.yml</code></a></p>
+<h3>🏛️ Engine Architecture</h3>
 <pre><code>index.html
-├── zhl-engine-bundle.js      ← ZHL Tier 3 (Bühlmann ZHL-16C + GF + CCR/pSCR)
-│     └── zhl-schedule-worker.js  (Web Worker shell)
-│           └── zhl-worker-bridge.js  (Promise bridge, terminate() API)
-├── vpm-engine-bundle.js      ← VPM Tier 3 (VPM-B / VPM-B+GFS) → window.VPMEngine
-└── lsp-test-harness.js       ← Dual-engine test router</code></pre>
+├── zhl-engine-bundle.js        ← ZHL Tier 3 (Bühlmann ZHL-16C + GF + CCR/pSCR, Web Worker)
+│     └── zhl-schedule-worker.js
+│           └── zhl-worker-bridge.js   (Promise bridge, terminate() API)
+├── vpm-engine-bundle.js        ← VPM Tier 3 (VPM-B / VPM-B+GFS) → window.VPMEngine
+└── lsp-test-harness.js         ← Dual-engine test router</code></pre>
 <p>Build sources (not loaded at runtime): <code>zhl-schedule-core.js</code> · <code>zhl-ccr-core.js</code> · <code>vpm-engine-core.js</code></p>
 <p>Bundle rebuild tools: <code>tools/build_zhl_bundle.py</code> · <code>tools/build_vpm_bundle.py</code></p>
-<hr>
-<h2>🗂️ Legacy Editions (Archived)</h2>
+<h3>🗂️ Legacy Editions (Archived)</h3>
 <p>Development continues in <strong>LSP D-Planner+</strong> only. The two predecessor apps are frozen.</p>
 <hr>
-<h2>📜 License</h2>
+<h2>📄 T-Viewer — Dive Plan File Viewer</h2>
+<blockquote><p><a href="https://threecats-lsp.com/t-viewer/">Live app</a> · <a href="https://github.com/Three-Cats-LSP/T-Viewer">Repo</a> · <a href="https://threecats-lsp.com/t-viewer/download.html">APK</a></p></blockquote>
+<p>The companion app for LSP D-Planner+. Export your dive plan as TXT or PDF, then open it in T-Viewer to share with your buddy or surface support team.</p>
+<ul>
+<li>Opens <code>.txt</code>, <code>.log</code>, <code>.plan</code>, <code>.div</code>, and <code>.pdf</code> files</li>
+<li>Receives shared files directly from LSP D-Planner+ on Android</li>
+<li>Syntax highlighting — section headers, parameter lines, depth/time data, warning keywords — all customisable per theme</li>
+<li>PDF viewer (PDF.js) with page navigation</li>
+<li>Edit mode — modify text plan, save back to device</li>
+<li>Font selector — System Default, Monospace, Roboto Mono, Source Code Pro, JetBrains Mono, Open Sans, Noto Sans</li>
+<li>Pinch-to-zoom — current font size shown in top bar</li>
+<li>Dark / light theme — all colors customisable via the COLORS tab</li>
+<li>Drag-and-drop on desktop browser</li>
+</ul>
+<hr>
+<h2>🎒 Get In Water — Dive Trip Packing Checklist</h2>
+<blockquote><p>v1.4.0 · MIT · <a href="https://threecats-lsp.com/get-in-water/">Live app</a> · <a href="https://github.com/Three-Cats-LSP/Get-In-Water">Repo</a> · <a href="https://threecats-lsp.com/get-in-water/download.html">APK</a></p></blockquote>
+<p>Never leave a regulator at home again. Maintain a master gear list, build per-trip checklists, tick items off as you pack, and export to TXT or PDF.</p>
+<ul>
+<li><strong>Master gear list</strong> with built-in starter templates: Recreational, Underwater Photographer, Technical Diver</li>
+<li><strong>Per-trip checklists</strong> — named trips, progress bar, item notes and quantity</li>
+<li><strong>TXT / PDF export</strong> — plain-text or formatted packing list, share via any Android share target</li>
+<li><strong>Optional Google sync</strong> — sign in to sync between web and Android; fully offline without an account</li>
+</ul>
+<hr>
+<h2>🏛️ Philosophy</h2>
+<ul>
+<li><strong>Free, forever</strong> — MIT licence on all apps</li>
+<li><strong>No account required</strong> — everything works anonymously; cloud sync in Get In Water is opt-in</li>
+<li><strong>No Play Store</strong> — direct APKs only, no gatekeeping</li>
+<li><strong>Offline-first</strong> — every app works fully without a network connection after first load</li>
+<li><strong>Open source</strong> — all code public, all engines documented and tested</li>
+</ul>
+<hr>
+<h2>📜 Licence</h2>
 <p>MIT — free to use, modify, and distribute.</p>
 <hr>
-<p><em>Three Cats LSP · <a href="https://threecats-lsp.com">threecats-lsp.com</a> · <a href="https://github.com/Three-Cats-LSP">GitHub org</a></em></p>
+<p><em>Three Cats LSP · <a href="https://threecats-lsp.com">threecats-lsp.com</a> · <a href="https://github.com/Three-Cats-LSP">GitHub org</a> · <a href="https://www.instagram.com/threecats_lsp">@threecats_lsp</a></em></p>
       </article>
     </div>
   </main>
