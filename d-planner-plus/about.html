@@ -28,32 +28,37 @@
       <p class="about-eyebrow">About LSP D-Planner+</p>
       <article class="prose">
 <h1>LSP D-Planner+</h1>
-<p>Free open-source decompression planner for recreational and technical divers. Runs entirely in the browser — no install, no build step, no server, no account.</p>
-<p>Part of the <a href="https://threecats-lsp.com">Three Cats LSP</a> <strong>Diver&#x27;s Toolkit</strong>.</p>
+<blockquote><p><strong>Free, open-source decompression planner for recreational and technical divers.</strong></p></blockquote>
+<blockquote><p>Runs entirely in the browser — no install, no build step, no server, no account required.</p></blockquote>
+<p>Part of the <a href="https://threecats-lsp.com">Three Cats LSP <strong>Diver&#x27;s Toolkit</strong></a> — a suite of free open-source diving apps for every stage of your dive.</p>
 <p>🌐 <strong>Live app:</strong> https://threecats-lsp.com/d-planner-plus/</p>
 <p>📲 <strong>Android APK:</strong> https://threecats-lsp.com/d-planner-plus/download.html</p>
-<p><strong>Current version: 2.50.00</strong></p>
+<p>📦 <strong>Current version:</strong> 2.52.00 (stable)</p>
+<p>📄 <strong>License:</strong> MIT</p>
 <hr>
-<h2>Diver&#x27;s Toolkit</h2>
-<p>All apps at the <a href="https://threecats-lsp.com">Diver&#x27;s Toolkit hub</a>.</p>
+<h2>🧰 Diver&#x27;s Toolkit</h2>
+<p>Three free apps covering everything from planning to packing.</p>
+<p>All apps run offline, install as PWA, and are available as direct Android APKs. No Play Store, no account, no ads.</p>
+<p><strong>Toolkit hub:</strong> https://threecats-lsp.com</p>
 <hr>
-<h2>Algorithms</h2>
+<h2>⚗️ Algorithms</h2>
+<p>Engines run in an isolated <strong>Web Worker</strong> (ZHL Tier 3 bundle) and a dedicated IIFE bundle (<code>window.VPMEngine</code>) — no shared global state, deterministic output.</p>
 <hr>
-<h2>Features</h2>
+<h2>🤿 Features</h2>
 <h3>Recreational Mode</h3>
 <ul>
-<li>NDL tables (PADI RDP-based + Bühlmann) with GF-adjustable limits</li>
-<li>Multi-dive day planning with residual nitrogen tracking across up to 4 dives</li>
-<li>Surface interval calculator — compartment tissue loading, controlling compartment, reverse-profile warning</li>
+<li>NDL tables (PADI RDP + Bühlmann) with GF-adjustable limits</li>
+<li>Multi-dive day planning — residual nitrogen tracking across up to 4 dives</li>
+<li>Surface interval calculator — controlling compartment, tissue loading, reverse-profile warning</li>
 <li>Average depth converter</li>
 </ul>
 <h3>Technical Mode</h3>
 <ul>
-<li><strong>CCR / pSCR</strong> — circuit select, setpoint scheduling, diluent &amp; bailout gases, on-loop Bühlmann + VPM</li>
+<li><strong>CCR / pSCR</strong> — circuit select, setpoint scheduling, diluent &amp; bailout gases, on-loop Bühlmann + VPM tissue loading, pSCR Baker steady-state loop model</li>
 <li>Full trimix entry (O₂ / He / N₂) for bottom gas and all deco gases</li>
 <li>Travel gas card with auto-switch depth by MOD</li>
-<li>Altitude support — surface pressure presets to 3000 m, acclimatization toggle</li>
-<li>Repetitive dive tissue carry (ZHL + VPM)</li>
+<li>Altitude support — surface pressure presets to 3 000 m, acclimatisation toggle</li>
+<li>Repetitive dive tissue carry (ZHL + VPM bubble state)</li>
 <li>Contingency plans — extended bottom time, went deeper (+3 m / +5 m)</li>
 <li>Surface GF footer metric</li>
 </ul>
@@ -75,39 +80,46 @@
 </ul>
 <h3>Export</h3>
 <hr>
-<h2>Web App</h2>
+<h2>📱 Install</h2>
+<h3>Web / PWA</h3>
 <p>Open https://threecats-lsp.com/d-planner-plus/ in any modern browser — no install required.</p>
-<p><strong>Install as PWA:</strong></p>
-<ol>
-<li><strong>Safari (iPhone/iPad):</strong> Share → Add to Home Screen → Add</li>
-<li><strong>Chrome (Android):</strong> ⋮ → Install app / Add to Home Screen → confirm</li>
-<li><strong>Chrome (desktop):</strong> Click install icon in address bar</li>
-</ol>
-<hr>
-<h2>Android App</h2>
+<h3>Android APK</h3>
 <p>Built with <a href="https://capacitorjs.com">Capacitor</a>. Direct APK — no Play Store required.</p>
-<p><strong>Requirements:</strong> Android 5.0+ (API 21)</p>
-<p><strong>Install:</strong></p>
-<ol>
-<li>Download APK from https://threecats-lsp.com/d-planner-plus/download.html</li>
-<li>Allow &quot;Install from unknown sources&quot; in Android settings</li>
-<li>Open the downloaded APK and install</li>
-</ol>
+<ul>
+<li><strong>Requirements:</strong> Android 5.0+ (API 21)</li>
+<li><strong>Download:</strong> https://threecats-lsp.com/d-planner-plus/download.html</li>
+</ul>
+<p>Install steps: download APK → allow &quot;Install from unknown sources&quot; in Android settings → open and install.</p>
 <hr>
-<h2>Test Suites</h2>
-<p>Open any HTML suite from a local HTTP server (or the <a href="https://threecats-lsp.com/d-planner-plus/">live app</a> path) so <code>index.html</code> loads correctly in the iframe.</p>
-<h3>Browser suites</h3>
-<h3>Python gates (CI: <a href=".github/workflows/ci.yml"><code>.github/workflows/ci.yml</code></a> + release: <a href=".github/workflows/audit.yml"><code>.github/workflows/audit.yml</code></a>)</h3>
+<h2>🧪 Test Suites</h2>
+<p>All browser suites must be opened from a local HTTP server (or the <a href="https://threecats-lsp.com/d-planner-plus/">live app path</a>) so <code>index.html</code> loads correctly inside the iframe.</p>
+<h3>Browser Suites</h3>
+<h3>Python / CI Gates</h3>
 <p><strong>Quick local run:</strong></p>
-<pre><code>python tools/build_pages_site.py
-python dev/run_all_regression.py              # CI tier
-python dev/run_all_regression.py --tier release  # full release gates</code></pre>
-<p>Requires <code>pip install playwright &amp;&amp; playwright install chromium</code> for browser/native suites.</p>
+<pre><code>pip install playwright &amp;&amp; playwright install chromium
+python tools/build_pages_site.py
+python dev/run_all_regression.py                   # CI tier (fast)
+python dev/run_all_regression.py --tier release    # full release gates</code></pre>
+<p>CI workflow: <a href=".github/workflows/ci.yml"><code>.github/workflows/ci.yml</code></a></p>
+<p>Release audit workflow: <a href=".github/workflows/audit.yml"><code>.github/workflows/audit.yml</code></a></p>
 <hr>
-<h2>License</h2>
-<p>MIT — free to use, modify, and distribute. No account, no ads, no subscription.</p>
+<h2>🏛️ Engine Architecture</h2>
+<pre><code>index.html
+├── zhl-engine-bundle.js      ← ZHL Tier 3 (Bühlmann ZHL-16C + GF + CCR/pSCR)
+│     └── zhl-schedule-worker.js  (Web Worker shell)
+│           └── zhl-worker-bridge.js  (Promise bridge, terminate() API)
+├── vpm-engine-bundle.js      ← VPM Tier 3 (VPM-B / VPM-B+GFS) → window.VPMEngine
+└── lsp-test-harness.js       ← Dual-engine test router</code></pre>
+<p>Build sources (not loaded at runtime): <code>zhl-schedule-core.js</code> · <code>zhl-ccr-core.js</code> · <code>vpm-engine-core.js</code></p>
+<p>Bundle rebuild tools: <code>tools/build_zhl_bundle.py</code> · <code>tools/build_vpm_bundle.py</code></p>
 <hr>
-<p><em>Three Cats LSP · <a href="https://threecats-lsp.com">threecats-lsp.com</a></em></p>
+<h2>🗂️ Legacy Editions (Archived)</h2>
+<p>Development continues in <strong>LSP D-Planner+</strong> only. The two predecessor apps are frozen.</p>
+<hr>
+<h2>📜 License</h2>
+<p>MIT — free to use, modify, and distribute.</p>
+<hr>
+<p><em>Three Cats LSP · <a href="https://threecats-lsp.com">threecats-lsp.com</a> · <a href="https://github.com/Three-Cats-LSP">GitHub org</a></em></p>
       </article>
     </div>
   </main>
