@@ -91,8 +91,11 @@ python dev/run_all_regression.py --tier release    # full release gates</code></
 │           └── zhl-worker-bridge.js   (Promise bridge, terminate() API)
 ├── vpm-engine-bundle.js        ← VPM Tier 3 (VPM-B / VPM-B+GFS) → window.VPMEngine
 └── lsp-test-harness.js         ← Dual-engine test router</code></pre>
-<p>Build sources (not loaded at runtime): <code>zhl-schedule-core.js</code> · <code>zhl-ccr-core.js</code> · <code>vpm-engine-core.js</code></p>
-<p>Bundle rebuild tools: <code>tools/build_zhl_bundle.py</code> · <code>tools/build_vpm_bundle.py</code></p>
+<p>Build sources (not loaded at runtime): <code>zhl-physics-core.js</code> · <code>zhl-gas-core.js</code> · <code>zhl-schedule-core.js</code> · <code>zhl-ccr-core.js</code> · <code>vpm-engine-core.js</code></p>
+<p>Bundle rebuild: <code>npm run build:bundles</code> or <code>tools/build_zhl_bundle.py</code> · <code>tools/build_vpm_bundle.py</code></p>
+<p>Engine parity check: <code>npm run check:engine-parity</code></p>
+<p>Audit mirror rule: <a href="docs/AUDIT_MIRROR_RULE.md"><code>docs/AUDIT_MIRROR_RULE.md</code></a></p>
+<p><strong>DOM adapter (index.html only):</strong> <code>getCCRSettingsFromDOM</code> + <code>mergeCCRSettings</code> read UI state; all Bühlmann/CCR physics delegate to <code>ZhlEngineBundle</code>.</p>
 <h3>🗂️ Legacy Editions (Archived)</h3>
 <p>Development continues in <strong>LSP D-Planner+</strong> only. The two predecessor apps are frozen.</p>
 <hr>
