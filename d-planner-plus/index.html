@@ -2321,9 +2321,6 @@ body.light-theme .switch-legend-icon { color: #FFBF00 !important; }
 <div class="adv-row"><label>Deco SAC (L/min)</label>
 <input id="sacDeco" max="40" min="5" step="1" type="number" value="20"/>
 </div>
-<div class="adv-row"><label>Contingency SAC × <span class="tip-icon" onclick="showTip('Contingency SAC Multiplier','Stress multiplier applied to SAC during emergency contingency gas calculations (went deeper / stayed longer). Default 1.5× reflects elevated RMV under stress.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
-<input id="contingencySacMultiplier" max="3" min="1" step="0.1" type="number" value="1.5"/>
-</div>
 <div class="adv-row">
 <label>N₂ Narcotic <span class="tip-icon" onclick="showTip('N2 Narcotic','Whether N2 is counted as narcotic when calculating Equivalent Narcotic Depth (END).\nYes = NOAA/IANTD standard.')"><svg fill="none" height="11" viewbox="0 0 11 11" width="11" xmlns="http://www.w3.org/2000/svg"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.1"></circle><path d="M4.1 3.8 Q4.1 2.4 5.5 2.4 Q6.9 2.4 6.9 3.7 Q6.9 4.6 5.5 5.3 L5.5 6.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1"></path><circle cx="5.5" cy="7.4" fill="currentColor" r="0.55"></circle></svg></span></label>
 <select id="n2NarcSel" onchange="setNarcosis('n2', this.value==='yes')">
@@ -6691,12 +6688,12 @@ function getConfiguredBailoutMixes() {
   return mixes;
 }
 
-/** Richest breathable bailout mix for stress/problem-solve reserve at depth. */
+/** Deepest-capable bailout mix label for stress/problem-solve reserve at depth. */
 function getBailoutReserveMixLabel(depthM, fO2Bot, fHeBot) {
   const mixes = getConfiguredBailoutMixes();
   const atDepth = mixes.filter(m => m.modM >= depthM - 0.01);
   if (atDepth.length) {
-    return atDepth.reduce((best, m) => (!best || m.modM < best.modM) ? m : best).label;
+    return atDepth.reduce((best, m) => (!best || m.modM > best.modM) ? m : best).label;
   }
   const useDil = document.getElementById('diluentUseAsBailout')?.value === 'on';
   if (useDil) {
@@ -6753,7 +6750,7 @@ function validateCcrGasConfiguration() {
     const diluentMod = calcGasMODm(bot.fO2, activePpo2);
     const modDisp = units === 'imperial' ? Math.round(diluentMod * 3.28084) : diluentMod;
     if (depthM > diluentMod + 0.01) {
-      errors.push(`Diluent MOD (${modDisp}${du}) is shallower than dive depth (${depthDisp}${du}). Use a leaner diluent or reduce depth.`);
+      errors.push(`Diluent MOD (${modDisp}${du}) is shallower than dive depth (${depthDisp}${du}). Use a richer diluent or reduce depth.`);
     }
     const useDiluentBailout = document.getElementById('diluentUseAsBailout')?.value === 'on';
     const bailoutMixes = getConfiguredBailoutMixes();
@@ -7501,7 +7498,7 @@ const _ADV_FIELDS = [
   'gfPresetSelect','gfLowInput','gfHighInput',
   'descentRate','ascentRate','decoAscentRate','surfaceAscentRate',
   'decoStep','lastDecoStop','minStopTime','stopRounding','decoTransitMode','shallowGradient',
-  'waterVapor','heHalfTimeMode','sacBottom','sacDeco','contingencySacMultiplier',
+  'waterVapor','heHalfTimeMode','sacBottom','sacDeco',
   'n2NarcSel','o2NarcSel','ppo2Bottom','ppo2Deco','o2AtMODSelect',
   'ccrDescentSetpoint','ccrBottomSetpoint','ccrDecoSetpoint',
   'ccrLoopVolume','ccrMetabolicO2',
@@ -7557,7 +7554,6 @@ function _factoryMetricDefaults() {
     // SAC rates
     sacBottom:        '22',
     sacDeco:          '20',
-    contingencySacMultiplier: '1.5',
     // Narcosis
     n2NarcSel:        'yes',
     o2NarcSel:        'yes',
@@ -7842,7 +7838,6 @@ function runVPMSchedule(depthM, bt, descentRate, ascentRate, decoAscentRate, sur
   // Headless mode: skip all VPM computation and DOM rendering
   // (called from ZHLEngine or fastRDS headless path when algo is VPM-B)
   if (window._zhlHeadless) return;
-  _syncZhlBundleEnv();
   const conservatism = parseInt(document.getElementById('conservatismSelect')?.value || '0');
   const gfHi = (mGF && Number.isFinite(mGF.high)) ? mGF.high : 85;
 
@@ -8590,12 +8585,13 @@ function updateGasMODDisplays() {
   // Bottom gas MOD — validate raw DOM % before clamped fractions
   const botMix = document.getElementById('decoGas')?.value;
   const botDom = (botMix === 'custom' || botMix === 'trimix') ? getDomBottomGasPct() : null;
-  const botDomCheck = botDom ? validateGasFractionsPct(botDom.o2, botDom.he, 'bottomGas') : null;
   const botEl    = document.getElementById('botMODDisplay');
   if (botEl) {
-    if (botDomCheck && !botDomCheck.ok) {
+    if (botDom && (!Number.isFinite(botDom.o2) || (botMix === 'trimix' && !Number.isFinite(botDom.he)))) {
       botEl.value = '—';
-      botEl.title = botDomCheck.message;
+      botEl.title = botMix === 'trimix'
+        ? 'Enter valid O₂ and He % for trimix bottom gas'
+        : 'Enter a valid O₂ % for custom bottom gas';
     } else {
       const botFracs = getBottomGasFractions();
       if (!botFracs) {
@@ -8627,13 +8623,11 @@ function updateGasMODDisplays() {
     if (sel.value === 'none' || !sel.value) { disp.value = '—'; disp.title = 'Select a gas mix to see MOD'; continue; }
     if (sel.value === 'custom' || sel.value === 'trimix') {
       const domG = getDomDecoGasPct(cidx);
-      const domCheck = domG ? validateGasFractionsPct(domG.o2, domG.he, `dg${cidx}`) : null;
-      if (!domCheck || !domCheck.ok) {
+      if (!domG || !Number.isFinite(domG.o2) || (sel.value === 'trimix' && !Number.isFinite(domG.he))) {
         disp.value = '—';
-        const inputHint = sel.value === 'custom'
-          ? 'Enter a valid O₂ % for custom deco gas.'
-          : 'Enter valid O₂ and He % for trimix deco gas.';
-        disp.title = domCheck?.message ? `${inputHint} ${domCheck.message}` : inputHint;
+        disp.title = sel.value === 'custom'
+          ? 'Enter a valid O₂ % for custom deco gas'
+          : 'Enter valid O₂ and He % for trimix deco gas';
         continue;
       }
     }
@@ -9316,7 +9310,6 @@ function isStaleDecoScheduleGen(gen) {
 function runDecoSchedule() {
   let _zhlPrevGF = null;
   const scheduleGen = nextDecoScheduleGen();
-  _syncZhlBundleEnv();
   window._scheduleWorkerBusy = true;
   try {
   if (!guardEngineBootForCalculate()) return;
@@ -9618,13 +9611,8 @@ function runDecoSchedule() {
   }
 
   // ── SAC gas consumption ──
-  let sacBottom = sacDomToLpm('sacBottom', 20);
-  let sacDeco   = sacDomToLpm('sacDeco', 15);
-  if (_contingencyRunning && typeof getContingencySacMultiplier === 'function') {
-    const contSacMult = getContingencySacMultiplier();
-    sacBottom *= contSacMult;
-    sacDeco *= contSacMult;
-  }
+  const sacBottom = sacDomToLpm('sacBottom', 20);
+  const sacDeco   = sacDomToLpm('sacDeco', 15);
   const sacBottomDisp = parseFloat(document.getElementById('sacBottom')?.value) || 20;
   const sacDecoDisp   = parseFloat(document.getElementById('sacDeco')?.value) || 15;
   const BAR_PER_M = BAR_PER_METRE;
@@ -9949,8 +9937,6 @@ function runDecoSchedule() {
   if (!_contingencyRunning) {
     window._lastGasConsumed = Object.assign({}, gasConsumed);
     window._lastBottomPhaseConsumedL = Object.assign({}, bottomPhaseConsumed);
-  } else {
-    window._contingencyScratchGasConsumed = Object.assign({}, gasConsumed);
   }
   _syncCylToGasPlan();
 
@@ -10523,7 +10509,6 @@ const ZHLEngine = (() => {
   }
 
   function calculate(levels, decoGases, settings) {
-    _syncZhlBundleEnv();
     const s = mergeRepSettings(settings);
     const ccrVal = validateCcrCalculationInputs(levels, s, decoGases);
     if (!ccrVal.ok) return engineValidationError(ccrVal);
@@ -10542,7 +10527,6 @@ const ZHLEngine = (() => {
   }
 
   async function calculateInWorker(levels, decoGases, settings) {
-    _syncZhlBundleEnv();
     const s = mergeRepSettings(settings);
     const ccrVal = validateCcrCalculationInputs(levels, s, decoGases);
     if (!ccrVal.ok) return engineValidationError(ccrVal);
@@ -10745,7 +10729,7 @@ function runUnifiedPlan() {
   const fO2  = rbOnLoop ? bot.fO2 : 0.21;
 
   function loadAtDepth(tissues, depthM, durMin) {
-    if (rbOnLoop) return loadTissuesWithCCR(tissues, depthM, depthM, durMin, fO2, fHe, { ...ccr, ccrPhase: 'bottom' });
+    if (rbOnLoop) return loadTissuesWithCCR(tissues, depthM, depthM, durMin, fO2, fHe, ccr);
     return saturate(tissues, depthM, durMin, fN2, fHe);
   }
   function offgasAtSurface(tissues, durMin) {
@@ -13065,7 +13049,7 @@ var appSettings = {
     'shallowGradient',
     'siD1Depth', 'siD1BT', 'siD2Depth', 'siD2BT', 'siGfLow', 'siD2O2', 'siD2He',
     'travelGasMix', 'travelGasCustomO2', 'travelGasTrimixO2', 'travelGasTrimixHe', 'travelGasSwitchMode', 'travelGasManualDepth',
-    'sacBottom', 'sacDeco', 'contingencySacMultiplier',
+    'sacBottom', 'sacDeco',
     'cylBot_size', 'cylBot_pres', 'cylBot_reserve',
     'cylDg1_size', 'cylDg1_pres', 'cylDg1_reserve',
     'cylDg2_size', 'cylDg2_pres', 'cylDg2_reserve',
@@ -13274,7 +13258,6 @@ var appSettings = {
   _restoreFields: function(values) {
     let restored = 0;
     this._restoreInProgress = true;
-    try {
     if (!window._zhlHeadless && typeof restoreDecoGasCardLayout === 'function') {
       restoreDecoGasCardLayout(values.__decoCardIds, values.__dgNextIdx);
     }
@@ -13346,9 +13329,7 @@ var appSettings = {
         }
       });
     }
-    } finally {
-      this._restoreInProgress = false;
-    }
+    this._restoreInProgress = false;
     if (!window._zhlHeadless && typeof this.save === 'function') {
       this.save(false);
     }

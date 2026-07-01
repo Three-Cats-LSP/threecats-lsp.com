@@ -120,73 +120,6 @@ function withScratchDecoTableBody(fn, prefillHtml) {
   }
 }
 
-/** Gas-switch / MOD warning when contingency ceiling is deeper than primary plan. */
-function revalidateContingencyGasSwitchDepth(primaryPlan, contPlan) {
-  if (!primaryPlan || !contPlan) return '';
-  const pStop = primaryPlan.firstStopDepth;
-  const cStop = contPlan.firstStopDepth;
-  if (pStop == null || cStop == null || cStop <= pStop + 0.5) return '';
-  if (typeof updateGasMODDisplays === 'function') updateGasMODDisplays();
-  const parts = [];
-  const travel = typeof getTravelGasInfo === 'function' ? getTravelGasInfo() : null;
-  if (travel && travel.switchDepthM < cStop - 0.5) {
-    const du = units === 'metric' ? 'm' : 'ft';
-    const sw = units === 'metric' ? Math.round(travel.switchDepthM) : Math.round(travel.switchDepthM * 3.28084);
-    const cs = units === 'metric' ? Math.round(cStop) : Math.round(cStop * 3.28084);
-    parts.push(`Travel gas switch at ${sw}${du} is above contingency first stop (${cs}${du}) — verify gas switches.`);
-  }
-  if (typeof getConfiguredBailoutMixes === 'function') {
-    const shallow = getConfiguredBailoutMixes().filter(m => m.modM < cStop - 0.5);
-    if (shallow.length) {
-      const du = units === 'metric' ? 'm' : 'ft';
-      const cs = units === 'metric' ? Math.round(cStop) : Math.round(cStop * 3.28084);
-      const names = shallow.map(m => m.label).join(', ');
-      parts.push(`${names} MOD is below contingency first stop (${cs}${du}) — gas may be unavailable at depth.`);
-    }
-  }
-  if (!parts.length) return '';
-  return `<div class="alert warn" style="margin-top:8px;"><span>⚠</span><div><strong>GAS SWITCH REVIEW.</strong> ${parts.join(' ')}</div></div>`;
-}
-
-/** Bailout volumetric sufficiency for contingency profile (pass-2 dual-check). */
-function buildContingencyBailoutGasAlert(contGasConsumed) {
-  if (!contGasConsumed || typeof calculateGasRequirementsFromConsumed !== 'function') {
-    return { html: '', warningBailoutContingency: false };
-  }
-  const mult = typeof getContingencySacMultiplier === 'function' ? getContingencySacMultiplier() : 1.5;
-  const req = calculateGasRequirementsFromConsumed(contGasConsumed, { sacMultiplier: 1, bailoutFocus: true });
-  if (!req.warningBailoutContingency) return { html: '', warningBailoutContingency: false };
-  const volU = units === 'imperial' ? 'cu ft' : 'L';
-  const lines = req.bailoutShortfalls.map((s) => {
-    const shortDisp = typeof gpVolDisp === 'function' ? gpVolDisp(s.shortL) : Math.round(s.shortL);
-    const needDisp = typeof gpVolDisp === 'function' ? gpVolDisp(s.reqL) : Math.round(s.reqL);
-    const haveDisp = typeof gpVolDisp === 'function' ? gpVolDisp(s.availL) : Math.round(s.availL);
-    return `${s.label}: need ${needDisp} ${volU}, have ${haveDisp} ${volU} (short ${shortDisp} ${volU})`;
-  }).join('; ');
-  return {
-    warningBailoutContingency: true,
-    html: `<div class="alert dang" style="margin-top:8px;" data-warning="bailout-contingency"><span>⚠</span><div><strong>BAILOUT INSUFFICIENT FOR CONTINGENCY.</strong> ${lines} — calculated at ${mult}× stress SAC.</div></div>`,
-  };
-}
-
-/** MOD / ppO₂ warning when contingency "went deeper" exceeds bottom-gas MOD at new depth. */
-function buildContingencyModViolationAlert(extraDepthM) {
-  if (!extraDepthM || extraDepthM <= 0) return '';
-  if (typeof getBottomGasFractions !== 'function' || typeof calcGasMODm !== 'function' || typeof domDepthToM !== 'function') return '';
-  const bot = getBottomGasFractions();
-  if (!bot || !Number.isFinite(bot.fO2)) return '';
-  const depthM = domDepthToM('decoDepth') + extraDepthM;
-  const ppo2Limit = parseFloat(document.getElementById('ppo2Bottom')?.value) || 1.4;
-  const modM = calcGasMODm(bot.fO2, ppo2Limit);
-  if (depthM <= modM + 0.01) return '';
-  const ppO2 = (altSurfaceP + depthM * BAR_PER_METRE) * bot.fO2;
-  const du = units === 'metric' ? 'm' : 'ft';
-  const depthDisp = units === 'metric' ? Math.round(depthM) : Math.round(depthM * 3.28084);
-  const modDisp = units === 'metric' ? modM : Math.floor(modM * 3.28084);
-  const gasLabel = typeof getGasLabel === 'function' ? getGasLabel(bot.fO2, bot.fHe) : 'bottom gas';
-  return `<div class="alert dang" style="margin-top:8px;"><span>⚠</span><div><strong>BEYOND MOD.</strong> Contingency depth ${depthDisp}${du} exceeds ${gasLabel} MOD of ${modDisp}${du} at ${ppo2Limit.toFixed(1)} bar ppO₂ (actual ${ppO2.toFixed(2)} bar). CNS oxygen toxicity risk.</div></div>`;
-}
-
 /**
  * Run a contingency schedule without mutating the main deco table DOM.
  * modifyFn may adjust planner inputs (depth, BT, deco gases, bailout, circuit) — all are restored in finally.
@@ -196,15 +129,13 @@ function runContingencyScenario(modifyFn) {
     ok: false, newRows: '', lastRun: 0, decoTime: 0, lastRunFmt: null, decoTimeFmt: null,
     totalCNS: null, totalOTUc: null, decoZoneStart: 0, decozoneDisp: null, decoStop: null,
     tts: null, planSum: null, contSurfaceGF: null, scenarioDepth: null, scenarioBT: null,
-    scenarioBotFracs: null, contLastPlan: null, contLastTissues: null, contLastGasConsumed: null,
-    primaryFirstStopDepth: null,
+    scenarioBotFracs: null, contLastPlan: null, contLastTissues: null,
   };
   const mainTbody = document.getElementById('decoTableBody');
   if (!mainTbody) return empty;
 
   const savedSummary = document.getElementById('decoSummary')?.innerHTML || '';
   const savedLastPlan = window._lastPlan;
-  const primaryFirstStopDepth = savedLastPlan?.firstStopDepth ?? null;
   const origDepth = document.getElementById('decoDepth')?.value;
   const origBT = document.getElementById('decoBT')?.value;
   const origDgVals = {};
@@ -219,12 +150,11 @@ function runContingencyScenario(modifyFn) {
   let ok = false;
   let scenarioDepth, scenarioBT, scenarioBotFracs, newRows = '', lastRun, decoTime;
   let lastRunFmt, decoTimeFmt, totalCNS, totalOTUc, tts, decoStop, decozoneDisp;
-  let decoZoneStart, contSurfaceGF, planSum, contLastPlan, contLastTissues, contLastGasConsumed;
+  let decoZoneStart, contSurfaceGF, planSum, contLastPlan, contLastTissues;
   let error = null;
   try {
     withScratchDecoTableBody((scratchTbody) => {
       if (typeof modifyFn === 'function') modifyFn();
-      if (contExtraDepth > 0 && typeof updateGasMODDisplays === 'function') updateGasMODDisplays();
       runDecoSchedule();
 
       const rows = scratchTbody.querySelectorAll('tr[data-phase]');
@@ -263,9 +193,6 @@ function runContingencyScenario(modifyFn) {
       contLastTissues = tissueSrc && tissueSrc.length
         ? tissueSrc.map(t => ({ pN2: t.pN2, pHe: t.pHe || 0, mv: t.mv }))
         : null;
-      contLastGasConsumed = window._contingencyScratchGasConsumed
-        ? Object.assign({}, window._contingencyScratchGasConsumed)
-        : null;
     });
   } catch (e) {
     error = e.message;
@@ -294,14 +221,13 @@ function runContingencyScenario(modifyFn) {
     if (summEl) summEl.innerHTML = savedSummary;
     window._lastPlan = savedLastPlan;
     _contingencyRunning = false;
-    delete window._contingencyScratchGasConsumed;
   }
 
   if (!ok) return empty;
   return {
     ok, newRows, lastRun, decoTime: Math.round(decoTime), lastRunFmt, decoTimeFmt, totalCNS, totalOTUc,
     decoZoneStart, decozoneDisp, decoStop, tts, planSum, contSurfaceGF, scenarioDepth, scenarioBT, scenarioBotFracs,
-    contLastPlan, contLastTissues, contLastGasConsumed, primaryFirstStopDepth, error,
+    contLastPlan, contLastTissues, error,
   };
 }
 
@@ -415,7 +341,6 @@ function calcContingency() {
   const resultEl = document.getElementById('contingencyResult');
   if (!resultEl) return;
 
-  try {
   const gases = [];
   for (const idx of getAllDecoGasIds()) {
     const el = document.getElementById('dg' + idx + 'Mix');
@@ -446,7 +371,7 @@ function calcContingency() {
                    (contExtraDepth > 0)     ? 'You went deeper — deco obligation increased.' :
                    'Showing standard plan.';
 
-  const { ok, newRows, lastRun, decoTime, lastRunFmt, decoTimeFmt, totalCNS, totalOTUc, decoZoneStart, decozoneDisp, decoStop, tts, planSum, contSurfaceGF, scenarioDepth, scenarioBT, scenarioBotFracs, contLastPlan, contLastTissues, contLastGasConsumed, primaryFirstStopDepth } = runContingencyScenario(() => {
+  const { ok, newRows, lastRun, decoTime, lastRunFmt, decoTimeFmt, totalCNS, totalOTUc, decoZoneStart, decozoneDisp, decoStop, tts, planSum, contSurfaceGF, scenarioDepth, scenarioBT, scenarioBotFracs, contLastPlan, contLastTissues } = runContingencyScenario(() => {
     if (contExtraBT > 0) {
       const btEl = document.getElementById('decoBT');
       if (btEl) btEl.value = parseFloat(btEl.value) + contExtraBT;
@@ -528,34 +453,18 @@ function calcContingency() {
   // Store for export
   window._lastContingency = { label, lastRun, decoTime, lastRunFmt, decoTimeFmt, totalCNS, totalOTU: _emOTU, totalPrT: _emPrT, decoZoneStart, decozoneDisp: _emDecozone, decoStop: _emDecoStop, tts: _emTts, newRows, severity, icon, msg, surfGF: contSurfaceGF != null ? Math.round(contSurfaceGF) + '%' : '-', scenarioDepth, scenarioBT, scenarioBotFracs, emAlertsHtml: '', contLastPlan, contLastTissues };
 
-  // CNS / bailout / gas-switch alerts — emergency card only, NOT main decoAlerts
+  // CNS alert — goes into emergency card, NOT main decoAlerts
   const emAlerts = document.getElementById('decoAlertsEmergency');
   if (emAlerts) {
-    const modAlert = buildContingencyModViolationAlert(contExtraDepth);
-    const gasSwitchAlert = revalidateContingencyGasSwitchDepth(
-      primaryFirstStopDepth != null ? { firstStopDepth: primaryFirstStopDepth } : window._lastPlan,
-      contLastPlan,
-    );
-    const bailoutAlert = buildContingencyBailoutGasAlert(contLastGasConsumed);
     const cnsPctEm = totalCNS ? parseFloat(totalCNS) : 0;
-    let cnsAlert = '';
     if (cnsPctEm >= 80) {
-      cnsAlert = `<div class="alert" style="margin-top:8px;background:#ffff00;border-color:#cccc00;color:#111;font-weight:700;"><span>☢</span><div><strong>HIGH CNS%.</strong> Emergency CNS oxygen load ${cnsPctEm.toFixed(0)}% exceeds 80%. Extreme caution.</div></div>`;
+      emAlerts.innerHTML = `<div class="alert" style="margin-top:8px;background:#ffff00;border-color:#cccc00;color:#111;font-weight:700;"><span>☢</span><div><strong>HIGH CNS%.</strong> Emergency CNS oxygen load ${cnsPctEm.toFixed(0)}% exceeds 80%. Extreme caution.</div></div>`;
+    } else {
+      emAlerts.innerHTML = '';
     }
-    emAlerts.innerHTML = modAlert + gasSwitchAlert + bailoutAlert.html + cnsAlert;
     window._lastContingency.emAlertsHtml = emAlerts.innerHTML;
-    window._lastContingency.warningBailoutContingency = bailoutAlert.warningBailoutContingency;
   }
   scheduleDecoScheduleStackSync();
-  } catch (e) {
-    console.error('[Contingency]', e);
-    resultEl.style.display = 'block';
-    resultEl.innerHTML = `<div class="alert dang" style="margin:0;"><span>⚠</span><div><strong>Contingency calculation failed.</strong> ${escapeHtmlText(e.message || String(e))}</div></div>`;
-  } finally {
-    _contingencyRunning = false;
-    window._scheduleWorkerBusy = false;
-    delete window._contingencyScratchGasConsumed;
-  }
 }
 // Redirected to unified exportTXT — kept for backward compat
 
