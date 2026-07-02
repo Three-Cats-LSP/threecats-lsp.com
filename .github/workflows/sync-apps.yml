@@ -3,7 +3,7 @@ name: Sync Apps
 on:
   workflow_dispatch:
   repository_dispatch:
-    types: [sync-d-planner, sync-d-planner-ccr, sync-d-planner-plus, sync-t-viewer, sync-get-in-water, sync-apk-d-planner, sync-apk-d-planner-ccr, sync-apk-d-planner-plus, sync-apk-t-viewer, sync-apk-get-in-water]
+    types: [sync-d-planner, sync-d-planner-ccr, sync-d-planner-plus, sync-t-viewer, sync-get-in-water]
 
 jobs:
   sync:
@@ -119,57 +119,8 @@ jobs:
                -o "scripts/readmes/t-viewer.md" || echo "skip README"
           echo "T-Viewer synced"
 
-      - name: Pull latest D-Planner APK
-        if: github.event.action == 'sync-apk-d-planner' || github.event_name == 'workflow_dispatch'
-        run: |
-          mkdir -p d-planner
-          curl -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3.raw" \
-               -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner/contents/Android%20Apk/LSP_D-planner.apk" \
-               -o d-planner/LSP_D-planner.apk
-          echo "D-Planner APK synced"
-
-      - name: Pull latest D-Planner + CCR APK
-        if: github.event.action == 'sync-apk-d-planner-ccr' || github.event_name == 'workflow_dispatch'
-        run: |
-          mkdir -p d-planner-ccr
-          curl -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3.raw" \
-               -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-CCR/contents/Android%20Apk/LSP_D-planner-CCR.apk" \
-               -o d-planner-ccr/LSP_D-planner-CCR.apk || echo "APK not yet built — skip"
-          echo "D-Planner + CCR APK synced"
-
-      - name: Pull latest LSP D-Planner+ APK
-        if: github.event.action == 'sync-apk-d-planner-plus' || github.event_name == 'workflow_dispatch'
-        run: |
-          mkdir -p d-planner-plus
-          rm -f d-planner-plus/LSP_D-planner-plus*.apk
-          APK_NAME=$(curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/Android%20Apk" \
-            | python3 -c "import sys,json; items=json.load(sys.stdin); apks=sorted(x['name'] for x in items if x['name'].endswith('.apk')); print(apks[-1] if apks else '')")
-          if [ -z "$APK_NAME" ]; then
-            echo "APK not yet built — skip"
-            exit 0
-          fi
-          curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3.raw" \
-               -L "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/Android%20Apk/${APK_NAME}" \
-               -o "d-planner-plus/${APK_NAME}"
-          echo "LSP D-Planner+ APK synced: ${APK_NAME}"
-
-      - name: Pull latest T-Viewer APK
-        if: github.event.action == 'sync-apk-t-viewer' || github.event_name == 'workflow_dispatch'
-        run: |
-          mkdir -p t-viewer
-          curl -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3.raw" \
-               -L "https://api.github.com/repos/Three-Cats-LSP/T-Viewer/contents/Android%20Apk/T-Viewer.apk" \
-               -o t-viewer/T-Viewer.apk
-          echo "T-Viewer APK synced"
-
       - name: Pull latest Get In Water files
-        if: github.event.action == 'sync-get-in-water' || github.event.action == 'sync-apk-get-in-water' || github.event_name == 'workflow_dispatch'
+        if: github.event.action == 'sync-get-in-water' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p get-in-water/vendor/fonts get-in-water/vendor/firebase scripts/readmes
           for f in index.html download.html manifest.json sw.js capacitor-bridge.js backup-sanitize.js sync.js icon-192.png icon-512.png icon-192-light.png icon-512-light.png; do
@@ -191,7 +142,7 @@ jobs:
           echo "Get In Water synced"
 
       - name: Propagate Get In Water icon to partner app footers
-        if: github.event.action == 'sync-get-in-water' || github.event.action == 'sync-apk-get-in-water' || github.event_name == 'workflow_dispatch'
+        if: github.event.action == 'sync-get-in-water' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p d-planner/vendor/icons d-planner-plus/vendor/icons
           cp get-in-water/icon-192.png d-planner/vendor/icons/giw-icon-192.png
@@ -199,7 +150,7 @@ jobs:
           echo "Updated giw-icon-192.png in d-planner and d-planner-plus"
 
       - name: Write Get In Water Firebase config
-        if: github.event.action == 'sync-get-in-water' || github.event.action == 'sync-apk-get-in-water' || github.event_name == 'workflow_dispatch'
+        if: github.event.action == 'sync-get-in-water' || github.event_name == 'workflow_dispatch'
         env:
           FIREBASE_WEB_CONFIG: ${{ secrets.FIREBASE_WEB_CONFIG }}
         run: |
@@ -210,15 +161,11 @@ jobs:
             echo "FIREBASE_WEB_CONFIG not set — keeping existing get-in-water/firebase-config.js"
           fi
 
-      - name: Pull latest Get In Water APK
-        if: github.event.action == 'sync-get-in-water' || github.event.action == 'sync-apk-get-in-water' || github.event_name == 'workflow_dispatch'
+      - name: Remove APKs from site tree
+        if: github.event_name == 'workflow_dispatch' || startsWith(github.event.action, 'sync-')
         run: |
-          mkdir -p get-in-water
-          curl -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3.raw" \
-               -L "https://api.github.com/repos/Three-Cats-LSP/Get-In-Water/contents/Android%20Apk/Get-In-Water.apk" \
-               -o get-in-water/Get-In-Water.apk
-          echo "Get In Water APK synced"
+          find d-planner d-planner-ccr d-planner-plus t-viewer get-in-water -name '*.apk' -delete 2>/dev/null || true
+          echo "APKs removed — downloads use GitHub Releases"
 
       - name: Regenerate about pages
         if: github.event_name == 'workflow_dispatch' || startsWith(github.event.action, 'sync-')
