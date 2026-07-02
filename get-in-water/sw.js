@@ -1,4 +1,4 @@
-const CACHE_NAME = 'giw-v1.4.3';
+const CACHE_NAME = 'giw-v1.4.4';
 const ASSETS = [
   '/get-in-water/',
   '/get-in-water/index.html',

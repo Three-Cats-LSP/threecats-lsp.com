@@ -86,12 +86,13 @@ header.hdr {
 }
 .brand { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
 .brand-icon {
-  width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; overflow: hidden;
-  background: #030c18; border: 1px solid var(--border-hi);
+  width: 44px; height: 44px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
 }
-body.light-theme .brand-icon { background: #f5f7f9; }
-.brand-icon img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.brand-icon img {
+  width: 44px; height: 44px; display: block; object-fit: contain;
+  border-radius: 8px; border: 1px solid var(--border-hi);
+}
 .brand-text h1 {
   font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px;
   color: var(--text); line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -516,7 +517,7 @@ body.light-theme .about-tab-btn.active { color: #fff; }
 </div>
 <script src="capacitor-bridge.js"></script>
 <script>
-const APP_VERSION = '1.4.3';
+const APP_VERSION = '1.4.4';
 const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 const STORAGE_KEY = 'giw_v1';
 
