@@ -7,7 +7,7 @@ Maintain a **master gear list**, create **per-trip checklists**, tick items off 
 🌐 **Live app:** https://threecats-lsp.com/get-in-water/  
 📲 **Android APK:** https://threecats-lsp.com/get-in-water/download.html  
 
-**Current version: 1.4.0**
+**Current version: 1.4.2**
 
 ---
 
