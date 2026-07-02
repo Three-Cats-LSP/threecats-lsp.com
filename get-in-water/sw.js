@@ -1,4 +1,4 @@
-const CACHE_NAME = 'giw-v1.4.2';
+const CACHE_NAME = 'giw-v1.4.3';
 const ASSETS = [
   '/get-in-water/',
   '/get-in-water/index.html',
@@ -53,10 +53,18 @@ self.addEventListener('activate', e => {
   );
 });
 
+function isIconAsset(url) {
+  return /\/get-in-water\/icon-\d+/.test(url.pathname);
+}
+
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (isFirebaseRequest(url)) {
     e.respondWith(fetch(e.request));
+    return;
+  }
+  if (isIconAsset(url)) {
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
     return;
   }
   e.respondWith(

@@ -516,7 +516,7 @@ body.light-theme .about-tab-btn.active { color: #fff; }
 </div>
 <script src="capacitor-bridge.js"></script>
 <script>
-const APP_VERSION = '1.4.2';
+const APP_VERSION = '1.4.3';
 const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 const STORAGE_KEY = 'giw_v1';
 
@@ -1012,10 +1012,6 @@ function initBubbles() {
 }
 
 function appLogoSrc() {
-  return 'icon-192.png?v=' + APP_VERSION;
-}
-
-function faviconSrc() {
   const file = state && state.settings.theme === 'light' ? 'icon-192-light.png' : 'icon-192.png';
   return file + '?v=' + APP_VERSION;
 }
@@ -1024,11 +1020,12 @@ function updateAppLogo() {
   const logoSrc = appLogoSrc();
   const logo = document.getElementById('brandLogo');
   if (logo) logo.src = logoSrc;
-  const favSrc = faviconSrc();
+  const footerLogo = document.getElementById('footerAppLogo');
+  if (footerLogo) footerLogo.src = logoSrc;
   const fav = document.getElementById('favicon');
-  if (fav) fav.href = favSrc;
+  if (fav) fav.href = logoSrc;
   const apple = document.getElementById('apple-touch-icon');
-  if (apple) apple.href = favSrc;
+  if (apple) apple.href = logoSrc;
 }
 
 function toggleTheme() {
@@ -1039,6 +1036,7 @@ function toggleTheme() {
   const meta = document.getElementById('theme-color-active');
   if (meta) meta.setAttribute('content', isLight ? '#f5f7f9' : '#030c18');
   updateAppLogo();
+  render();
 }
 
 function applyTheme() {
@@ -1525,7 +1523,7 @@ function renderAppFooter() {
           </svg>
         </a>
         ${IS_NATIVE ? '' : `<a class="app-footer-icon" href="https://threecats-lsp.com/get-in-water/download.html" target="_blank" rel="noopener noreferrer" title="Download Get In Water APK">
-          <img alt="Get In Water APK" src="${appLogoSrc()}" style="border-radius:8px;border:1px solid var(--border-hi)"/>
+          <img id="footerAppLogo" alt="Get In Water APK" src="${appLogoSrc()}" style="border-radius:8px;border:1px solid var(--border-hi)"/>
         </a>`}
       </div>
       <div class="app-footer-donate-wrap">
