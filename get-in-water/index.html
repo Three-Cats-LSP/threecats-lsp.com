@@ -91,8 +91,10 @@ header.hdr {
 }
 .brand-icon img {
   width: 44px; height: 44px; display: block; object-fit: contain;
+  box-sizing: content-box;
   border-radius: 8px; border: 1px solid var(--border-hi);
 }
+#footerAppLogo { box-sizing: content-box; }
 .brand-text h1 {
   font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px;
   color: var(--text); line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -517,7 +519,7 @@ body.light-theme .about-tab-btn.active { color: #fff; }
 </div>
 <script src="capacitor-bridge.js"></script>
 <script>
-const APP_VERSION = '1.4.4';
+const APP_VERSION = '1.4.5';
 const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 const STORAGE_KEY = 'giw_v1';
 
@@ -1013,8 +1015,9 @@ function initBubbles() {
 }
 
 function appLogoSrc() {
-  const file = state && state.settings.theme === 'light' ? 'icon-192-light.png' : 'icon-192.png';
-  return file + '?v=' + APP_VERSION;
+  // Navy-bg icon reads correctly in both themes; light-bg variant makes ear
+  // outlines blend into the pale background and look clipped.
+  return 'icon-192.png?v=' + APP_VERSION;
 }
 
 function updateAppLogo() {
