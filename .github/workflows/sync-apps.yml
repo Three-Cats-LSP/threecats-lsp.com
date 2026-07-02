@@ -8,6 +8,9 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    concurrency:
+      group: site-sync
+      cancel-in-progress: true
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
@@ -166,7 +169,7 @@ jobs:
           echo "T-Viewer APK synced"
 
       - name: Pull latest Get In Water files
-        if: github.event.action == 'sync-get-in-water' || github.event_name == 'workflow_dispatch'
+        if: github.event.action == 'sync-get-in-water' || github.event.action == 'sync-apk-get-in-water' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p get-in-water/vendor/fonts get-in-water/vendor/firebase scripts/readmes
           for f in index.html download.html manifest.json sw.js capacitor-bridge.js backup-sanitize.js sync.js icon-192.png icon-512.png icon-192-light.png icon-512-light.png; do
@@ -188,7 +191,7 @@ jobs:
           echo "Get In Water synced"
 
       - name: Propagate Get In Water icon to partner app footers
-        if: github.event.action == 'sync-get-in-water' || github.event_name == 'workflow_dispatch'
+        if: github.event.action == 'sync-get-in-water' || github.event.action == 'sync-apk-get-in-water' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p d-planner/vendor/icons d-planner-plus/vendor/icons
           cp get-in-water/icon-192.png d-planner/vendor/icons/giw-icon-192.png
@@ -196,7 +199,7 @@ jobs:
           echo "Updated giw-icon-192.png in d-planner and d-planner-plus"
 
       - name: Write Get In Water Firebase config
-        if: github.event.action == 'sync-get-in-water' || github.event_name == 'workflow_dispatch'
+        if: github.event.action == 'sync-get-in-water' || github.event.action == 'sync-apk-get-in-water' || github.event_name == 'workflow_dispatch'
         env:
           FIREBASE_WEB_CONFIG: ${{ secrets.FIREBASE_WEB_CONFIG }}
         run: |
@@ -208,7 +211,7 @@ jobs:
           fi
 
       - name: Pull latest Get In Water APK
-        if: github.event.action == 'sync-apk-get-in-water' || github.event_name == 'workflow_dispatch'
+        if: github.event.action == 'sync-get-in-water' || github.event.action == 'sync-apk-get-in-water' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p get-in-water
           curl -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
