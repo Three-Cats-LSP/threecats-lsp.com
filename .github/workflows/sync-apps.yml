@@ -187,6 +187,14 @@ jobs:
                -o "scripts/readmes/get-in-water.md" || echo "skip README"
           echo "Get In Water synced"
 
+      - name: Propagate Get In Water icon to partner app footers
+        if: github.event.action == 'sync-get-in-water' || github.event_name == 'workflow_dispatch'
+        run: |
+          mkdir -p d-planner/vendor/icons d-planner-plus/vendor/icons
+          cp get-in-water/icon-192.png d-planner/vendor/icons/giw-icon-192.png
+          cp get-in-water/icon-192.png d-planner-plus/vendor/icons/giw-icon-192.png
+          echo "Updated giw-icon-192.png in d-planner and d-planner-plus"
+
       - name: Write Get In Water Firebase config
         if: github.event.action == 'sync-get-in-water' || github.event_name == 'workflow_dispatch'
         env:
