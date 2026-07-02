@@ -1,0 +1,85 @@
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let an in-flight publish finish; cancelling leaves the CDN on an old build.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare static site
+        run: |
+          mkdir -p _site
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='_site' \
+            ./ _site/
+          touch _site/.nojekyll
+          du -sh _site
+          find _site -type f | wc -l
+
+      - name: Hash site contents
+        id: sitehash
+        run: |
+          HASH=$(find _site -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+          echo "Site content hash: $HASH"
+
+      - name: Check for unchanged site
+        id: deploy-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .pages-deploy-marker
+          key: pages-deploy-${{ steps.sitehash.outputs.hash }}
+
+      - name: Skip deploy (site unchanged)
+        if: steps.deploy-cache.outputs.cache-hit == 'true'
+        run: echo "Site content unchanged — skipping Pages artifact upload and deploy."
+
+      - name: Setup Pages
+        if: steps.deploy-cache.outputs.cache-hit != 'true'
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        if: steps.deploy-cache.outputs.cache-hit != 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        if: steps.deploy-cache.outputs.cache-hit != 'true'
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Record deploy marker
+        if: steps.deploy-cache.outputs.cache-hit != 'true'
+        run: mkdir -p .pages-deploy-marker && date -u +%Y-%m-%dT%H:%M:%SZ > .pages-deploy-marker/deployed-at
+
+      - name: Save deploy cache
+        if: steps.deploy-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .pages-deploy-marker
+          key: pages-deploy-${{ steps.sitehash.outputs.hash }}
