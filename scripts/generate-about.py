@@ -214,8 +214,8 @@ def page_html(app: dict, body: str) -> str:
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>About · {html.escape(title)} · Three Cats LSP</title>
-  <meta name="description" content="About {html.escape(title)} — part of the Three Cats LSP Diver's Toolkit."/>
+  <title>About - {html.escape(title)} - Three Cats LSP</title>
+  <meta name="description" content="About {html.escape(title)} - part of the Three Cats LSP Diver's Toolkit."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet"/>
@@ -242,7 +242,7 @@ def page_html(app: dict, body: str) -> str:
       </article>
     </div>
   </main>
-  <footer class="site-footer">Three Cats LSP · Diver's Toolkit</footer>
+  <footer class="site-footer">Three Cats LSP - Diver's Toolkit</footer>
 </body>
 </html>
 """
