@@ -382,7 +382,9 @@ body {
 
 .prose table {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
   margin: 1rem 0 1.25rem;
   font-size: 0.9rem;
 }
@@ -391,6 +393,9 @@ body {
   border: 1px solid var(--border);
   padding: 10px 12px;
   text-align: left;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  vertical-align: top;
 }
 
 .prose th {
@@ -402,6 +407,11 @@ body {
 .prose td { color: var(--muted); }
 
 .prose td a, .prose th a { color: var(--primary); }
+
+@media (max-width: 760px) {
+  .prose table { font-size: 0.78rem; }
+  .prose th, .prose td { padding: 8px 9px; }
+}
 
 .site-footer {
   position: relative;
