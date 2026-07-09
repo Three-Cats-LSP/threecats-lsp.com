@@ -1,149 +1,114 @@
 # T-Viewer
 
-A companion app for **[LSP D-Planner+](https://github.com/Three-Cats-LSP/LSP_D-planner-plus)** — open, read, edit, and share dive plan **TXT** and **PDF** files exported by LSP D-Planner+ on your phone or in the browser.
+T-Viewer is a free companion app for LSP D-Planner+. It opens, reads, edits, styles, and shares exported dive-plan TXT and PDF files on your phone, tablet, or desktop browser.
 
-Part of the [Three Cats LSP](https://threecats-lsp.com) **Diver's Toolkit**.
+- Live app: https://threecats-lsp.com/t-viewer/
+- Android APK: https://threecats-lsp.com/t-viewer/download.html
+- Repository: https://github.com/Three-Cats-LSP/T-Viewer
+- Toolkit hub: https://threecats-lsp.com
+- License: MIT
 
-🌐 **Web app**: https://threecats-lsp.com/t-viewer/
+## What It Is For
 
-Also runs in any browser — no install required.
+LSP D-Planner+ exports dive plans as text, slate text, and PDF. T-Viewer is the viewer/editor for those files.
 
----
+Use it when you want to:
 
-## Diver's Toolkit
+- open an exported dive plan on a phone;
+- keep a readable deco slate;
+- share a plan with a buddy or surface support;
+- adjust text formatting and colors for readability;
+- read PDF exports without leaving the toolkit.
 
-| App | Purpose |
-|-----|---------|
-| **[LSP D-Planner+](https://threecats-lsp.com/d-planner-plus/)** | Decompression planning (Bühlmann, VPM-B, Rec/Tec, CCR/pSCR) |
-| **T-Viewer** | Open and share exported dive plan TXT/PDF files (this app) |
-| **[Get In Water](https://threecats-lsp.com/get-in-water/)** | Trip packing checklists |
+T-Viewer does not calculate decompression. It is a viewer and editor only.
 
-All apps live on the [Diver's Toolkit hub](https://threecats-lsp.com).
+## Three Cats LSP Toolkit
 
----
-
-## Web App
-
-Add T-Viewer to your home screen for quick access from Safari or Chrome.
-
-**Installation:**
-1. Open https://threecats-lsp.com/t-viewer/ on your phone, tablet, or computer
-2. **Safari (iPhone / iPad):** Tap **Share** (square with arrow) → **Add to Home Screen** → **Add**
-3. **Chrome (Android):** Tap **⋮** menu → **Install app** or **Add to Home screen** → confirm
-4. **Chrome (desktop):** Click the install icon in the address bar, or **⋮** → **Install T-Viewer**
-
-### Android APK
-
-T-Viewer is also available as a native Android app built with Capacitor.
-
-📲 **[Download APK](https://threecats-lsp.com/t-viewer/download.html)**
-
-**APK installation:**
-1. Open the download page on your Android device
-2. Tap **Download APK**
-3. Open the downloaded file from your Downloads folder
-4. If prompted, allow *Install from unknown sources* in Settings
-5. Install and launch T-Viewer
-
-Export a dive plan as **TXT** or **PDF** from LSP D-Planner and share it directly into T-Viewer on Android.
-
----
+| App | Purpose | Live app |
+| --- | --- | --- |
+| LSP D-Planner+ | OC, CCR, pSCR, rec and tech decompression planning | https://threecats-lsp.com/d-planner-plus/ |
+| T-Viewer | Dive-plan TXT/PDF viewer and editor | https://threecats-lsp.com/t-viewer/ |
+| Get In Water | Dive trip packing lists and exportable checklists | https://threecats-lsp.com/get-in-water/ |
 
 ## Features
 
-### File support
-- Open `.txt`, `.log`, `.plan`, `.div`, and **`.pdf`** files
-- Receive shared files directly from LSP D-Planner on Android
-- Drag and drop on desktop browser (web version)
+### File Support
 
-### Text plans
-- **Syntax highlighting** for deco logs:
-  - Section headers (cyan / blue)
-  - Parameter lines — `Algorithm :`, `Depth :`, `Deco Gas 1 :` etc. (teal)
-  - Data rows — `Stp`, `Asc`, `Des` etc. (amber in dark / black in light)
-  - Separator lines (dim)
-  - Warning keywords (orange / red)
-- **Edit mode** — modify file contents; save back to device or discard with confirmation
-- No word wrap — long deco table rows scroll horizontally for clean alignment
-- Copy and share text
+- Opens `.txt`, `.log`, `.plan`, `.div`, and `.pdf`.
+- Receives shared files from LSP D-Planner+ on Android.
+- Supports desktop drag and drop in the browser.
+- Can copy, edit, save, download, and share text files.
+- Displays PDF exports with in-app PDF navigation.
 
-### PDF plans
-- View LSP D-Planner PDF exports in-app (PDF.js)
-- Page navigation bar for multi-page documents
+### Dive-Plan Text View
 
-### Appearance & settings
-- Dark and light theme — tap 🌙 / ☀️ to toggle
-- Customizable colors — adjust syntax and UI colors per theme via the **COLORS** tab
-- Font selector — System Default, Monospace, Roboto Mono, Source Code Pro, JetBrains Mono, Open Sans, Noto Sans
-- Pinch-to-zoom — font size shown in top bar
-- All settings persisted in `localStorage`
+- Syntax highlighting for common dive-plan structure.
+- Distinct styling for headers, parameters, schedule rows, separators, and warnings.
+- Horizontal scrolling for monospaced tables so slate rows stay aligned.
+- Font-size control with pinch-to-zoom on touch devices.
+- Light and dark themes.
 
----
+### Editing And Sharing
 
-## UI
+- Edit exported text plans.
+- Save edited text back to the device.
+- Copy full text to the clipboard.
+- Share through Android or browser share targets.
+- Keep settings in local browser storage.
 
-### Top bar
+### Appearance
 
-| Button | Action |
-|--------|--------|
-| Folder icon | Open a file |
-| Copy icon | Copy all text to clipboard |
-| Edit icon | Enter edit mode (text files) |
-| Save icon | Save / download edited file (edit mode) |
-| Share icon | Share current file |
-| `?` | Open COLORS / ABOUT modal |
-| Font size label | Current size (e.g. `15px`) — pinch to zoom |
-| 🌙 / ☀️ | Toggle dark / light theme |
+- Font selector for the content area.
+- Customizable colors for dark and light themes.
+- Reset controls for theme colors.
+- Mobile-friendly toolbar.
 
-### `?` modal — COLORS tab *(opens first)*
+## Install
 
-- Font selector for the content area
-- Dark / Light sub-tabs with live color editing
-- Reset button per theme
+### Web / PWA
 
-### `?` modal — ABOUT tab
+Open:
 
-- App description and feature list
-- **Links:** Diver's Toolkit hub, T-Viewer GitHub, T-Viewer APK, Thingiverse, Instagram, PayPal
+```text
+https://threecats-lsp.com/t-viewer/
+```
 
----
+Install from your browser:
 
-## Syntax highlighting
+| Platform | Install path |
+| --- | --- |
+| iPhone / iPad Safari | Share -> Add to Home Screen |
+| Android Chrome | Menu -> Install app or Add to Home Screen |
+| Desktop Chrome / Edge / Vivaldi | Install icon in address bar |
 
-| Class | Pattern | Dark | Light |
-|-------|---------|------|-------|
-| `.h` Header | All-caps lines (`DECO PLAN`, `GAS CONSUMPTION`) | cyan | blue |
-| `.s` Separator | Lines of dashes / equals / dots | dim | grey |
-| `.d` Data | Depth/time units (`60m`, `3:00`) | amber | black |
-| `.w` Warning | `warn`, `caution`, `deco`, `stop` etc. | orange | red |
-| `.l` Label | `Key : Value` parameter lines | teal | dark teal |
+### Android APK
 
-All colors are customizable via the COLORS tab.
+Download:
 
----
+```text
+https://threecats-lsp.com/t-viewer/download.html
+```
 
-## Repository structure
+Requirements:
 
-| Path | Purpose |
-|------|---------|
-| `index.html` | Self-contained web app |
-| `manifest.json` | PWA manifest |
-| `download.html` | Android APK download page |
-| `android/` | Capacitor Android project |
-| `Android Apk/` | Latest built APK (auto-updated by CI) |
+- Android 5.0+ / API 21+
+- Allow "Install unknown apps" for your browser or file manager
 
----
+## Typical Workflow
 
-## Deployment
+1. Build a dive plan in LSP D-Planner+.
+2. Export it as TXT or PDF.
+3. Open or share the file into T-Viewer.
+4. Adjust font, theme, or colors if needed.
+5. Share the final plan with your team.
 
-Static single-file app served from [threecats-lsp.com/t-viewer/](https://threecats-lsp.com/t-viewer/). Android APK is built by GitHub Actions on push to `main` and synced to the homepage.
+## Safety Notice
 
----
+T-Viewer does not validate or calculate dive plans. It only displays and edits files. Always verify dive plans independently with your training, tables, dive computer, and team procedures.
 
-## Disclaimer
+## Links
 
-T-Viewer is a file viewer and editor. It does not perform decompression calculations. Always use a calibrated dive computer and formal dive training. Use at your own risk.
-
----
-
-*Developed by Three Cats LSP · [@threecats_lsp](https://www.instagram.com/threecats_lsp)*
+- LSP D-Planner+: https://threecats-lsp.com/d-planner-plus/
+- T-Viewer APK: https://threecats-lsp.com/t-viewer/download.html
+- GitHub organization: https://github.com/Three-Cats-LSP
+- Instagram: https://www.instagram.com/threecats_lsp
