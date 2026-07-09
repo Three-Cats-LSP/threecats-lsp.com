@@ -70,6 +70,14 @@ jobs:
                  "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/${f}" \
                  -o "d-planner-plus/${f}" || echo "skip ${f}"
           done
+          while IFS= read -r f || [ -n "$f" ]; do
+            [ -z "$f" ] && continue
+            mkdir -p "d-planner-plus/$(dirname "$f")"
+            curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+                 -H "Accept: application/vnd.github.v3.raw" \
+                 "https://api.github.com/repos/Three-Cats-LSP/LSP_D-planner-plus/contents/${f}" \
+                 -o "d-planner-plus/${f}" || echo "skip manifest ${f}"
+          done < d-planner-plus/site-assets-manifest.txt
           mkdir -p d-planner-plus/vendor/fonts d-planner-plus/vendor/icons
           curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                -H "Accept: application/vnd.github.v3.raw" \
