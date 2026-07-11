@@ -28,149 +28,86 @@
       <p class="about-eyebrow">About Get In Water</p>
       <article class="prose">
 <h1>Get In Water</h1>
-<p>Get In Water is a free dive-trip packing checklist app. It helps you keep a master gear list, create trip-specific packing lists, track what is packed, and export checklists as TXT or PDF.</p>
-<ul>
-<li>Live app: https://threecats-lsp.com/get-in-water/</li>
-<li>Android APK: https://threecats-lsp.com/get-in-water/download.html</li>
-<li>Repository: https://github.com/Three-Cats-LSP/Get-In-Water</li>
-<li>Toolkit hub: https://threecats-lsp.com</li>
-<li>Current version: 1.4.2</li>
-<li>License: MIT</li>
-</ul>
-<h2>What It Is For</h2>
-<p>Plan the dive in LSP D-Planner+. Read the plan in T-Viewer. Pack for the trip with Get In Water.</p>
-<p>Use it for:</p>
-<ul>
-<li>weekend recreational dives;</li>
-<li>technical dive trips;</li>
-<li>underwater photography trips;</li>
-<li>travel packing;</li>
-<li>team or buddy gear checks;</li>
-<li>reusable personal templates.</li>
-</ul>
-<h2>Three Cats LSP Toolkit</h2>
-<table><thead><tr>
-<th>App</th>
-<th>Purpose</th>
-<th>Live app</th>
-</tr></thead><tbody>
-<tr>
-<td>LSP D-Planner+</td>
-<td>OC, CCR, pSCR, rec and tech decompression planning</td>
-<td>https://threecats-lsp.com/d-planner-plus/</td>
-</tr>
-<tr>
-<td>T-Viewer</td>
-<td>Dive-plan TXT/PDF viewer and editor</td>
-<td>https://threecats-lsp.com/t-viewer/</td>
-</tr>
-<tr>
-<td>Get In Water</td>
-<td>Dive trip packing lists and exportable checklists</td>
-<td>https://threecats-lsp.com/get-in-water/</td>
-</tr>
-</tbody></table>
+<p>Dive trip packing checklist app — part of the <a href="https://threecats-lsp.com">Three Cats LSP</a> <strong>Diver&#x27;s Toolkit</strong>.</p>
+<p>Maintain a <strong>master gear list</strong>, create <strong>per-trip checklists</strong>, tick items off as you pack, and export TXT or PDF for printing or sharing. Use it alongside <a href="https://threecats-lsp.com/d-planner-plus/">LSP D-Planner+</a> — plan the dive, then pack for it.</p>
+<p>🌐 <strong>Live app:</strong> https://threecats-lsp.com/get-in-water/</p>
+<p>📲 <strong>Android APK:</strong> https://threecats-lsp.com/get-in-water/download.html</p>
+<p><strong>Current version: 1.4.2</strong></p>
+<hr>
+<h2>Diver&#x27;s Toolkit</h2>
+<p>All apps at the <a href="https://threecats-lsp.com">Diver&#x27;s Toolkit hub</a>.</p>
+<hr>
 <h2>Features</h2>
-<h3>Master Gear List</h3>
+<h3>Master List &amp; Templates</h3>
 <ul>
-<li>Maintain one master list of your normal gear.</li>
-<li>Add item notes and quantities.</li>
-<li>Edit, reorder, and remove items.</li>
-<li>Use the master list as the starting point for new trips.</li>
+<li><strong>Master gear list</strong> — your default packing list; new trips start from it or any saved template</li>
+<li><strong>Starter templates</strong> — Recreational, Underwater Photographer, Technical Diver (built-in, resettable)</li>
+<li>Edit under <strong>Settings → Templates</strong></li>
 </ul>
-<h3>Templates</h3>
+<h3>Per-Trip Checklists</h3>
 <ul>
-<li>Built-in starter templates:</li>
+<li>Create named trips from master list or a template</li>
+<li>Tick items off as you pack — progress bar tracks completion</li>
+<li>Items carry notes and quantity</li>
 </ul>
-<p>  - Recreational diver</p>
-<p>  - Underwater photographer</p>
-<p>  - Technical diver</p>
+<h3>Export</h3>
 <ul>
-<li>Reset built-in templates when needed.</li>
-<li>Create your own reusable templates.</li>
+<li><strong>TXT</strong> — plain text gear list to clipboard or Downloads</li>
+<li><strong>PDF</strong> — formatted packing list with trip name, date, and item notes</li>
+<li>Share via any Android share target (WhatsApp, email, etc.)</li>
 </ul>
-<h3>Trip Checklists</h3>
+<h3>Cloud sync (optional)</h3>
 <ul>
-<li>Create named trips.</li>
-<li>Start from the master list or a template.</li>
-<li>Tick items off as you pack.</li>
-<li>Track completion with a progress indicator.</li>
-<li>Keep trip-specific notes and quantities.</li>
+<li><strong>Sign in with Google</strong> to sync checklists between the web app and Android</li>
+<li><strong>Offline-first</strong> — works fully without an account; sync when signed in</li>
+<li><strong>Home screen Sync button</strong> — manual sync without reloading the app</li>
+<li>Start packing on your phone, finish on desktop (or vice versa)</li>
+<li>Configure Firebase once — see <a href="#cloud-sync-setup">Cloud sync setup</a> for contributors</li>
 </ul>
-<h3>Export And Sharing</h3>
+<h3>Android Native Features</h3>
 <ul>
-<li>Export TXT packing lists.</li>
-<li>Export formatted PDF packing lists.</li>
-<li>Copy checklist text.</li>
-<li>Share through Android or browser share targets.</li>
+<li>Full offline support — no internet needed after install</li>
+<li>Home-screen launcher name <strong>GiW</strong> (short label under the icon)</li>
+<li>Edge-to-edge layout, light/dark theme</li>
+<li>Export TXT/PDF to app storage, then share via the system sheet (Downloads when the device allows)</li>
 </ul>
-<h3>Optional Cloud Sync</h3>
-<ul>
-<li>Optional Google sign-in.</li>
-<li>Sync trips and lists between browser and Android.</li>
-<li>Works fully offline without an account.</li>
-<li>Manual Sync button for controlled push/pull.</li>
-<li>Conflict handling for first sign-in.</li>
-</ul>
-<p>Cloud sync is optional. Local-only use is fully supported.</p>
-<h2>Install</h2>
-<h3>Web / PWA</h3>
-<p>Open:</p>
-<pre><code>https://threecats-lsp.com/get-in-water/</code></pre>
-<p>Install from your browser:</p>
-<table><thead><tr>
-<th>Platform</th>
-<th>Install path</th>
-</tr></thead><tbody>
-<tr>
-<td>iPhone / iPad Safari</td>
-<td>Share -&gt; Add to Home Screen</td>
-</tr>
-<tr>
-<td>Android Chrome</td>
-<td>Menu -&gt; Install app or Add to Home Screen</td>
-</tr>
-<tr>
-<td>Desktop Chrome / Edge / Vivaldi</td>
-<td>Install icon in address bar</td>
-</tr>
-</tbody></table>
-<h3>Android APK</h3>
-<p>Download:</p>
-<pre><code>https://threecats-lsp.com/get-in-water/download.html</code></pre>
-<p>Requirements:</p>
-<ul>
-<li>Android 5.0+ / API 21+</li>
-<li>Allow &quot;Install unknown apps&quot; for your browser or file manager</li>
-</ul>
-<h2>Typical Workflow</h2>
+<hr>
+<h2>Web App</h2>
+<p>Open https://threecats-lsp.com/get-in-water/ in any modern browser.</p>
+<p><strong>Install as PWA:</strong></p>
 <ol>
-<li>Maintain your master gear list.</li>
-<li>Create a trip checklist.</li>
-<li>Remove gear you do not need for that trip.</li>
-<li>Add trip-specific gear, notes, and quantities.</li>
-<li>Tick items off while packing.</li>
-<li>Export or share the checklist.</li>
+<li><strong>Safari (iPhone/iPad):</strong> Share → Add to Home Screen → Add</li>
+<li><strong>Chrome (Android):</strong> ⋮ → Install app / Add to Home Screen → confirm</li>
+<li><strong>Chrome (desktop):</strong> Click install icon in address bar</li>
 </ol>
-<h2>Contributor Notes</h2>
-<p>Optional Google sync uses Firebase Auth and Firestore. Contributor setup uses local Firebase config files and GitHub secrets for Android builds.</p>
-<p>Key files:</p>
-<ul>
-<li><code>firebase-config.example.js</code></li>
-<li><code>.env.example</code></li>
-<li><code>firestore.rules</code></li>
-<li><code>android/</code></li>
-</ul>
-<h2>Safety Notice</h2>
-<p>Get In Water is a packing aid. It cannot know whether your equipment is appropriate, serviced, analyzed, charged, or safe for a specific dive. Always check life-support equipment personally and follow your training and team procedures.</p>
-<h2>Links</h2>
-<ul>
-<li>LSP D-Planner+: https://threecats-lsp.com/d-planner-plus/</li>
-<li>T-Viewer: https://threecats-lsp.com/t-viewer/</li>
-<li>Get In Water APK: https://threecats-lsp.com/get-in-water/download.html</li>
-<li>GitHub organization: https://github.com/Three-Cats-LSP</li>
-<li>Instagram: https://www.instagram.com/threecats_lsp</li>
-</ul>
+<hr>
+<h2>Android App</h2>
+<p>Built with <a href="https://capacitorjs.com">Capacitor</a>. Direct APK — no Play Store required.</p>
+<p><strong>Requirements:</strong> Android 5.0+ (API 21)</p>
+<p><strong>Install:</strong></p>
+<ol>
+<li>Download APK from https://threecats-lsp.com/get-in-water/download.html</li>
+<li>Allow &quot;Install from unknown sources&quot; in Android settings</li>
+<li>Open the downloaded APK and install</li>
+</ol>
+<hr>
+<h2>Cloud sync setup</h2>
+<p>Optional Google sign-in uses <a href="https://firebase.google.com">Firebase</a> (Auth + Firestore). See <a href=".env.example"><code>.env.example</code></a> for one-time console steps:</p>
+<ol>
+<li>Create a Firebase project and enable <strong>Google</strong> sign-in</li>
+<li>Create Firestore and deploy <a href="firestore.rules"><code>firestore.rules</code></a></li>
+<li>Copy web config into local <code>firebase-config.js</code> (from <a href="firebase-config.example.js"><code>firebase-config.example.js</code></a>; file is gitignored)</li>
+<li>Add Android app → <code>google-services.json</code> in <code>android/app/</code> (not committed)</li>
+<li>Ensure <code>android/variables.gradle</code> has <code>rgcfaIncludeGoogle = true</code> (required for Google Sign-In in APK)</li>
+<li>Register SHA-1 fingerprints for debug/release keystores</li>
+<li>GitHub secrets: <code>GOOGLE_SERVICES_JSON</code> (base64 of <code>google-services.json</code>), <code>FIREBASE_WEB_CONFIG</code> (base64 of <code>firebase-config.js</code>)</li>
+</ol>
+<p><strong>Manual test checklist</strong></p>
+<hr>
+<h2>License</h2>
+<p>MIT — free to use, modify, and distribute. Optional Google account for cloud sync; no ads, no subscription.</p>
+<hr>
+<p><em>Three Cats LSP · <a href="https://threecats-lsp.com">threecats-lsp.com</a></em></p>
       </article>
     </div>
   </main>

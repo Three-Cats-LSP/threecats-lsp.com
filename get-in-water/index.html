@@ -519,7 +519,7 @@ body.light-theme .about-tab-btn.active { color: #fff; }
 </div>
 <script src="capacitor-bridge.js"></script>
 <script>
-const APP_VERSION = '1.4.5';
+const APP_VERSION = '1.4.6';
 const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 const STORAGE_KEY = 'giw_v1';
 
@@ -1066,13 +1066,17 @@ function showToast(msg) {
 }
 window.showExportToast = (msg) => showToast(msg || '📥 Saved!');
 
-function navigate(s, tripId) {
+function navigate(s, tripId, options) {
+  const opts = options || {};
+  const keepScroll = opts.preserveScroll;
+  const scrollY = opts.scrollY != null ? opts.scrollY : window.scrollY;
   screen = s;
   if (tripId !== undefined) activeTripId = tripId;
   menuOpen = false;
   exportMenuOpen = false;
   render();
-  window.scrollTo(0, 0);
+  if (keepScroll) window.scrollTo(0, scrollY);
+  else window.scrollTo(0, 0);
 }
 
 function switchAboutTab(tab) {
@@ -1834,8 +1838,12 @@ function renderItemRow(ctx, it) {
     });
   }
   const editBtn = `<button class="icon-btn" onclick="event.stopPropagation(); openItemEditor('${type}','${jsAttr(tripId)}','${jsAttr(it.id)}')" title="Edit item">${icon('edit', 14)}</button>`;
+  const moveBtns = type === 'trip'
+    ? `<button class="icon-btn" onclick="event.stopPropagation(); moveTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}',-1)" title="Move item up">${icon('chevUp', 14)}</button>
+       <button class="icon-btn" onclick="event.stopPropagation(); moveTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}',1)" title="Move item down">${icon('chevDown', 14)}</button>`
+    : '';
   const delBtn = type === 'trip'
-    ? `<button class="icon-btn danger" onclick="deleteTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}')" title="Remove item">${icon('close', 14)}</button>`
+    ? `<button class="icon-btn danger" onclick="event.stopPropagation(); deleteTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}')" title="Remove item">${icon('close', 14)}</button>`
     : `<button class="icon-btn danger" onclick="deleteTemplateItem('${jsAttr(it.id)}')" title="Delete item">${icon('close', 14)}</button>`;
   return `
     <div class="${cls}">
@@ -1848,7 +1856,7 @@ function renderItemRow(ctx, it) {
         </div>
       </div>
       ${qtyHtml}
-      <div class="item-actions">${editBtn}${delBtn}</div>
+      <div class="item-actions">${moveBtns}${editBtn}${delBtn}</div>
     </div>`;
 }
 
@@ -2166,6 +2174,7 @@ function openItemEditor(type, tripId, itemId) {
   const it = getItemRef(type, tripId, itemId);
   if (!it) return;
   ensureItem(it);
+  const returnScrollY = window.scrollY;
   const sectionChecks = TRIP_SECTIONS.map(s =>
     `<label class="modal-check-row"><input type="checkbox" class="item-sec" value="${s.id}" ${it.sections.includes(s.id) ? 'checked' : ''}/> ${esc(s.label)}</label>`
   ).join('');
@@ -2207,7 +2216,7 @@ function openItemEditor(type, tripId, itemId) {
       closeModal();
       if (type === 'template') { stayInMasterGearEditor(); navigate('about'); }
       else if (type === 'saved') { aboutTab = 'starters'; openSavedTemplateEditor(tripId); }
-      else navigate('trip', tripId);
+      else navigate('trip', tripId, { preserveScroll: true, scrollY: returnScrollY });
     };
   });
 }
@@ -2276,7 +2285,7 @@ function deleteTripItem(tripId, itemId) {
   if (!trip) return;
   trip.items = trip.items.filter(i => i.id !== itemId);
   saveState();
-  navigate('trip', tripId);
+  navigate('trip', tripId, { preserveScroll: true });
 }
 function addTripItem(tripId, catId) {
   const trip = state.trips.find(t => t.id === tripId);
@@ -2286,6 +2295,25 @@ function addTripItem(tripId, catId) {
     saveState();
     openItemEditor('trip', tripId, item.id);
   }
+}
+
+function moveTripItem(tripId, itemId, dir) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  const item = trip.items.find(i => i.id === itemId);
+  if (!item) return;
+  const categoryIndexes = trip.items
+    .map((it, index) => ({ it, index }))
+    .filter(entry => entry.it.categoryId === item.categoryId)
+    .map(entry => entry.index);
+  const idx = categoryIndexes.findIndex(index => trip.items[index].id === itemId);
+  const swapIdx = idx + dir;
+  if (swapIdx < 0 || swapIdx >= categoryIndexes.length) return;
+  const from = categoryIndexes[idx];
+  const to = categoryIndexes[swapIdx];
+  [trip.items[from], trip.items[to]] = [trip.items[to], trip.items[from]];
+  saveState();
+  navigate('trip', tripId, { preserveScroll: true });
 }
 
 function renameTripCategory(tripId, catId, name) {
@@ -2361,7 +2389,7 @@ function moveTripCategory(tripId, catId, dir) {
   cats[idx].order = cats[swap].order;
   cats[swap].order = tmp;
   saveState();
-  navigate('trip', tripId);
+  navigate('trip', tripId, { preserveScroll: true });
 }
 
 // ── Export helpers ──
