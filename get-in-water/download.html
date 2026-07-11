@@ -80,7 +80,8 @@
   <script>
     const btn = document.getElementById('dlBtn');
     const status = document.getElementById('status');
-    const APK_URL = 'https://github.com/Three-Cats-LSP/Get-In-Water/releases/latest/download/Get-In-Water.apk';
+    const APK_URL = 'https://raw.githubusercontent.com/Three-Cats-LSP/Get-In-Water/main/Android%20Apk/Get-In-Water.apk';
+    const FALLBACK_URL = 'https://github.com/Three-Cats-LSP/Get-In-Water/releases/latest/download/Get-In-Water.apk';
 
     btn.addEventListener('click', function() {
       status.textContent = 'Starting download…';
@@ -106,8 +107,8 @@
           btn.style.pointerEvents = '';
         })
         .catch(() => {
-          status.textContent = 'Redirecting… tap Save if prompted';
-          window.location.href = APK_URL;
+          status.textContent = 'Opening fallback download… tap Save if prompted';
+          window.location.href = FALLBACK_URL;
           btn.style.opacity = '1';
           btn.style.pointerEvents = '';
         });
