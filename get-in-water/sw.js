@@ -1,23 +1,34 @@
-const CACHE_NAME = 'giw-v1.4.6';
+const CACHE_NAME = 'giw-v1.4.7';
+
+function getAppBasePath() {
+  const p = self.location.pathname || '/';
+  if (p.includes('/get-in-water/')) return '/get-in-water/';
+  if (p.includes('/Get-In-Water/')) return '/Get-In-Water/';
+  const swDir = p.replace(/[^/]*$/, '');
+  return swDir || '/get-in-water/';
+}
+
+const APP_BASE = getAppBasePath();
+const OFFLINE_INDEX = APP_BASE + 'index.html';
 const ASSETS = [
-  '/get-in-water/',
-  '/get-in-water/index.html',
-  '/get-in-water/manifest.json',
-  '/get-in-water/sw.js',
-  '/get-in-water/capacitor-bridge.js',
-  '/get-in-water/backup-sanitize.js',
-  '/get-in-water/firebase-config.js',
-  '/get-in-water/sync.js',
-  '/get-in-water/vendor/firebase/firebase-app-compat.js',
-  '/get-in-water/vendor/firebase/firebase-auth-compat.js',
-  '/get-in-water/vendor/firebase/firebase-firestore-compat.js',
-  '/get-in-water/vendor/jspdf.umd.min.js',
-  '/get-in-water/vendor/fonts/DejaVuSans.ttf',
-  '/get-in-water/vendor/fonts/DejaVuSans-Bold.ttf',
-  '/get-in-water/icon-192.png',
-  '/get-in-water/icon-512.png',
-  '/get-in-water/icon-192-light.png',
-  '/get-in-water/icon-512-light.png'
+  APP_BASE,
+  OFFLINE_INDEX,
+  APP_BASE + 'manifest.json',
+  APP_BASE + 'sw.js',
+  APP_BASE + 'capacitor-bridge.js',
+  APP_BASE + 'backup-sanitize.js',
+  APP_BASE + 'firebase-config.js',
+  APP_BASE + 'sync.js',
+  APP_BASE + 'vendor/firebase/firebase-app-compat.js',
+  APP_BASE + 'vendor/firebase/firebase-auth-compat.js',
+  APP_BASE + 'vendor/firebase/firebase-firestore-compat.js',
+  APP_BASE + 'vendor/jspdf.umd.min.js',
+  APP_BASE + 'vendor/fonts/DejaVuSans.ttf',
+  APP_BASE + 'vendor/fonts/DejaVuSans-Bold.ttf',
+  APP_BASE + 'icon-192.png',
+  APP_BASE + 'icon-512.png',
+  APP_BASE + 'icon-192-light.png',
+  APP_BASE + 'icon-512-light.png'
 ];
 
 const NETWORK_ONLY = [
@@ -54,13 +65,30 @@ self.addEventListener('activate', e => {
 });
 
 function isIconAsset(url) {
-  return /\/get-in-water\/icon-\d+/.test(url.pathname);
+  return url.pathname.startsWith(APP_BASE) && /\/icon-\d+/.test(url.pathname);
 }
 
 self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
+  if (url.origin !== self.location.origin) return;
   if (isFirebaseRequest(url)) {
     e.respondWith(fetch(e.request));
+    return;
+  }
+  if (e.request.mode === 'navigate' || (e.request.headers.get('Accept') || '').includes('text/html')) {
+    e.respondWith(
+      fetch(e.request)
+        .then(response => {
+          if (response.ok && url.pathname.startsWith(APP_BASE)) {
+            const clone = response.clone();
+            e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(new Request(url.origin + url.pathname), clone)));
+          }
+          return response;
+        })
+        .catch(() => caches.match(e.request, { ignoreSearch: true })
+          .then(cached => cached || caches.match(OFFLINE_INDEX, { ignoreSearch: true })))
+    );
     return;
   }
   if (isIconAsset(url)) {
