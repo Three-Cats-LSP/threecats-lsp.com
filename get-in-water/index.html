@@ -2245,9 +2245,8 @@ function moveCategory(id, dir) {
 function addTemplateItem(catId) {
   const item = { id: uid(), categoryId: catId, name: 'New item', note: '', qty: 1, packed: 0, critical: false, bag: '', sections: [] };
   state.masterTemplate.items.push(item);
-  saveState();
   stayInMasterGearEditor();
-  openItemEditor('template', '', item.id);
+  openItemEditor('template', '', item.id, { removeOnCancel: true });
 }
 function renameTemplateItem(id, name) {
   const it = state.masterTemplate.items.find(x => x.id === id);
@@ -2269,11 +2268,27 @@ function getItemRef(type, tripId, itemId) {
   return trip && trip.items.find(i => i.id === itemId);
 }
 
-function openItemEditor(type, tripId, itemId) {
+function removeItemRef(type, tripId, itemId) {
+  if (type === 'template') {
+    state.masterTemplate.items = state.masterTemplate.items.filter(i => i.id !== itemId);
+    return;
+  }
+  if (type === 'saved') {
+    const tpl = getSavedTemplate(tripId);
+    if (tpl) tpl.items = tpl.items.filter(i => i.id !== itemId);
+    return;
+  }
+  const trip = state.trips.find(t => t.id === tripId);
+  if (trip) trip.items = trip.items.filter(i => i.id !== itemId);
+}
+
+function openItemEditor(type, tripId, itemId, options) {
+  const opts = options || {};
   const it = getItemRef(type, tripId, itemId);
   if (!it) return;
   ensureItem(it);
   const returnScrollY = window.scrollY;
+  let saved = false;
   const sectionChecks = TRIP_SECTIONS.map(s =>
     `<label class="modal-check-row"><input type="checkbox" class="item-sec" value="${s.id}" ${it.sections.includes(s.id) ? 'checked' : ''}/> ${esc(s.label)}</label>`
   ).join('');
@@ -2296,21 +2311,34 @@ function openItemEditor(type, tripId, itemId) {
     <div class="modal-field"><label>When to pack (leave empty = all phases)</label></div>
     <div class="modal-checklist">${sectionChecks}</div>
     <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-secondary" id="item-edit-cancel">Cancel</button>
       <button class="btn-primary" id="item-edit-save">Save</button>
     </div>
   `, () => {
+    document.getElementById('item-edit-cancel').onclick = () => {
+      if (opts.removeOnCancel && !saved) removeItemRef(type, tripId, itemId);
+      closeModal();
+    };
     document.getElementById('item-edit-save').onclick = () => {
+      const target = getItemRef(type, tripId, itemId);
+      if (!target) {
+        showToast('Item no longer exists');
+        closeModal();
+        return;
+      }
+      ensureItem(target);
       const name = document.getElementById('item-edit-name').value.trim();
       if (!name) { showToast('Enter a name'); return; }
-      it.name = name;
-      it.note = document.getElementById('item-edit-note').value.trim();
-      it.qty = Math.max(1, parseInt(document.getElementById('item-edit-qty').value, 10) || 1);
-      it.bag = document.getElementById('item-edit-bag').value;
-      it.critical = document.getElementById('item-edit-critical').checked;
-      it.sections = [...document.querySelectorAll('.item-sec:checked')].map(el => el.value);
-      if (it.packed > it.qty) it.packed = it.qty;
-      it.checked = it.packed >= it.qty;
+      target.name = name;
+      target.note = document.getElementById('item-edit-note').value.trim();
+      target.qty = Math.max(1, parseInt(document.getElementById('item-edit-qty').value, 10) || 1);
+      target.bag = document.getElementById('item-edit-bag').value;
+      target.critical = document.getElementById('item-edit-critical').checked;
+      target.sections = [...document.querySelectorAll('.item-sec:checked')].map(el => el.value);
+      if (target.packed > target.qty) target.packed = target.qty;
+      if (target.returnPacked > target.qty) target.returnPacked = target.qty;
+      target.checked = target.packed >= target.qty;
+      saved = true;
       saveState();
       closeModal();
       if (type === 'template') { stayInMasterGearEditor(); navigate('about'); }
@@ -2391,8 +2419,7 @@ function addTripItem(tripId, catId) {
   if (trip) {
     const item = { id: uid(), categoryId: catId, name: 'New item', note: '', qty: 1, packed: 0, critical: false, bag: '', sections: [], checked: false, fromTemplate: false };
     trip.items.push(item);
-    saveState();
-    openItemEditor('trip', tripId, item.id);
+    openItemEditor('trip', tripId, item.id, { removeOnCancel: true });
   }
 }
 
@@ -2856,8 +2883,7 @@ function addSavedTemplateItem(tplId, catId) {
   if (!tpl) return;
   const item = { id: uid(), categoryId: catId, name: 'New item', note: '', qty: 1, packed: 0, critical: false, bag: '', sections: [] };
   tpl.items.push(item);
-  saveState();
-  openItemEditor('saved', tplId, item.id);
+  openItemEditor('saved', tplId, item.id, { removeOnCancel: true });
 }
 
 function deleteSavedTemplateItem(tplId, itemId) {
