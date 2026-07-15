@@ -737,7 +737,7 @@ function itemMatchesSection(item, sectionId) {
 
 function itemDisplayName(item) {
   ensureItem(item);
-  return item.qty > 1 ? item.qty + '\u00d7 ' + item.name : item.name;
+  return item.qty > 1 ? item.name + ' x ' + item.qty : item.name;
 }
 
 function copyItemFields(src) {
@@ -1888,7 +1888,6 @@ function renderItemRow(ctx, it) {
   ensureItem(it);
   if (type === 'template' || type === 'saved') {
     const badges = [];
-    if (it.qty > 1) badges.push(`<span class="item-badge">${it.qty}×</span>`);
     if (it.critical) badges.push(`<span class="item-badge">★ critical</span>`);
     if (it.bag) badges.push(`<span class="item-badge">${esc(bagLabel(it.bag))}</span>`);
     const delFn = type === 'saved'
@@ -1897,7 +1896,7 @@ function renderItemRow(ctx, it) {
     return `
       <div class="edit-row">
         <div style="flex:1;min-width:0">
-          <div class="item-name">${esc(it.name)}</div>
+          <div class="item-name">${esc(itemDisplayName(it))}</div>
           ${it.note ? `<div class="item-note">${esc(it.note)}</div>` : ''}
           ${badges.length ? `<div class="item-meta">${badges.join('')}</div>` : ''}
         </div>
