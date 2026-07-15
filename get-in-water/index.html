@@ -448,7 +448,16 @@ body.light-theme .about-tab-btn.active { color: #fff; }
   display: flex; align-items: center; justify-content: center; padding: 0;
 }
 .qty-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; min-width: 28px; text-align: center; color: var(--tip); }
-.check-item .item-actions { display: flex; gap: 4px; flex-shrink: 0; align-items: flex-start; }
+.check-item .item-actions { display: flex; gap: 3px; flex-shrink: 0; align-items: center; }
+.item-move-stack {
+  display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;
+}
+.item-move-stack .icon-btn {
+  width: 24px; height: 15px; border-radius: 5px;
+}
+.item-move-stack .icon-btn svg {
+  width: 10px; height: 10px;
+}
 .modal-box.modal-wide { max-width: 420px; }
 .modal-checklist { max-height: 220px; overflow-y: auto; margin: 8px 0; }
 .modal-check-row {
@@ -836,6 +845,19 @@ function formatTripDateRange(trip) {
   } catch (e) {
     return start;
   }
+}
+
+function parseTripDate(value) {
+  if (!value) return null;
+  const date = new Date(value + 'T12:00:00');
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function tripDurationDays(start, end) {
+  const ds = parseTripDate(start);
+  const de = parseTripDate(end || start);
+  if (!ds || !de) return null;
+  return Math.round((de - ds) / 86400000) + 1;
 }
 
 function persistLocalOnly() {
@@ -1313,9 +1335,25 @@ function getHomeTrips() {
 function mountTripDateModal(startId, endId, oneDayId) {
   const startEl = document.getElementById(startId);
   const endEl = document.getElementById(endId);
-  document.getElementById(oneDayId).onclick = () => {
+  const oneDayEl = document.getElementById(oneDayId);
+  const updateDurationLabel = () => {
+    if (!startEl.value) {
+      oneDayEl.textContent = 'Pick start date';
+      return;
+    }
+    const days = tripDurationDays(startEl.value, endEl.value || startEl.value);
+    if (days == null) {
+      oneDayEl.textContent = 'Pick dates';
+    } else if (days < 1) {
+      oneDayEl.textContent = 'Finish before start';
+    } else {
+      oneDayEl.textContent = days === 1 ? 'One day trip' : `${days} day trip`;
+    }
+  };
+  oneDayEl.onclick = () => {
     if (startEl.value) {
       endEl.value = startEl.value;
+      updateDurationLabel();
       showToast('One day trip');
     } else {
       showToast('Pick a start date first');
@@ -1323,7 +1361,12 @@ function mountTripDateModal(startId, endId, oneDayId) {
   };
   startEl.addEventListener('change', () => {
     if (!endEl.value || endEl.value < startEl.value) endEl.value = startEl.value;
+    updateDurationLabel();
   });
+  endEl.addEventListener('change', updateDurationLabel);
+  startEl.addEventListener('input', updateDurationLabel);
+  endEl.addEventListener('input', updateDurationLabel);
+  updateDurationLabel();
 }
 
 function promptNewTrip() {
@@ -1872,8 +1915,10 @@ function renderItemRow(ctx, it) {
   }
   const editBtn = `<button class="icon-btn" onclick="event.stopPropagation(); openItemEditor('${type}','${jsAttr(tripId)}','${jsAttr(it.id)}')" title="Edit item">${icon('edit', 14)}</button>`;
   const moveBtns = type === 'trip'
-    ? `<button class="icon-btn" onclick="event.stopPropagation(); moveTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}',-1)" title="Move item up">${icon('chevUp', 14)}</button>
-       <button class="icon-btn" onclick="event.stopPropagation(); moveTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}',1)" title="Move item down">${icon('chevDown', 14)}</button>`
+    ? `<div class="item-move-stack" onclick="event.stopPropagation()">
+         <button class="icon-btn" onclick="moveTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}',-1)" title="Move item up">${icon('chevUp', 11)}</button>
+         <button class="icon-btn" onclick="moveTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}',1)" title="Move item down">${icon('chevDown', 11)}</button>
+       </div>`
     : '';
   const delBtn = type === 'trip'
     ? `<button class="icon-btn danger" onclick="event.stopPropagation(); deleteTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}')" title="Remove item">${icon('close', 14)}</button>`
