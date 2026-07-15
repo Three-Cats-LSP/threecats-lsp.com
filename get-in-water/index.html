@@ -185,7 +185,7 @@ header.hdr {
   letter-spacing: normal;
   text-transform: none;
 }
-.card-title-actions { display: flex; gap: 4px; flex-shrink: 0; align-items: center; }
+.card-title-actions { display: flex; gap: 3px; flex-shrink: 0; align-items: center; }
 .modal-field-row { display: flex; gap: 8px; }
 .modal-field-row .modal-field { flex: 1; }
 .card.collapsible.card-open .card-title .card-caret { transform: rotate(180deg); }
@@ -449,13 +449,24 @@ body.light-theme .about-tab-btn.active { color: #fff; }
 }
 .qty-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; min-width: 28px; text-align: center; color: var(--tip); }
 .check-item .item-actions { display: flex; gap: 3px; flex-shrink: 0; align-items: center; }
-.item-move-stack {
+.check-item .item-actions > .icon-btn,
+.card-title .icon-btn {
+  width: 23px; height: 23px; border-radius: 5px;
+}
+.check-item .item-actions > .icon-btn svg,
+.card-title .icon-btn svg {
+  width: 11px; height: 11px;
+}
+.item-move-stack,
+.card-move-stack {
   display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;
 }
-.item-move-stack .icon-btn {
-  width: 24px; height: 15px; border-radius: 5px;
+.item-move-stack .icon-btn,
+.card-move-stack .icon-btn {
+  width: 23px; height: 14px; border-radius: 5px;
 }
-.item-move-stack .icon-btn svg {
+.item-move-stack .icon-btn svg,
+.card-move-stack .icon-btn svg {
   width: 10px; height: 10px;
 }
 .modal-box.modal-wide { max-width: 420px; }
@@ -1712,8 +1723,10 @@ function renderTemplateContent() {
           <div class="card-title-left" onclick="event.stopPropagation()">
             <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameCategory('${jsAttr(cat.id)}',this.value)" title="Rename card"/>
             <div class="card-title-actions">
-              <button class="icon-btn icon-btn-sm" onclick="moveCategory('${jsAttr(cat.id)}',-1)" title="Move up">${icon('chevUp', 13)}</button>
-              <button class="icon-btn icon-btn-sm" onclick="moveCategory('${jsAttr(cat.id)}',1)" title="Move down">${icon('chevDown', 13)}</button>
+              <div class="card-move-stack">
+                <button class="icon-btn icon-btn-sm" onclick="moveCategory('${jsAttr(cat.id)}',-1)" title="Move card up">${icon('chevUp', 11)}</button>
+                <button class="icon-btn icon-btn-sm" onclick="moveCategory('${jsAttr(cat.id)}',1)" title="Move card down">${icon('chevDown', 11)}</button>
+              </div>
               <button class="icon-btn icon-btn-sm danger" onclick="deleteCategory('${jsAttr(cat.id)}')" title="Remove card">${icon('close', 13)}</button>
             </div>
           </div>
@@ -1794,8 +1807,10 @@ function renderSavedTemplateEditor() {
           <div class="card-title-left" onclick="event.stopPropagation()">
             <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}',this.value)" title="Rename card"/>
             <div class="card-title-actions">
-              <button class="icon-btn icon-btn-sm" onclick="moveSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}',-1)" title="Move up">${icon('chevUp', 13)}</button>
-              <button class="icon-btn icon-btn-sm" onclick="moveSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}',1)" title="Move down">${icon('chevDown', 13)}</button>
+              <div class="card-move-stack">
+                <button class="icon-btn icon-btn-sm" onclick="moveSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}',-1)" title="Move card up">${icon('chevUp', 11)}</button>
+                <button class="icon-btn icon-btn-sm" onclick="moveSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}',1)" title="Move card down">${icon('chevDown', 11)}</button>
+              </div>
               <button class="icon-btn icon-btn-sm danger" onclick="deleteSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}')" title="Remove card">${icon('close', 13)}</button>
             </div>
           </div>
@@ -1999,8 +2014,10 @@ function renderTrip() {
           <div class="card-title-left" onclick="event.stopPropagation()">
             <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}',this.value)" title="Rename card"/>
             <div class="card-title-actions">
-              <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}',-1)" title="Move up">${icon('chevUp', 13)}</button>
-              <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}',1)" title="Move down">${icon('chevDown', 13)}</button>
+              <div class="card-move-stack">
+                <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}',-1)" title="Move card up">${icon('chevUp', 11)}</button>
+                <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}',1)" title="Move card down">${icon('chevDown', 11)}</button>
+              </div>
               <button class="icon-btn icon-btn-sm" onclick="duplicateTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}')" title="Duplicate card">${icon('copy', 13)}</button>
               <button class="icon-btn icon-btn-sm danger" onclick="removeTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}')" title="Remove card">${icon('close', 13)}</button>
             </div>
