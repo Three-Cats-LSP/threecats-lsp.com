@@ -28,6 +28,14 @@
       "cta": { "label": "Open App", "href": "/get-in-water/", "external": true }
     },
     {
+      "kind": "app",
+      "category": "App",
+      "title": "SeaBirds",
+      "description": "Offline-first dive log for Shearwater Perdix and Teric. Download and review dive profiles, keep your log across devices with Google sync, and use it on Android, Windows, or the web.",
+      "icon": { "type": "img", "src": "/seabirds/icon.svg", "alt": "SeaBirds Dive Log" },
+      "cta": { "label": "Open App", "href": "/seabirds/", "external": true }
+    },
+    {
       "kind": "resource",
       "category": "Learn",
       "title": "Knowledge Base",
