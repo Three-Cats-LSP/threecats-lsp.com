@@ -173,7 +173,7 @@ jobs:
         if: github.event.action == 'sync-seabirds' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p seabirds/vendor/firebase scripts/readmes
-          for f in index.html app.css seabirds.css app.js sync.js plot-core.js manifest.webmanifest icon.svg firebase-config.js sw.js; do
+          for f in index.html app.css seabirds.css app.js shearwater.js sync.js plot-core.js manifest.webmanifest icon.svg firebase-config.js sw.js; do
             curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                  -H "Accept: application/vnd.github.v3.raw" \
                  "https://api.github.com/repos/Three-Cats-LSP/seabirds/contents/www/${f}" \
