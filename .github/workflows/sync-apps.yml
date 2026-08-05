@@ -3,7 +3,7 @@ name: Sync Apps
 on:
   workflow_dispatch:
   repository_dispatch:
-    types: [sync-d-planner, sync-d-planner-ccr, sync-d-planner-plus, sync-t-viewer, sync-get-in-water]
+    types: [sync-d-planner, sync-d-planner-ccr, sync-d-planner-plus, sync-t-viewer, sync-get-in-water, sync-seabirds]
 
 jobs:
   sync:
@@ -169,10 +169,32 @@ jobs:
             echo "FIREBASE_WEB_CONFIG not set — keeping existing get-in-water/firebase-config.js"
           fi
 
+      - name: Pull latest SeaBirds web app
+        if: github.event.action == 'sync-seabirds' || github.event_name == 'workflow_dispatch'
+        run: |
+          mkdir -p seabirds/vendor/firebase scripts/readmes
+          for f in index.html app.css seabirds.css app.js sync.js plot-core.js manifest.webmanifest icon.svg firebase-config.js sw.js; do
+            curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+                 -H "Accept: application/vnd.github.v3.raw" \
+                 "https://api.github.com/repos/Three-Cats-LSP/seabirds/contents/www/${f}" \
+                 -o "seabirds/${f}" || echo "skip ${f}"
+          done
+          for f in firebase-app-compat.js firebase-auth-compat.js firebase-firestore-compat.js; do
+            curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+                 -H "Accept: application/vnd.github.v3.raw" \
+                 "https://api.github.com/repos/Three-Cats-LSP/seabirds/contents/www/vendor/firebase/${f}" \
+                 -o "seabirds/vendor/firebase/${f}" || echo "skip ${f}"
+          done
+          curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               "https://api.github.com/repos/Three-Cats-LSP/seabirds/contents/README.md" \
+               -o "scripts/readmes/seabirds.md" || echo "skip README"
+          echo "SeaBirds synced"
+
       - name: Remove APKs from site tree
         if: github.event_name == 'workflow_dispatch' || startsWith(github.event.action, 'sync-')
         run: |
-          find d-planner d-planner-ccr d-planner-plus t-viewer get-in-water -name '*.apk' -delete 2>/dev/null || true
+          find d-planner d-planner-ccr d-planner-plus t-viewer get-in-water seabirds -name '*.apk' -delete 2>/dev/null || true
           echo "APKs removed — downloads use GitHub Releases"
 
       - name: Regenerate about pages
@@ -186,5 +208,5 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A d-planner/ d-planner-ccr/ d-planner-plus/ t-viewer/ get-in-water/ knowledge-base/ scripts/readmes/ scripts/homepage-cards.json about.css
+          git add -A d-planner/ d-planner-ccr/ d-planner-plus/ t-viewer/ get-in-water/ seabirds/ knowledge-base/ scripts/readmes/ scripts/homepage-cards.json about.css
           git diff --staged --quiet || (git commit -m "Sync apps from upstream repos" && git pull --rebase && git push)
