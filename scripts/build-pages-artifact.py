@@ -53,6 +53,13 @@ def build(root: Path, out_dir: Path) -> None:
     for rel in PUBLIC_DIRS:
         copy_dir(root / rel, out_dir / rel)
 
+    # The stable download URL is SeaBirds-Windows-Setup.exe. Historical,
+    # versioned installers belong in GitHub Releases and needlessly make every
+    # Pages snapshot tens of megabytes larger.
+    seabirds_dir = out_dir / "seabirds"
+    for installer in seabirds_dir.glob("SeaBirds-Windows-Setup-*.exe"):
+        installer.unlink()
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
