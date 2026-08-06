@@ -48,6 +48,40 @@ DEPLOYS = [
         "dirs": ["vendor", "tests/ccr-differential"],
         "readme": "d-planner-plus.md",
     },
+    {
+        "src": PARENT / "T-Viewer",
+        "dst": ROOT / "t-viewer",
+        "files": [
+            "index.html", "download.html", "manifest.json", "sw.js",
+            "icon-192.png", "icon-512.png", "icon-192-light.png", "icon-512-light.png",
+        ],
+        "dirs": [],
+        "readme": "t-viewer.md",
+    },
+    {
+        "src": PARENT / "Get-In-Water",
+        "dst": ROOT / "get-in-water",
+        "files": [
+            "index.html", "download.html", "manifest.json", "sw.js", "capacitor-bridge.js",
+            "backup-sanitize.js", "sync.js", "firebase-config.js",
+            "icon-192.png", "icon-512.png", "icon-192-light.png", "icon-512-light.png",
+        ],
+        "dirs": [],
+        "readme": "get-in-water.md",
+    },
+    {
+        "src": PARENT / "seabirds",
+        "dst": ROOT / "seabirds",
+        "files": [
+            "index.html", "app.css", "seabirds.css", "app.js", "app-version.js",
+            "shearwater.js", "sync.js", "plot-core.js", "manifest.webmanifest",
+            "icon.svg", "icon-192.png", "icon-512.png", "firebase-config.js", "sw.js",
+            "tab-profile.png", "tab-notes.png", "tab-equipment.png", "tab-information.png",
+            "version.json",
+        ],
+        "dirs": ["vendor"],
+        "readme": "seabirds.md",
+    },
 ]
 
 for spec in DEPLOYS:
