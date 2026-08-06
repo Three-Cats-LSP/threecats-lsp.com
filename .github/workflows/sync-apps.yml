@@ -213,4 +213,24 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A d-planner/ d-planner-ccr/ d-planner-plus/ t-viewer/ get-in-water/ seabirds/ knowledge-base/ scripts/readmes/ scripts/homepage-cards.json scripts/verify-cross-app-links.py about.css
-          git diff --staged --quiet || (git commit -m "Sync apps from upstream repos" && git pull --rebase && git push)
+          git diff --staged --quiet || (git commit -m "Sync apps from upstream repos [skip site-publish]" && git pull --rebase && git push)
+
+      - name: Build clean Pages artifact
+        run: python3 scripts/build-pages-artifact.py --out _site
+
+      - name: Publish artifact branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages
+          git worktree add --detach _deploy origin/gh-pages
+          git -C _deploy rm -r --quiet .
+          cp -a _site/. _deploy/
+          git -C _deploy add -A
+          if git -C _deploy diff --cached --quiet; then
+            echo "No gh-pages changes to publish"
+          else
+            git -C _deploy commit -m "Publish synced apps"
+            git -C _deploy push origin HEAD:gh-pages
+          fi

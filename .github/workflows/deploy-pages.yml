@@ -10,10 +10,15 @@ permissions:
 
 concurrency:
   group: site-publish
-  cancel-in-progress: false
+  # Only the newest site revision matters. Do not make it wait behind a
+  # deployment that has already been superseded by another push.
+  cancel-in-progress: true
 
 jobs:
   publish:
+    # App-sync commits publish the site in the sync workflow itself, avoiding
+    # a second hosted-runner queue. Ordinary site edits still publish here.
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip site-publish]')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
