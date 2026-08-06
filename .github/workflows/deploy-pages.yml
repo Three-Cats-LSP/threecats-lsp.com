@@ -1,4 +1,4 @@
-name: Verify static site before GitHub Pages build
+name: Deploy static site to GitHub Pages
 
 on:
   push:
@@ -7,18 +7,38 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: site-verify
-  cancel-in-progress: true
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  verify:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Verify public app mirror links
         run: python3 scripts/verify-cross-app-links.py
+
+      - name: Build Pages artifact
+        run: python3 scripts/build-pages-artifact.py --out _site
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

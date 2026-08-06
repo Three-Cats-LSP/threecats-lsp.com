@@ -1,2 +1,3 @@
 # APKs are hosted on GitHub Releases, not Pages
 **/*.apk
+_site/
