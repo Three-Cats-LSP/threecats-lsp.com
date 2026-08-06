@@ -73,8 +73,10 @@ DEPLOYS = [
         "src": PARENT / "seabirds",
         "dst": ROOT / "seabirds",
         "files": [
-            "index.html", "app.css", "seabirds.css", "app.js", "app-version.js",
-            "shearwater.js", "sync.js", "plot-core.js", "manifest.webmanifest",
+            "index.html", "app.css", "seabirds.css", "app.js", "app-core.js",
+            "dive-list.js", "dive-editor.js", "equipment.js", "devices-ui.js",
+            "settings-ui.js", "import-export.js", "app-version.js", "shearwater.js",
+            "sync.js", "storage.js", "plot-core.js", "update.js", "manifest.webmanifest",
             "icon.svg", "icon-192.png", "icon-512.png", "firebase-config.js", "sw.js",
             "tab-profile.png", "tab-notes.png", "tab-equipment.png", "tab-information.png",
             "version.json",

@@ -130,6 +130,8 @@
             </select>
           </div>
           <div id="deviceFilters" class="device-filters" aria-label="Filter dives by dive computer"></div>
+          <div id="modeFilters" class="device-filters classification-filters" aria-label="Mode filters"></div>
+          <div id="styleFilters" class="device-filters classification-filters" aria-label="Style filters"></div>
           <div id="allDives" class="dive-list"></div>
         </section>
 
@@ -212,14 +214,14 @@
             <div class="sync-block">
               <span>
                 <b>SeaBirds for Windows</b>
-                <small>Version 0.1.12 · lightweight WebView2 installer</small>
+                <small>Version 0.1.13 · lightweight WebView2 installer</small>
               </span>
               <a class="download" href="https://threecats-lsp.com/seabirds/SeaBirds-Windows-Setup.exe">Download EXE</a>
             </div>
             <div class="sync-block">
               <span>
                 <b>Application updates</b>
-                <small id="updateStatus">Installed version 0.1.12</small>
+                <small id="updateStatus">Installed version 0.1.13</small>
               </span>
               <button type="button" id="checkForUpdates">Check for new version</button>
             </div>
@@ -433,6 +435,18 @@
         <section class="dive-panel" data-dive-panel="notes">
           <div class="edit-grid">
             <label>
+              Dive #
+              <input id="editDiveNumber" type="number" min="1" max="9999" step="1" inputmode="numeric" placeholder="1–9999" />
+            </label>
+            <label>
+              Dive date
+              <input id="editDiveDate" type="date" />
+            </label>
+            <label>
+              Dive time
+              <input id="editDiveTime" type="time" step="60" />
+            </label>
+            <label>
               Dive title
               <input id="editDiveTitle" placeholder="Maldives, Dive 1" />
             </label>
@@ -464,6 +478,10 @@
                 <option value="Double tanks">Double tanks</option>
                 <option value="Sidemount">Sidemount</option>
               </select>
+            </label>
+            <label>
+              Gas Used
+              <input id="editDiveGas" placeholder="Air, EAN32, Tx 18/45" />
             </label>
             <label class="wide">
               Notes
@@ -522,12 +540,19 @@
     <script src="vendor/firebase/firebase-auth-compat.js"></script>
     <script src="vendor/firebase/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
-    <script src="app-version.js?v=77"></script>
-    <script src="plot-core.js?v=77"></script>
-    <script src="sync.js?v=77"></script>
-    <script src="shearwater.js?v=77"></script>
-    <script src="storage.js?v=77"></script>
-    <script src="app.js?v=77"></script>
-    <script src="update.js?v=77"></script>
+    <script src="app-version.js?v=82"></script>
+    <script src="plot-core.js?v=82"></script>
+    <script src="storage.js?v=82"></script>
+    <script src="sync.js?v=82"></script>
+    <script src="shearwater.js?v=82"></script>
+    <script src="app-core.js?v=82"></script>
+    <script src="dive-list.js?v=82"></script>
+    <script src="dive-editor.js?v=82"></script>
+    <script src="equipment.js?v=82"></script>
+    <script src="devices-ui.js?v=82"></script>
+    <script src="settings-ui.js?v=82"></script>
+    <script src="import-export.js?v=82"></script>
+    <script src="app.js?v=82"></script>
+    <script src="update.js?v=82"></script>
   </body>
 </html>
