@@ -350,6 +350,9 @@
 <a class="app-footer-icon" href="https://threecats-lsp.com/get-in-water/" rel="noopener noreferrer" target="_blank" title="Get In Water">
 <img alt="Get In Water" src="https://threecats-lsp.com/get-in-water/icon-192.png" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border-hi);object-fit:contain;"/>
 </a>
+<a class="app-footer-icon" href="https://threecats-lsp.com/seabirds/" rel="noopener noreferrer" target="_blank" title="SeaBirds">
+<img alt="SeaBirds" src="https://threecats-lsp.com/seabirds/icon-192.png" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border-hi);object-fit:contain;display:block;"/>
+</a>
 <a class="app-footer-icon" href="https://threecats-lsp.com/t-viewer/download.html" id="tvApkDownloadIcon" rel="noopener noreferrer" target="_blank" title="Download T-Viewer APK">
 <img alt="T-Viewer" src="icon-192.png" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border-hi);object-fit:contain;display:block;"/>
 </a>
@@ -450,6 +453,10 @@ If you find this useful, consider a donation to support development
 <a href="https://threecats-lsp.com/get-in-water/" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;" target="_blank">
 <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" x2="21" y1="6" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
 <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Get In Water</span>
+</a>
+<a href="https://threecats-lsp.com/seabirds/" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;" target="_blank">
+<img alt="" src="https://threecats-lsp.com/seabirds/icon-192.png" style="width:16px;height:16px;object-fit:contain;border-radius:4px;flex-shrink:0;"/>
+<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">SeaBirds</span>
 </a>
 <a href="https://threecats-lsp.com/t-viewer/download.html" id="tvApkAboutLink" onmouseout="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;padding:9px 12px;box-sizing:border-box;width:100%;min-width:0;overflow:hidden;background:var(--card);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s;" target="_blank">
 <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M12 2v10m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3"></path></svg>
@@ -1453,6 +1460,22 @@ loadSavedColors();
 
 
 // ── Load PDF.js dynamically ───────────────────────────────
+if ('serviceWorker' in navigator) {
+  const registerServiceWorker = () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(r => {
+        console.log('[SW] registered, scope:', r.scope);
+        r.update();
+      })
+      .catch(e => console.warn('[SW] registration failed:', e));
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', registerServiceWorker, { once: true });
+  } else {
+    registerServiceWorker();
+  }
+}
+
 (async () => {
   try {
     const pdfjs = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs');
