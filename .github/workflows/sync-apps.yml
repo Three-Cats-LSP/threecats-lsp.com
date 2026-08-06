@@ -191,11 +191,11 @@ jobs:
                -o "scripts/readmes/seabirds.md" || echo "skip README"
           echo "SeaBirds synced"
 
-      - name: Remove APKs from site tree
+      - name: Remove legacy APKs from site tree
         if: github.event_name == 'workflow_dispatch' || startsWith(github.event.action, 'sync-')
         run: |
-          find d-planner d-planner-ccr d-planner-plus t-viewer get-in-water seabirds -name '*.apk' -delete 2>/dev/null || true
-          echo "APKs removed — downloads use GitHub Releases"
+          find d-planner d-planner-ccr d-planner-plus t-viewer get-in-water -name '*.apk' -delete 2>/dev/null || true
+          echo "Legacy APKs removed; the direct SeaBirds APK is preserved"
 
       - name: Regenerate about pages
         if: github.event_name == 'workflow_dispatch' || startsWith(github.event.action, 'sync-')

@@ -35,7 +35,6 @@ jobs:
             --exclude='.git' \
             --exclude='.github' \
             --exclude='_site' \
-            --exclude='*.apk' \
             ./ _site/
           touch _site/.nojekyll
           du -sh _site
