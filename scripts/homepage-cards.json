@@ -31,7 +31,7 @@
       "kind": "app",
       "category": "App",
       "title": "SeaBirds",
-      "description": "Offline-first dive log for Shearwater Perdix and Teric. Download and review dive profiles, keep your log across devices with Google sync, and use it on Android, Windows, or the web.",
+      "description": "Dive log and profile viewer for Shearwater dive computers. Download and explore detailed profiles with depth, temperature, gas, NDL/TTS, ascent, descent, decompression and ceiling data. Add dive names, locations, buddies, tags, notes and reusable equipment lists; import or export logs; sync across devices with Google; and use SeaBirds on Android, Windows or the web.",
       "icon": { "type": "img", "src": "/seabirds/icon-192.png", "alt": "SeaBirds Dive Log" },
       "cta": { "label": "Open App", "href": "/seabirds/", "external": true }
     },
