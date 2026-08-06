@@ -40,6 +40,9 @@ jobs:
           du -sh _site
           find _site -type f | wc -l
 
+      - name: Verify public app mirror links
+        run: python3 scripts/verify-cross-app-links.py --root _site
+
       - name: Hash site contents
         id: sitehash
         run: |
