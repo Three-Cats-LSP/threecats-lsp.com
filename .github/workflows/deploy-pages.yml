@@ -1,4 +1,4 @@
-name: Deploy static site to GitHub Pages
+name: Publish static site to gh-pages
 
 on:
   push:
@@ -6,27 +6,21 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: site-publish
+  cancel-in-progress: false
 
 jobs:
-  deploy:
+  publish:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
+        with:
+          fetch-depth: 0
 
       - name: Verify public app mirror links
         run: python3 scripts/verify-cross-app-links.py
@@ -34,11 +28,19 @@ jobs:
       - name: Build clean Pages artifact
         run: python3 scripts/build-pages-artifact.py --out _site
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: _site
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Publish artifact branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages
+          git worktree add --detach _deploy origin/gh-pages
+          git -C _deploy rm -r --quiet .
+          cp -a _site/. _deploy/
+          git -C _deploy add -A
+          if git -C _deploy diff --cached --quiet; then
+            echo "No gh-pages changes to publish"
+          else
+            git -C _deploy commit -m "Publish static site artifact"
+            git -C _deploy push origin HEAD:gh-pages
+          fi
