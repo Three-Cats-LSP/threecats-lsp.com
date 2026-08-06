@@ -9,7 +9,9 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     concurrency:
-      group: site-sync
+      # Share the group with the ordinary site publisher so two workflows
+      # cannot rewrite the generated branch at the same time.
+      group: site-publish
       cancel-in-progress: true
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -223,14 +225,10 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin gh-pages
-          git worktree add --detach _deploy origin/gh-pages
+          git worktree add --detach _deploy HEAD
+          git -C _deploy switch --orphan gh-pages-publish
           git -C _deploy rm -r --quiet .
           cp -a _site/. _deploy/
           git -C _deploy add -A
-          if git -C _deploy diff --cached --quiet; then
-            echo "No gh-pages changes to publish"
-          else
-            git -C _deploy commit -m "Publish synced apps"
-            git -C _deploy push origin HEAD:gh-pages
-          fi
+          git -C _deploy commit -m "Publish synced apps"
+          git -C _deploy push --force origin HEAD:gh-pages
