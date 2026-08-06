@@ -65,7 +65,7 @@ if ld_block:
 # Meta / support copy
 html = html.replace(
     "LSP D-Planner, LSP D-Planner + CCR, T-Viewer, and Get In Water",
-    "LSP D-Planner+, T-Viewer, and Get In Water",
+    "LSP D-Planner+, T-Viewer, Get In Water, and SeaBirds",
 )
 html = html.replace(
     "the LSP D-Planner deco schedule app",

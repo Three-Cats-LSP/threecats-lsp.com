@@ -76,6 +76,6 @@ Or install the Android APK from each app's download page for native features (fi
 
 ## Support
 
-LSP D-Planner+, T-Viewer, and Get In Water are free and open-source. If they help your diving, consider [supporting development via PayPal](https://paypal.me/ThreeCatsLSP).
+LSP D-Planner+, T-Viewer, Get In Water, and SeaBirds are free and open-source. If these apps help your diving, consider [supporting their continued development via PayPal](https://paypal.me/ThreeCatsLSP).
 
 Follow [@threecats_lsp](https://www.instagram.com/threecats_lsp) on Instagram for updates.

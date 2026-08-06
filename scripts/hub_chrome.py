@@ -30,7 +30,7 @@ PROMO_SECTION = """
     </a>
   </div>
   <div class="hub-promo-card hub-promo-donate">
-    <p>LSP D-Planner+, T-Viewer, and Get In Water are free and open-source. If they help your diving, consider supporting development.</p>
+    <p>LSP D-Planner+, T-Viewer, Get In Water, and SeaBirds are free and open-source. If these apps help your diving, consider supporting their continued development.</p>
     <a class="hub-donate-btn" href="https://paypal.me/ThreeCatsLSP" rel="noopener noreferrer" target="_blank">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.77.77 0 0 1 .758-.643h6.58c2.753 0 4.667.568 5.694 1.688.9 1.972.741 4.906-.474 7.98-.01.026-.024.05-.036.076l-.4.77c-.972 1.87-2.638 2.82-4.95 2.82h-1.2c-.414 0-.75.336-.814.745l-.65 4.12-.028.18-.636 4.031a.64.64 0 0 1-.633.54z"/></svg>
       Donate via PayPal
