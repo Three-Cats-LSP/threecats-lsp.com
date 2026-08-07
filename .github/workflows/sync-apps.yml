@@ -12,7 +12,7 @@ jobs:
       # Share the group with the ordinary site publisher so two workflows
       # cannot rewrite the generated branch at the same time.
       group: site-publish
-      cancel-in-progress: true
+      cancel-in-progress: false
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:

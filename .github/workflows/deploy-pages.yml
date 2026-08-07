@@ -10,9 +10,10 @@ permissions:
 
 concurrency:
   group: site-publish
-  # Only the newest site revision matters. Do not make it wait behind a
-  # deployment that has already been superseded by another push.
-  cancel-in-progress: true
+  # Queue publishes instead of canceling them. Manual app/site reruns often
+  # happen close together, and canceling mid-publish leaves confusing red
+  # Actions even when the generated site is otherwise valid.
+  cancel-in-progress: false
 
 jobs:
   publish:
