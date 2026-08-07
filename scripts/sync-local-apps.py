@@ -79,6 +79,8 @@ DEPLOYS = [
             "sync.js", "storage.js", "plot-core.js", "update.js", "manifest.webmanifest",
             "icon.svg", "icon-192.png", "icon-512.png", "firebase-config.js", "sw.js",
             "tab-profile.png", "tab-notes.png", "tab-equipment.png", "tab-information.png",
+            "tab-export.png", "dive-export-utils.js", "dive-export-text.js",
+            "dive-export-pdf.js", "dive-export-uddf.js", "dive-export-ui.js",
             "version.json",
         ],
         "dirs": ["vendor"],
