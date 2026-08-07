@@ -227,7 +227,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git worktree add --detach _deploy HEAD
           git -C _deploy switch --orphan gh-pages-publish
-          git -C _deploy rm -r --quiet .
+          git -C _deploy rm -r --quiet . 2>/dev/null || true
           cp -a _site/. _deploy/
           git -C _deploy add -A
           git -C _deploy commit -m "Publish synced apps"
