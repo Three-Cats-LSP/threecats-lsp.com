@@ -17030,7 +17030,7 @@ window.addEventListener('load', function() {
   })();
 
   if ('serviceWorker' in navigator && !isTestHarness) {
-    window.addEventListener('load', () => {
+    const registerServiceWorker = () => {
       navigator.serviceWorker.register(`sw.js?v=${APP_VERSION}`, { updateViaCache: 'none' })
         .then(r => {
           console.log('[SW] registered, scope:', r.scope);
@@ -17053,7 +17053,12 @@ window.addEventListener('load', function() {
           });
         })
         .catch(e => console.warn('[SW] registration failed:', e));
-    });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', registerServiceWorker, { once: true });
+    } else {
+      registerServiceWorker();
+    }
   }
 
   // Install prompt banner (Android Chrome)
