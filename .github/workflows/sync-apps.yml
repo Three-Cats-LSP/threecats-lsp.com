@@ -195,6 +195,15 @@ jobs:
                -H "Accept: application/vnd.github.v3.raw" \
                "https://api.github.com/repos/Three-Cats-LSP/seabirds/contents/README.md" \
                -o "scripts/readmes/seabirds.md" || echo "skip README"
+          # The web source tree intentionally does not contain binary release
+          # packages. Keep the direct-download files on the official site in
+          # lockstep with the latest signed SeaBirds GitHub release instead.
+          curl -fsSL -L \
+               "https://github.com/Three-Cats-LSP/seabirds/releases/latest/download/SeaBirds.apk" \
+               -o "seabirds/SeaBirds.apk"
+          curl -fsSL -L \
+               "https://github.com/Three-Cats-LSP/seabirds/releases/latest/download/SeaBirds-Windows-Setup.exe" \
+               -o "seabirds/SeaBirds-Windows-Setup.exe"
           echo "SeaBirds synced"
 
       - name: Remove legacy APKs from site tree
