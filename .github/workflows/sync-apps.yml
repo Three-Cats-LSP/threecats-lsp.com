@@ -175,22 +175,17 @@ jobs:
         if: github.event.action == 'sync-seabirds' || github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p seabirds/vendor/firebase scripts/readmes
-          for f in index.html app.css seabirds.css app.js app-core.js dive-list.js dive-editor.js equipment.js devices-ui.js settings-ui.js import-export.js shearwater.js sync.js storage.js zhl-profile-engine.js plot-core.js update.js app-version.js version.json manifest.webmanifest icon.svg icon-192.png icon-512.png seabirds-app-icon.png shearwater-logo.png shearwater-logo-stacked.png app-dplanner.png app-getinwater.png app-threecats.png app-tviewer.png firebase-config.js sw.js tab-profile.png tab-notes.png tab-equipment.png tab-information.png tab-export.png dive-export-utils.js dive-export-text.js dive-export-pdf.js dive-export-uddf.js dive-export-ui.js; do
+          curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               "https://api.github.com/repos/Three-Cats-LSP/seabirds/contents/www/site-assets-manifest.txt" \
+               -o "seabirds/site-assets-manifest.txt"
+          grep -v '^[[:space:]]*#' seabirds/site-assets-manifest.txt | sed '/^[[:space:]]*$/d' | while IFS= read -r f; do
+            mkdir -p "seabirds/$(dirname "$f")"
             curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                  -H "Accept: application/vnd.github.v3.raw" \
                  "https://api.github.com/repos/Three-Cats-LSP/seabirds/contents/www/${f}" \
-                 -o "seabirds/${f}" || echo "skip ${f}"
+                 -o "seabirds/${f}"
           done
-          for f in firebase-app-compat.js firebase-auth-compat.js firebase-firestore-compat.js; do
-            curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
-                 -H "Accept: application/vnd.github.v3.raw" \
-                 "https://api.github.com/repos/Three-Cats-LSP/seabirds/contents/www/vendor/firebase/${f}" \
-                 -o "seabirds/vendor/firebase/${f}" || echo "skip ${f}"
-          done
-          curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3.raw" \
-               "https://api.github.com/repos/Three-Cats-LSP/seabirds/contents/www/vendor/jspdf.umd.min.js" \
-               -o "seabirds/vendor/jspdf.umd.min.js" || echo "skip vendor/jspdf.umd.min.js"
           curl -fsSL -H "Authorization: token ${{ secrets.SYNC_TOKEN }}" \
                -H "Accept: application/vnd.github.v3.raw" \
                "https://api.github.com/repos/Three-Cats-LSP/seabirds/contents/README.md" \
