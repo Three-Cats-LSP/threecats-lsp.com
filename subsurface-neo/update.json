@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "publishedAt": null,
   "summary": "No public stable Subsurface Neo release has been published yet.",
-  "releaseUrl": "https://github.com/Three-Cats-LSP/subsurface/releases",
+  "releaseNotesUrl": "https://github.com/Three-Cats-LSP/subsurface/releases",
   "platforms": {
     "windows-x64": {
       "url": "",
