@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#061321">
   <title>Subsurface Neo — Design Preview</title>
-  <link rel="stylesheet" href="responsive-preview.css">
+  <link rel="stylesheet" href="cards-layout.css">
 </head>
 <body>
   <svg class="svg-defs" aria-hidden="true">
@@ -23,7 +23,6 @@
       <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
       <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10m-7 6h4"/></symbol>
       <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
-      <symbol id="i-mode" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><path d="M12 7v5m0 0-6 5m6-5 6 5"/></symbol>
       <symbol id="i-computer" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 3h6l1 3H8zm0 18h6l1-3H8z"/></symbol>
       <symbol id="i-boat" viewBox="0 0 24 24"><path d="m4 13 3 6h10l3-6-8-3zM9 10V5h5l2 5M3 21c2-1.5 4-1.5 6 0 2-1.5 4-1.5 6 0 2-1.5 4-1.5 6 0"/></symbol>
       <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5.5 21c.5-5 2.7-7.5 6.5-7.5s6 2.5 6.5 7.5z"/></symbol>
@@ -109,7 +108,7 @@
         <div class="ocean-glow detail-glow"></div>
         <button class="back-link" data-view="dives"><svg><use href="#i-back"/></svg> Back to dives</button>
         <header class="detail-title"><span class="dive-number large">#247</span><div><h1 id="detail-title">Izu Oceanic Park</h1><p><svg><use href="#i-pin"/></svg> Shizuoka, Japan <span>·</span> July 28, 2026 <span>·</span> 10:42</p></div><button class="more-button"><svg><use href="#i-more"/></svg></button></header>
-        <div class="detail-metrics"><article><span class="metric-icon"><svg><use href="#i-depth"/></svg></span><span><small>MAX DEPTH</small><b>27.4 <em>m</em></b></span></article><article><span class="metric-icon"><svg><use href="#i-clock"/></svg></span><span><small>DIVE TIME</small><b>48 <em>min</em></b></span></article><article><span class="metric-icon"><svg><use href="#i-temp"/></svg></span><span><small>WATER TEMP</small><b>22 <em>°C</em></b></span></article><article><span class="metric-icon"><svg><use href="#i-mode"/></svg></span><span><small>MODE</small><b>OC</b><p>Open Circuit</p></span></article><article><span class="metric-icon"><svg><use href="#i-tank"/></svg></span><span><small>GEAR</small><b>Single Tank</b><p>Aluminum 12 L</p></span></article></div>
+        <div class="detail-metrics"><article><span class="metric-icon"><svg><use href="#i-depth"/></svg></span><span><small>MAX DEPTH</small><b>27.4 <em>m</em></b></span></article><article><span class="metric-icon"><svg><use href="#i-clock"/></svg></span><span><small>DIVE TIME</small><b>48 <em>min</em></b></span></article><article><span class="metric-icon"><svg><use href="#i-temp"/></svg></span><span><small>WATER TEMP</small><b>22 <em>°C</em></b></span></article></div>
         <article class="profile-panel">
           <div class="computer-strip"><span class="computer-icon"><svg><use href="#i-computer"/></svg></span><button>Shearwater Perdix <span>⌄</span></button><i></i><span>OC Tec</span><i></i><span>Bühlmann ZHL-16C</span><i></i><strong>GF 30/75</strong></div>
           <div class="graph-controls"><button class="on" data-line="depth">Depth</button><button class="on temp" data-line="temp">Water Temp</button><button class="on ndl" data-line="ndl">NDL</button><button class="on gf" data-line="gf">GF99</button><button>Gas</button><button class="expand">↗ Expand</button></div>
@@ -128,8 +127,9 @@
             <div class="time-axis"><span>0</span><span>10</span><span>20</span><span>30</span><span>40</span><span>48 min</span></div>
           </div>
         </article>
-        <div class="post-graph-grid"><article class="gas-card"><span class="info-icon"><svg><use href="#i-tank"/></svg></span><span><small>GAS INFORMATION</small><b>Air <em>/ AL80</em></b><div class="gas-details"><p>200 bar → 54 bar</p><p>SAC 16.8 L/min</p></div></span></article><article><span class="info-icon"><svg><use href="#i-boat"/></svg></span><span><small>TYPE</small><b>Boat</b><p>Dive</p></span></article><article><span class="info-icon"><svg><use href="#i-user"/></svg></span><span><small>BUDDY</small><b>Dirk Hohndel</b><p>No. 1847</p></span></article></div>
+        <div class="post-graph-grid"><article class="gas-card"><span class="info-icon"><svg><use href="#i-tank"/></svg></span><span><small>GAS INFORMATION</small><b>Air <em>/ AL80</em></b><div class="gas-details"><p>200 bar → 54 bar</p><p>SAC 16.8 L/min</p></div></span></article><article class="mode-card"><span class="info-icon regulator-icon"><img src="regulator-magnific.png" alt=""></span><span><small>MODE</small><b>OC</b><p>Open Circuit</p></span></article><article class="type-card"><span class="info-icon"><svg><use href="#i-boat"/></svg></span><span><small>TYPE</small><b>Boat</b><p>Dive</p></span></article><article class="gear-card"><span class="info-icon"><svg><use href="#i-tank"/></svg></span><span><small>GEAR</small><b>Single Tank</b><p>Aluminum 12 L</p></span></article><article class="buddy-card"><span class="info-icon"><svg><use href="#i-user"/></svg></span><span><small>BUDDY</small><b>Dirk Hohndel</b><p>No. 1847</p></span></article></div>
         <article class="notes-card"><span class="info-icon"><svg><use href="#i-notes"/></svg></span><span><small>NOTES</small><p>Great visibility. Strong current near the end of the dive.</p></span></article>
+        <p class="icon-credit"><a href="https://www.flaticon.com/free-icon/regulator_4864503" target="_blank" rel="noreferrer">Regulator icon created by Magnific — Flaticon</a>.</p>
       </section>
     </main>
 
