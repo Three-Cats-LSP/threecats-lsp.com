@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#061321">
   <title>Subsurface Neo — Design Preview</title>
-  <link rel="stylesheet" href="centered-layout.css">
+  <link rel="stylesheet" href="about-layout.css">
 </head>
 <body>
   <svg class="svg-defs" aria-hidden="true">
@@ -42,6 +42,7 @@
         <button class="nav-item"><svg><use href="#i-pin"/></svg><span>Dive Sites</span></button>
         <button class="nav-item"><svg><use href="#i-chart"/></svg><span>Statistics</span></button>
         <button class="nav-item"><svg><use href="#i-gear"/></svg><span>Equipment</span></button>
+        <button class="nav-item" data-view="settings"><svg><use href="#i-gear"/></svg><span>Settings</span></button>
       </nav>
       <div class="side-bottom">
         <div class="sync-state"><svg><use href="#i-cloud"/></svg><span><b>Cloud sync</b><small>Up to date</small></span></div>
@@ -104,6 +105,21 @@
         </div>
       </section>
 
+      <section class="view" id="settings" aria-labelledby="settings-title">
+        <div class="ocean-glow"></div>
+        <header class="page-heading"><div><p class="eyebrow">Preferences</p><h1 id="settings-title">Settings</h1><p>Application preferences, legal information, and acknowledgements.</p></div></header>
+        <div class="settings-layout">
+          <nav class="settings-tabs" aria-label="Settings sections"><button>General</button><button>Units</button><button>Cloud &amp; Sync</button><button class="selected">About</button></nav>
+          <section class="about-panel" aria-labelledby="about-title">
+            <header><span class="about-logo"><span>S</span></span><span><small>SUBSURFACE</small><h2 id="about-title">Subsurface Neo</h2><p>Development design preview</p></span></header>
+            <div class="about-block"><h3>About Subsurface Neo</h3><p>A modern interface built on Subsurface’s mature native dive-log, decompression, planning, and dive-computer foundations.</p></div>
+            <div class="about-block"><h3>Subsurface legacy</h3><p>Subsurface was started by Linus Torvalds in 2011. Dirk Hohndel became maintainer in 2012, working with a worldwide community of contributors. Neo continues from that open-source codebase and preserves its native data structures and calculation engines.</p></div>
+            <div class="about-block"><h3>Copyright &amp; open source</h3><p>Copyright belongs to the respective Subsurface and Subsurface Neo contributors. The Subsurface codebase is licensed under GNU GPL version 2. Full source and bundled third-party notices accompany distributed builds.</p></div>
+            <div class="about-block"><h3>Third-party artwork</h3><p><a href="https://www.flaticon.com/free-icon/regulator_4864503" target="_blank" rel="noreferrer">Regulator icon created by Magnific — Flaticon</a>.</p></div>
+          </section>
+        </div>
+      </section>
+
       <section class="view" id="detail" aria-labelledby="detail-title">
         <div class="ocean-glow detail-glow"></div>
         <button class="back-link" data-view="dives"><svg><use href="#i-back"/></svg> Back to dives</button>
@@ -127,9 +143,8 @@
             <div class="time-axis"><span>0</span><span>10</span><span>20</span><span>30</span><span>40</span><span>48 min</span></div>
           </div>
         </article>
-        <div class="post-graph-grid"><article class="gas-card"><span class="info-icon"><svg><use href="#i-tank"/></svg></span><span><small>GAS INFORMATION</small><b>Air <em>/ AL80</em></b><div class="gas-details"><p>200 bar → 54 bar</p><p>SAC 16.8 L/min</p></div></span></article><article class="gear-card"><span class="info-icon"><svg><use href="#i-tank"/></svg></span><span><small>GEAR</small><b>Single Tank</b><p>Aluminum 12 L</p></span></article><article class="type-card"><span class="info-icon"><svg><use href="#i-boat"/></svg></span><span><small>TYPE</small><b>Boat</b><p>Dive</p></span></article><article class="mode-card"><span class="info-icon regulator-icon"><img src="regulator-magnific.png" alt=""></span><span><small>MODE</small><b>OC</b><p>Open Circuit</p></span></article><article class="buddy-card"><span class="info-icon"><svg><use href="#i-user"/></svg></span><span><small>BUDDY</small><b>Dirk Hohndel</b><p>No. 1847</p></span></article></div>
+        <div class="post-graph-grid"><article class="gas-card"><span class="info-icon"><svg><use href="#i-tank"/></svg></span><span><small>GAS INFORMATION</small><b>Air <em>/ AL80</em></b><div class="gas-details"><p>200 bar → 54 bar</p><p>SAC 16.8 L/min</p></div></span></article><article class="gear-card"><span class="info-icon"><svg><use href="#i-tank"/></svg></span><span><small>GEAR</small><b>Single Tank</b><p>Aluminum 12 L</p></span></article><article class="mode-card"><span class="info-icon regulator-icon"><img src="regulator-magnific.png" alt=""></span><span><small>MODE</small><b>OC</b><p>Open Circuit</p></span></article><article class="type-card"><span class="info-icon"><svg><use href="#i-boat"/></svg></span><span><small>TYPE</small><b>Boat</b><p>Dive</p></span></article><article class="buddy-card"><span class="info-icon"><svg><use href="#i-user"/></svg></span><span><small>BUDDY</small><b>Dirk Hohndel</b><p>No. 1847</p></span></article></div>
         <article class="notes-card"><span class="info-icon"><svg><use href="#i-notes"/></svg></span><span><small>NOTES</small><p>Great visibility. Strong current near the end of the dive.</p></span></article>
-        <p class="icon-credit"><a href="https://www.flaticon.com/free-icon/regulator_4864503" target="_blank" rel="noreferrer">Regulator icon created by Magnific — Flaticon</a>.</p>
       </section>
     </main>
 
@@ -138,7 +153,7 @@
       <button data-view="dives"><svg><use href="#i-tank"/></svg><span>Dives</span></button>
       <button><svg><use href="#i-pin"/></svg><span>Sites</span></button>
       <button><svg><use href="#i-chart"/></svg><span>Stats</span></button>
-      <button><svg><use href="#i-more"/></svg><span>More</span></button>
+      <button data-view="settings"><svg><use href="#i-more"/></svg><span>More</span></button>
     </nav>
   </div>
   <script src="responsive-preview.js"></script>
