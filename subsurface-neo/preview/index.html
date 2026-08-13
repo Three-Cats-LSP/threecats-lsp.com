@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#061321">
   <title>Subsurface Neo — Design Preview</title>
-  <link rel="stylesheet" href="neo-preview.css?v=approved-dive-rows">
+  <link rel="stylesheet" href="responsive-preview.css">
 </head>
 <body>
   <svg class="svg-defs" aria-hidden="true">
@@ -23,6 +23,11 @@
       <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
       <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10m-7 6h4"/></symbol>
       <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+      <symbol id="i-mode" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><path d="M12 7v5m0 0-6 5m6-5 6 5"/></symbol>
+      <symbol id="i-computer" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 3h6l1 3H8zm0 18h6l1-3H8z"/></symbol>
+      <symbol id="i-boat" viewBox="0 0 24 24"><path d="m4 13 3 6h10l3-6-8-3zM9 10V5h5l2 5M3 21c2-1.5 4-1.5 6 0 2-1.5 4-1.5 6 0 2-1.5 4-1.5 6 0"/></symbol>
+      <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5.5 21c.5-5 2.7-7.5 6.5-7.5s6 2.5 6.5 7.5z"/></symbol>
+      <symbol id="i-notes" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
     </defs>
   </svg>
 
@@ -104,9 +109,9 @@
         <div class="ocean-glow detail-glow"></div>
         <button class="back-link" data-view="dives"><svg><use href="#i-back"/></svg> Back to dives</button>
         <header class="detail-title"><span class="dive-number large">#247</span><div><h1 id="detail-title">Izu Oceanic Park</h1><p><svg><use href="#i-pin"/></svg> Shizuoka, Japan <span>·</span> July 28, 2026 <span>·</span> 10:42</p></div><button class="more-button"><svg><use href="#i-more"/></svg></button></header>
-        <div class="detail-metrics"><article><span class="metric-icon"><svg><use href="#i-depth"/></svg></span><span><small>MAX DEPTH</small><b>27.4 <em>m</em></b></span></article><article><span class="metric-icon"><svg><use href="#i-clock"/></svg></span><span><small>DIVE TIME</small><b>48 <em>min</em></b></span></article><article><span class="metric-icon"><svg><use href="#i-temp"/></svg></span><span><small>WATER TEMP</small><b>22 <em>°C</em></b></span></article><article><span class="metric-icon">⌁</span><span><small>MODE</small><b>OC</b><p>Open Circuit</p></span></article><article><span class="metric-icon">♊</span><span><small>GEAR</small><b>Single Tank</b><p>Aluminum 12 L</p></span></article></div>
+        <div class="detail-metrics"><article><span class="metric-icon"><svg><use href="#i-depth"/></svg></span><span><small>MAX DEPTH</small><b>27.4 <em>m</em></b></span></article><article><span class="metric-icon"><svg><use href="#i-clock"/></svg></span><span><small>DIVE TIME</small><b>48 <em>min</em></b></span></article><article><span class="metric-icon"><svg><use href="#i-temp"/></svg></span><span><small>WATER TEMP</small><b>22 <em>°C</em></b></span></article><article><span class="metric-icon"><svg><use href="#i-mode"/></svg></span><span><small>MODE</small><b>OC</b><p>Open Circuit</p></span></article><article><span class="metric-icon"><svg><use href="#i-tank"/></svg></span><span><small>GEAR</small><b>Single Tank</b><p>Aluminum 12 L</p></span></article></div>
         <article class="profile-panel">
-          <div class="computer-strip"><span class="computer-icon">⌚</span><button>Shearwater Perdix <span>⌄</span></button><i></i><span>OC Tec</span><i></i><span>Bühlmann ZHL-16C</span><i></i><strong>GF 30/75</strong></div>
+          <div class="computer-strip"><span class="computer-icon"><svg><use href="#i-computer"/></svg></span><button>Shearwater Perdix <span>⌄</span></button><i></i><span>OC Tec</span><i></i><span>Bühlmann ZHL-16C</span><i></i><strong>GF 30/75</strong></div>
           <div class="graph-controls"><button class="on" data-line="depth">Depth</button><button class="on temp" data-line="temp">Water Temp</button><button class="on ndl" data-line="ndl">NDL</button><button class="on gf" data-line="gf">GF99</button><button>Gas</button><button class="expand">↗ Expand</button></div>
           <div class="large-profile" id="large-profile">
             <div class="depth-axis"><span>0</span><span>10</span><span>20</span><span>30</span><span>40</span></div>
@@ -117,15 +122,14 @@
               <path class="graph-temp" data-series="temp" d="M0 20L28 91 65 170 130 184 215 177 310 194 430 188 520 192 635 187 760 190 850 170 935 108 1000 62"/>
               <path class="graph-ndl" data-series="ndl" d="M0 300L40 253 90 205 150 174 230 145 330 125 430 114 550 118 650 129 750 151 830 187 910 234 1000 289"/>
               <path class="graph-gf" data-series="gf" d="M0 310L55 260 120 220 200 203 300 208 390 199 485 196 590 205 690 198 780 212 860 236 930 281 1000 324"/>
-              <line class="crosshair" x1="500" x2="500" y1="0" y2="340"/>
-              <g class="sample-points"><circle class="p-depth" cx="500" cy="307" r="5"/><circle class="p-temp" cx="500" cy="192" r="5"/><circle class="p-ndl" cx="500" cy="118" r="5"/><circle class="p-gf" cx="500" cy="201" r="5"/></g>
+              <g class="inspector-overlay"><line class="crosshair" x1="500" x2="500" y1="0" y2="340"/><g class="sample-points"><circle class="p-depth" data-point="depth" cx="500" cy="307" r="5"/><circle class="p-temp" data-point="temp" cx="500" cy="192" r="5"/><circle class="p-ndl" data-point="ndl" cx="500" cy="118" r="5"/><circle class="p-gf" data-point="gf" cx="500" cy="201" r="5"/></g></g>
             </svg>
             <div class="graph-tooltip" id="graph-tooltip"><b>24:00</b><span><i class="blue"></i>Depth <strong>30.2 m</strong></span><span><i class="cyan"></i>Water Temp <strong>21.8 °C</strong></span><span><i class="yellow"></i>NDL <strong>25 min</strong></span><span><i class="purple"></i>GF99 <strong>41%</strong></span><hr><span>Pressure <strong>136 bar</strong></span><span>SAC <strong>16.5 L/min</strong></span></div>
             <div class="time-axis"><span>0</span><span>10</span><span>20</span><span>30</span><span>40</span><span>48 min</span></div>
           </div>
         </article>
-        <div class="post-graph-grid"><article class="gas-card"><span class="info-icon"><svg><use href="#i-tank"/></svg></span><span><small>GAS INFORMATION</small><b>Air <em>/ AL80</em></b><div class="gas-details"><p>200 bar → 54 bar</p><p>SAC 16.8 L/min</p></div></span></article><article><span class="info-icon">♨</span><span><small>TYPE</small><b>Boat</b><p>Dive</p></span></article><article><span class="info-icon">♙</span><span><small>BUDDY</small><b>Dirk Hohndel</b><p>No. 1847</p></span></article></div>
-        <article class="notes-card"><span class="info-icon">▤</span><span><small>NOTES</small><p>Great visibility. Strong current near the end of the dive.</p></span></article>
+        <div class="post-graph-grid"><article class="gas-card"><span class="info-icon"><svg><use href="#i-tank"/></svg></span><span><small>GAS INFORMATION</small><b>Air <em>/ AL80</em></b><div class="gas-details"><p>200 bar → 54 bar</p><p>SAC 16.8 L/min</p></div></span></article><article><span class="info-icon"><svg><use href="#i-boat"/></svg></span><span><small>TYPE</small><b>Boat</b><p>Dive</p></span></article><article><span class="info-icon"><svg><use href="#i-user"/></svg></span><span><small>BUDDY</small><b>Dirk Hohndel</b><p>No. 1847</p></span></article></div>
+        <article class="notes-card"><span class="info-icon"><svg><use href="#i-notes"/></svg></span><span><small>NOTES</small><p>Great visibility. Strong current near the end of the dive.</p></span></article>
       </section>
     </main>
 
@@ -137,6 +141,6 @@
       <button><svg><use href="#i-more"/></svg><span>More</span></button>
     </nav>
   </div>
-  <script src="app.js"></script>
+  <script src="responsive-preview.js"></script>
 </body>
 </html>
