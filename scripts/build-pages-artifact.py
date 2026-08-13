@@ -24,6 +24,7 @@ PUBLIC_DIRS = [
     "get-in-water",
     "knowledge-base",
     "seabirds",
+    "subsurface-neo",
     "t-viewer",
 ]
 
