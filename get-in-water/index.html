@@ -1,0 +1,3281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Get In Water · Trip Packing</title>
+<link href="manifest.json" rel="manifest"/>
+<meta content="#030c18" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="#f5f7f9" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030c18" id="theme-color-active" name="theme-color"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="Get In Water" name="apple-mobile-web-app-title"/>
+<meta content="Dive trip packing checklist — gear, camera, travel docs. Companion to LSP D-Planner+." name="description"/>
+<link href="icon-192.png" rel="icon" type="image/png" id="favicon"/>
+<link href="icon-192.png" rel="apple-touch-icon" id="apple-touch-icon"/>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!navigator.onLine) return;
+    const fontLink = document.createElement('link');
+    fontLink.rel = 'stylesheet';
+    fontLink.href = 'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap';
+    document.head.appendChild(fontLink);
+  });
+</script>
+<script src="backup-sanitize.js"></script>
+<script src="firebase-config.js"></script>
+<script src="vendor/firebase/firebase-app-compat.js"></script>
+<script src="vendor/firebase/firebase-auth-compat.js"></script>
+<script src="vendor/firebase/firebase-firestore-compat.js"></script>
+<script src="sync.js"></script>
+<script src="vendor/jspdf.umd.min.js"></script>
+<script>
+  if (!window.Capacitor) {
+    window.Capacitor = { isNativePlatform: () => false, Plugins: {} };
+  }
+</script>
+<style>
+:root {
+  --bg: #030c18; --surface: #07121f; --card: #0a1a2e; --card2: #0d2038;
+  --border: rgba(0,200,255,0.09); --border-hi: rgba(0,200,255,0.28);
+  --accent: #00d9ff; --accent2: #00b8a0;
+  --green: #26d07c; --yellow: #ffb703; --orange: #ff6d00; --red: #ff4757;
+  --text: #d8eef8; --muted: #3e6882; --tip: #5ba4c2; --dim: #142535;
+  --font-ui: 'Outfit', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-user: 'Noto Sans', 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --icon-btn-size: 32px;
+  --icon-btn-r: 6px;
+  --icon-btn-svg: 14px;
+}
+body.light-theme {
+  --bg: #ffffff; --surface: #f8f9fa; --card: #eff3f8; --card2: #e8ecf1;
+  --border: rgba(0,100,200,0.25); --border-hi: rgba(0,100,200,0.45);
+  --accent: #0055aa; --accent2: #005544;
+  --green: #1a9e55; --yellow: #FFBF00; --orange: #ff5500; --red: #FF3131;
+  --text: #1a1a1a; --muted: #555555; --tip: #4a7fa0; --dim: #cccccc;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: var(--font-ui); min-height: 100vh; overflow-x: hidden;
+  transition: all 0.4s ease;
+  padding: env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+}
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 60%, rgba(0,100,180,0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 70% at 85% 20%, rgba(0,60,140,0.18) 0%, transparent 60%),
+    linear-gradient(160deg, #030c18 0%, #050e1c 60%, #030c18 100%);
+  transition: all 0.4s ease;
+}
+body.light-theme::before {
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 60%, rgba(100,180,255,0.05) 0%, transparent 60%),
+    linear-gradient(160deg, #ffffff 0%, #ffffff 100%);
+}
+.bubbles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.bubble {
+  position: absolute; border-radius: 50%;
+  background: rgba(0,217,255,0.04); border: 1px solid rgba(0,217,255,0.1);
+  animation: rise linear infinite;
+}
+@keyframes rise {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 1; } 90% { opacity: 0.4; }
+  100% { transform: translateY(-110vh) translateX(20px); opacity: 0; }
+}
+.app { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 16px 14px 32px; }
+header.hdr {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 4px 0 12px; gap: 10px; flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.brand-icon {
+  width: 44px; height: 44px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.brand-icon img {
+  width: 44px; height: 44px; display: block; object-fit: contain;
+  box-sizing: content-box;
+  border-radius: 8px; border: 1px solid var(--border-hi);
+}
+#footerAppLogo { box-sizing: content-box; }
+.brand-text h1 {
+  font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px;
+  color: var(--text); line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.brand-text p {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted); margin-top: 3px;
+}
+.brand.trip-hdr { align-items: center; gap: 10px; }
+.trip-header-text { flex: 1; min-width: 0; }
+.trip-header-text h1 {
+  font-family: var(--font-user); font-size: 17px; font-weight: 600;
+  letter-spacing: 0.3px; text-transform: none; line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.trip-header-text p {
+  font-size: 9px; letter-spacing: 0.5px; text-transform: none;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.trip-header-tags { margin-top: 5px; }
+.trip-header-tags .trip-tag { font-size: 8px; padding: 2px 6px; }
+.hdr-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--icon-btn-size); height: var(--icon-btn-size); border-radius: var(--icon-btn-r);
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--accent); font-size: var(--icon-btn-svg); cursor: pointer; transition: all 0.3s;
+}
+.theme-toggle:hover { border-color: var(--accent); background: rgba(0,200,255,0.1); }
+.btn-back {
+  padding: 6px 10px; background: var(--surface); color: var(--accent);
+  border: 1px solid var(--border-hi); border-radius: 6px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px;
+}
+.btn-back:hover { border-color: var(--accent); }
+.btn-back.btn-close {
+  width: var(--icon-btn-size); height: var(--icon-btn-size); padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px; margin-bottom: 12px; position: relative; overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0.2;
+}
+.card-title {
+  font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.card-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border-hi), transparent);
+}
+.card.collapsible .card-title { cursor: pointer; user-select: none; margin-bottom: 0; display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+.card-title-left {
+  display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0;
+  font-family: var(--font-user); font-weight: 600; font-size: 13px; color: var(--accent);
+}
+.card-title-right {
+  display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: auto;
+}
+.card-title .card-add-btn { flex-shrink: 0; }
+.check-item .check-main { display: flex; align-items: flex-start; gap: 10px; flex: 1; min-width: 0; cursor: pointer; }
+.card.collapsible .card-title::after { display: none; }
+.card.collapsible .card-title .card-caret { flex-shrink: 0; transition: transform 0.2s; font-size: 10px; color: var(--muted); }
+.card-title input {
+  background: transparent; border: none; color: var(--accent);
+  font-family: var(--font-user);
+  field-sizing: content;
+  flex: 0 1 auto; min-width: 4ch; max-width: 100%;
+  letter-spacing: normal; text-transform: none;
+  font-weight: 600; font-size: 13px;
+}
+.card-title input:focus { outline: 1px solid var(--border-hi); border-radius: 4px; background: var(--surface); }
+.user-text, .item-name, .edit-row input, .modal-field input, .trip-card h3 {
+  font-family: var(--font-user);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.card-title-actions { display: flex; gap: 3px; flex-shrink: 0; align-items: center; }
+.modal-field-row { display: flex; gap: 8px; }
+.modal-field-row .modal-field { flex: 1; }
+.card.collapsible.card-open .card-title .card-caret { transform: rotate(180deg); }
+.card.collapsible:not(.card-open) .card-collapsible-body { display: none; }
+.card.collapsible.card-open .card-collapsible-body { display: block; margin-top: 12px; }
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 18px; background: linear-gradient(135deg, rgba(0,200,255,0.2), rgba(0,100,200,0.25));
+  color: var(--accent); border: 1px solid var(--accent); border-radius: 8px;
+  cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  font-weight: 600; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s;
+}
+.btn-primary:hover { background: rgba(0,200,255,0.25); }
+.btn-primary.btn-icon-only {
+  width: var(--icon-btn-size); height: var(--icon-btn-size); padding: 0; min-width: 0;
+}
+.btn-primary.btn-icon-only svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; background: var(--surface); color: var(--text);
+  border: 1px solid var(--border-hi); border-radius: 8px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.5px;
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.btn-secondary.btn-icon-only {
+  width: var(--icon-btn-size); height: var(--icon-btn-size); padding: 0; min-width: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.btn-secondary.btn-icon-only svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); }
+.btn-export {
+  padding: 7px 10px; background: var(--surface); color: var(--accent);
+  border: 1px solid var(--accent); border-radius: 6px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 12px;
+  letter-spacing: 1px; display: inline-flex; align-items: center; justify-content: center;
+  gap: 0; line-height: 1; transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent; outline: none;
+}
+.btn-export:focus { outline: none; }
+.btn-export:active { background: var(--accent); color: var(--bg); opacity: 1; }
+.btn-export:hover { background: rgba(0,200,255,0.1); }
+.btn-export.btn-icon-only {
+  width: var(--icon-btn-size); height: var(--icon-btn-size); padding: 0; min-width: 0;
+  border-radius: var(--icon-btn-r);
+}
+.btn-export.btn-icon-only svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); }
+.btn-export.btn-reset-red { border-color: var(--red) !important; color: var(--red) !important; }
+.btn-export.btn-reset-red:hover { background: rgba(255,71,87,0.12) !important; }
+.btn-export.btn-reset-red:active { background: var(--red) !important; color: var(--bg) !important; opacity: 1; }
+body.light-theme .btn-export.btn-reset-red { border-color: #FF3131 !important; color: #FF3131 !important; background: rgba(255,49,49,0.06) !important; }
+body.light-theme .btn-export.btn-reset-red:hover { background: rgba(255,49,49,0.15) !important; }
+.btn-export-pdf-label {
+  display: inline-block; width: 16px; height: 16px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
+  letter-spacing: 0; line-height: 16px; text-align: center;
+}
+.btn-danger { color: var(--red); border-color: var(--red); }
+.btn-danger:hover { background: rgba(255,71,87,0.1); }
+.action-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.trip-card {
+  background: var(--card2); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px; margin-bottom: 10px; transition: border-color 0.2s;
+}
+.trip-card:hover { border-color: var(--accent); }
+.trip-card-head { display: flex; align-items: flex-start; gap: 8px; }
+.trip-card-main { flex: 1; min-width: 0; cursor: pointer; }
+.trip-card-actions { display: flex; gap: 4px; flex-shrink: 0; align-items: center; }
+.trip-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.trip-card .progress-bar { cursor: pointer; }
+.trip-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
+.progress-bar {
+  height: 6px; background: var(--dim); border-radius: 3px; margin-top: 8px; overflow: hidden;
+}
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 3px; transition: width 0.3s; }
+.progress-sticky {
+  position: sticky; top: 0; z-index: 10; background: var(--bg);
+  padding: 10px 0 12px; margin-bottom: 4px; border-bottom: 1px solid var(--border);
+}
+.check-item {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 4px;
+  border-bottom: 1px solid var(--border); cursor: pointer; user-select: none;
+}
+.check-item:last-child { border-bottom: none; }
+.check-box {
+  width: 22px; height: 22px; flex-shrink: 0; border-radius: 5px;
+  border: 2px solid var(--border-hi); display: flex; align-items: center; justify-content: center;
+  font-size: 14px; transition: all 0.15s; margin-top: 1px;
+}
+.check-item.checked .check-box { background: var(--green); border-color: var(--green); color: #fff; }
+.check-item.checked .item-name { text-decoration: line-through; opacity: 0.55; }
+.item-name { font-size: 14px; flex: 1; }
+.item-note { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--tip); margin-top: 2px; }
+.edit-row {
+  display: flex; align-items: center; gap: 6px; padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.edit-row input {
+  flex: 1; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px 10px; color: var(--text);
+  font-family: 'Outfit', sans-serif; font-size: 13px;
+}
+.edit-row input:focus { outline: none; border-color: var(--accent); }
+.icon-btn {
+  width: var(--icon-btn-size); height: var(--icon-btn-size); border-radius: var(--icon-btn-r);
+  border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0;
+}
+.icon-btn svg, .btn-export svg, .card-caret svg, .check-box svg, .theme-toggle svg, .btn-back svg {
+  display: block; flex-shrink: 0;
+}
+.icon-btn svg, .icon-btn-sm svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); }
+.check-box svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); stroke-width: 2.5; }
+.btn-export:not(.btn-icon-only) svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); }
+.card-caret svg { width: 11px; height: 11px; color: var(--muted); }
+.theme-toggle svg { width: var(--icon-btn-svg); height: var(--icon-btn-svg); }
+.btn-back svg { width: 12px; height: 12px; }
+.icon-btn.sync-pending { position: relative; }
+.icon-btn.sync-pending::after {
+  content: ''; position: absolute; top: 4px; right: 4px; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent);
+}
+@keyframes giw-sync-spin { to { transform: rotate(360deg); } }
+.icon-btn.sync-spin svg { animation: giw-sync-spin 0.9s linear infinite; }
+.icon-btn.danger:hover { border-color: var(--red); color: var(--red); }
+.empty-state { text-align: center; padding: 32px 16px; color: var(--muted); }
+.empty-state p { font-size: 14px; line-height: 1.5; margin-top: 8px; }
+.link-card {
+  display: flex; align-items: center; gap: 9px; padding: 10px 14px;
+  background: var(--surface); border: 1px solid var(--border-hi); border-radius: 8px;
+  color: var(--muted); text-decoration: none; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; margin-bottom: 8px; transition: border-color 0.2s, color 0.2s;
+}
+.link-card:hover { border-color: var(--accent); color: var(--accent); }
+#toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: rgba(0,200,255,0.92); color: #000; padding: 10px 22px; border-radius: 20px;
+  font-size: 13px; z-index: 99999; pointer-events: none; opacity: 0;
+  transition: transform 0.3s, opacity 0.3s; font-family: 'JetBrains Mono', monospace;
+}
+#toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+#modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  z-index: 200; align-items: center; justify-content: center; padding: 20px;
+}
+#modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--card); border: 1px solid var(--border-hi); border-radius: 14px;
+  padding: 20px; width: 100%; max-width: 360px;
+}
+.modal-box h3 { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; margin-bottom: 14px; }
+.modal-field { margin-bottom: 12px; }
+.modal-field label {
+  display: block; font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
+}
+.modal-field input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 14px;
+}
+.modal-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+.menu-dropdown { position: relative; display: inline-block; }
+.menu-panel {
+  display: none; position: absolute; right: 0; top: 100%; margin-top: 4px;
+  background: var(--card); border: 1px solid var(--border-hi); border-radius: 8px;
+  min-width: 200px; z-index: 50; box-shadow: 0 8px 24px rgba(0,0,0,0.3); overflow: hidden;
+}
+.menu-panel.open { display: block; }
+.menu-panel button {
+  display: block; width: 100%; text-align: left; padding: 10px 14px;
+  background: none; border: none; color: var(--text); cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  border-bottom: 1px solid var(--border);
+}
+.menu-panel button:last-child { border-bottom: none; }
+.menu-panel button:hover { background: rgba(0,200,255,0.08); color: var(--accent); }
+.menu-panel button.danger { color: var(--red); }
+.menu-panel-check {
+  display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text);
+  cursor: pointer; border-bottom: 1px solid var(--border);
+}
+.menu-panel-check:last-child { border-bottom: none; }
+.menu-panel-check:hover { background: rgba(0,200,255,0.08); color: var(--accent); }
+.menu-panel-check input { width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; }
+.export-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; }
+.about-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.about-tab-btn {
+  flex: 1; padding: 8px; border-radius: 8px;
+  border: 1px solid var(--border-hi); background: transparent; color: var(--muted);
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.08em; cursor: pointer; text-transform: uppercase;
+}
+.about-tab-btn.active { border-color: var(--accent); background: var(--accent); color: #030c18; }
+body.light-theme .about-tab-btn.active { color: #fff; }
+.home-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; }
+.home-toolbar input, .home-toolbar select {
+  flex: 1; min-width: 120px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 10px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 13px;
+}
+.home-toolbar label { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); white-space: nowrap; cursor: pointer; }
+.home-list-filters {
+  display: flex; flex-wrap: wrap; gap: 12px 16px;
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);
+}
+.home-list-filters label {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); cursor: pointer;
+}
+.home-list-filters input { width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; }
+.trip-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.trip-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; padding: 2px 6px; border-radius: 4px;
+  background: rgba(0,200,255,0.12); color: var(--accent); border: 1px solid var(--border-hi);
+}
+.trip-location { font-size: 11px; color: var(--tip); margin-top: 2px; }
+.trip-countdown { color: var(--accent2); font-weight: 600; }
+.trip-card.archived { opacity: 0.65; }
+.section-tabs {
+  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.section-tabs::-webkit-scrollbar { display: none; }
+.section-tab {
+  flex-shrink: 0; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-hi);
+  background: var(--surface); color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.5px; cursor: pointer; white-space: nowrap;
+}
+.section-tab.active { border-color: var(--accent); background: rgba(0,200,255,0.15); color: var(--accent); }
+.trip-subbar {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px; min-width: 0;
+}
+.trip-subbar .section-tabs { flex: 1; min-width: 0; margin-bottom: 0; padding-bottom: 0; }
+.trip-mode-actions { display: flex; gap: 6px; flex-shrink: 0; margin-left: auto; }
+.trip-mode-btn {
+  flex-shrink: 0; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-hi);
+  background: var(--surface); color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.5px; cursor: pointer; white-space: nowrap;
+}
+.trip-mode-btn.active { border-color: var(--accent); background: rgba(0,200,255,0.15); color: var(--accent); }
+.trip-mode-btn.return-active { border-color: var(--yellow); background: rgba(255,183,3,0.12); color: var(--yellow); }
+.critical-banner {
+  background: rgba(255,109,0,0.15); border: 1px solid var(--orange); border-radius: 10px;
+  padding: 10px 12px; margin-bottom: 10px; font-size: 12px; color: var(--orange); line-height: 1.45;
+}
+.ready-banner {
+  background: rgba(38,208,124,0.15); border: 1px solid var(--green); border-radius: 10px;
+  padding: 10px 12px; margin-bottom: 10px; font-size: 13px; color: var(--green); text-align: center;
+}
+.check-item.critical-item .item-name::before { content: '★ '; color: var(--orange); }
+.item-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; align-items: center; }
+.item-badge {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; padding: 1px 5px; border-radius: 3px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+}
+.qty-controls {
+  display: flex; align-items: center; gap: 2px; flex-shrink: 0;
+}
+.qty-btn {
+  width: 24px; height: 24px; border-radius: 4px; border: 1px solid var(--border-hi);
+  background: var(--surface); color: var(--accent); cursor: pointer; font-size: 14px; line-height: 1;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+}
+.qty-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; min-width: 28px; text-align: center; color: var(--tip); }
+.check-item .item-actions { display: flex; gap: 3px; flex-shrink: 0; align-items: center; }
+.check-item .item-actions > .icon-btn,
+.card-title .icon-btn {
+  width: 23px; height: 23px; border-radius: 5px;
+}
+.check-item .item-actions > .icon-btn svg,
+.card-title .icon-btn svg {
+  width: 11px; height: 11px;
+}
+.item-move-stack,
+.card-move-stack {
+  display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;
+}
+.item-move-stack .icon-btn,
+.card-move-stack .icon-btn {
+  width: 23px; height: 14px; border-radius: 5px;
+  border-color: transparent; background: transparent; color: var(--muted);
+}
+.item-move-stack .icon-btn:hover,
+.card-move-stack .icon-btn:hover {
+  color: var(--accent); background: rgba(0,200,255,0.08);
+}
+.item-move-stack .icon-btn svg,
+.card-move-stack .icon-btn svg {
+  width: 10px; height: 10px;
+}
+.modal-box.modal-wide { max-width: 420px; }
+.modal-checklist { max-height: 220px; overflow-y: auto; margin: 8px 0; }
+.modal-check-row {
+  display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px; cursor: pointer;
+}
+.modal-check-row input { width: 16px; height: 16px; accent-color: var(--accent); }
+.template-gallery { display: grid; gap: 10px; }
+.template-card {
+  background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 12px;
+}
+.template-card-master { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--card2)); }
+.template-card h4 { font-size: 14px; margin-bottom: 4px; color: var(--accent); }
+.template-card p { font-size: 12px; color: var(--muted); line-height: 1.45; margin-bottom: 8px; }
+.template-card-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.template-card-meta { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); margin-bottom: 8px; }
+.celebrate-overlay {
+  display: none; position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.55);
+  align-items: center; justify-content: center; padding: 20px;
+}
+.celebrate-overlay.open { display: flex; }
+.celebrate-box {
+  background: var(--card); border: 1px solid var(--green); border-radius: 16px; padding: 28px 24px;
+  text-align: center; max-width: 320px; animation: popIn 0.35s ease;
+}
+@keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.celebrate-box .emoji { font-size: 48px; margin-bottom: 12px; }
+.celebrate-box h3 { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--green); margin-bottom: 8px; }
+.app-footer {
+  text-align: center; padding: 14px 0 8px; margin-top: 4px;
+}
+.app-footer-icons {
+  display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 14px;
+}
+.app-footer-icon {
+  display: flex; align-items: center; opacity: 0.8;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.app-footer-icon:hover { transform: scale(1.15); opacity: 1; }
+.app-footer-icon img { width: 36px; height: 36px; display: block; object-fit: contain; border-radius: 4px; }
+.app-footer-donate-wrap { margin-top: 10px; display: flex; align-items: center; justify-content: center; }
+.app-footer-donate {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px;
+  background: transparent; border: 1px solid rgba(0,112,186,0.35); border-radius: 20px;
+  color: var(--muted); text-decoration: none;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.5px;
+  opacity: 0.7; transition: border-color 0.2s, color 0.2s, opacity 0.2s;
+}
+.app-footer-donate:hover { border-color: #0070ba; color: #0070ba; opacity: 1; }
+.app-footer-donate svg { flex-shrink: 0; }
+.app-footer-version {
+  color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; margin-top: 6px; letter-spacing: 1px; opacity: 0.5;
+}
+@media (max-width: 600px) {
+  .card { padding: 12px 10px; }
+  .card-title input { font-size: 12px; }
+  .card.collapsible .card-title { gap: 4px; }
+}
+</style>
+</head>
+<body>
+<div class="bubbles" id="bubbles"></div>
+<div class="app" id="app-root"></div>
+<div id="toast"></div>
+<div id="modal-overlay">
+  <div class="modal-box" id="modal-content"></div>
+</div>
+<div class="celebrate-overlay" id="celebrate-overlay" onclick="closeCelebrate()">
+  <div class="celebrate-box" onclick="event.stopPropagation()">
+    <div class="emoji">🤿</div>
+    <h3>Ready to dive!</h3>
+    <p style="font-size:14px;color:var(--tip);line-height:1.5;margin-bottom:16px">Everything is packed. Have a safe and fun trip!</p>
+    <button class="btn-primary" onclick="closeCelebrate()">Let's go</button>
+  </div>
+</div>
+<script src="capacitor-bridge.js"></script>
+<script>
+const APP_VERSION = '1.4.6';
+const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+const STORAGE_KEY = 'giw_v1';
+const THEME_COLORS = {
+  dark: '#030c18',
+  light: '#f5f7f9'
+};
+let nativeStatusBarTheme = null;
+
+const BAG_TAGS = [
+  { id: 'carry-on', label: 'Carry-on' },
+  { id: 'checked', label: 'Checked bag' },
+  { id: 'camera', label: 'Camera case' },
+  { id: 'boat', label: 'Boat bin' }
+];
+
+const TRIP_SECTIONS = [
+  { id: 'night_before', label: 'Night before' },
+  { id: 'at_dock', label: 'At the dock' },
+  { id: 'before_dive', label: 'Before first dive' },
+  { id: 'after_dive', label: 'After last dive' }
+];
+
+const STARTER_TEMPLATES = {
+  rec: {
+    name: 'Recreational diver',
+    desc: 'Day boat / resort essentials — core gear, travel docs, personal items.',
+    categories: ['Core Dive Gear', 'Travel & Docs', 'Personal & Safety'],
+    items: {
+      'Core Dive Gear': ['BCD', 'Regulator', 'Fins', 'Mask', 'Wetsuit', 'Weights & belt', 'Dive computer', 'SMB + spool', 'Surface marker'],
+      'Travel & Docs': ['Passport / ID', 'Dive certification', 'Insurance', 'Logbook', 'Cash / cards'],
+      'Personal & Safety': ['Sunscreen', 'Meds', 'Towel', 'Dry bag', 'Snacks / water', 'Phone charger']
+    }
+  },
+  photo: {
+    name: 'Underwater photographer',
+    desc: 'Camera housing, strobes, batteries, and dive gear for photo trips.',
+    categories: ['Core Dive Gear', 'Camera & Photo', 'Travel & Docs', 'Personal & Safety'],
+    items: {
+      'Core Dive Gear': ['BCD', 'Regulator', 'Fins', 'Mask', 'Wetsuit / Drysuit', 'Dive computer', 'SMB + spool'],
+      'Camera & Photo': ['Housing', 'Camera body', 'Lens(es)', 'Strobes', 'Sync cords', 'Batteries', 'Chargers', 'Memory cards', 'Desiccant packs', 'Dome port cover', 'Focus light'],
+      'Travel & Docs': ['Passport / ID', 'Dive certification', 'Insurance', 'Customs paperwork for camera gear'],
+      'Personal & Safety': ['Dry bag', 'Lens cloth', 'Snacks / water', 'Phone charger']
+    }
+  },
+  tech: {
+    name: 'Technical diver',
+    desc: 'Stages, deco gas, redundancy, and travel for tech diving.',
+    categories: ['Core Dive Gear', 'Tanks & Gas', 'Travel & Docs', 'Personal & Safety'],
+    items: {
+      'Core Dive Gear': ['BCD / wing', 'Primary reg', 'Backup reg', 'Fins', 'Mask', 'Drysuit / undersuit', 'Dive computer', 'Backup computer', 'SMB + spool', 'Backup SMB', 'Torch', 'Backup torch', 'Knife / cutter', 'Slates / wet notes'],
+      'Tanks & Gas': ['Back gas cylinder(s)', 'Stage / deco bottles', 'DIN / Yoke adapter', 'O2 analyzer', 'Gas analysis log', 'Tank keys / tool'],
+      'Travel & Docs': ['Passport / ID', 'Tech certification', 'Insurance', 'Logbook', 'Dive insurance card'],
+      'Personal & Safety': ['First aid kit', 'O2 kit checklist', 'Meds', 'Dry bag', 'Snacks / water']
+    }
+  }
+};
+
+let state = null;
+let screen = 'home';
+let activeTripId = null;
+let menuOpen = false;
+let exportMenuOpen = false;
+let aboutTab = 'starters';
+let homeSearch = '';
+let activeSavedTemplateId = null;
+let editingMasterGear = false;
+
+function starterToSaved(key, tpl) {
+  const categories = tpl.categories.map((name, order) => ({ id: uid(), name, order }));
+  const byName = n => categories.find(c => c.name === n).id;
+  const items = [];
+  tpl.categories.forEach(catName => {
+    (tpl.items[catName] || []).forEach(name => {
+      items.push({ id: uid(), categoryId: byName(catName), name, note: '', qty: 1, packed: 0, critical: false, bag: '', sections: [] });
+    });
+  });
+  return { id: 'starter_' + key, name: tpl.name, desc: tpl.desc, builtIn: true, categories, items };
+}
+
+function getDefaultSavedTemplates() {
+  return Object.entries(STARTER_TEMPLATES).map(([key, tpl]) => starterToSaved(key, tpl));
+}
+
+function getSavedTemplate(id) {
+  return state.savedTemplates && state.savedTemplates.find(t => t.id === id);
+}
+
+function ensureSavedTemplates(data) {
+  if (!data.savedTemplates || !data.savedTemplates.length) {
+    data.savedTemplates = getDefaultSavedTemplates();
+    return;
+  }
+  data.savedTemplates.forEach(t => {
+    if (!t.categories) t.categories = [];
+    if (!t.items) t.items = [];
+    if (t.desc == null) t.desc = '';
+    if (t.builtIn == null) t.builtIn = false;
+    t.items.forEach(ensureItem);
+  });
+}
+
+function uid() { return 'id_' + Math.random().toString(36).slice(2, 11) + Date.now().toString(36); }
+
+function defaultTemplate() {
+  const cats = [
+    { id: uid(), name: 'Core Dive Gear', order: 0 },
+    { id: uid(), name: 'Tanks & Gas', order: 1 },
+    { id: uid(), name: 'Camera & Photo', order: 2 },
+    { id: uid(), name: 'Travel & Docs', order: 3 },
+    { id: uid(), name: 'Personal & Safety', order: 4 }
+  ];
+  const byName = n => cats.find(c => c.name === n).id;
+  const items = [];
+  const add = (cat, names) => names.forEach(n => items.push({ id: uid(), categoryId: byName(cat), name: n }));
+  add('Core Dive Gear', ['BCD', 'Regulator', 'Fins', 'Mask', 'Wetsuit / Drysuit', 'Weights & belt', 'Dive computer', 'SMB + spool', 'Torch', 'Knife / cutter', 'Surface marker']);
+  add('Tanks & Gas', ['Cylinder(s)', 'DIN / Yoke adapter', 'O2 analyzer', 'Stage / deco bottles']);
+  add('Camera & Photo', ['Housing', 'Camera body', 'Lens(es)', 'Strobes', 'Sync cords', 'Batteries', 'Chargers', 'Memory cards', 'Desiccant packs', 'Dome port cover']);
+  add('Travel & Docs', ['Passport / ID', 'Dive certification', 'Insurance', 'Logbook', 'Dive insurance card', 'Cash / cards']);
+  add('Personal & Safety', ['Sunscreen', 'Meds', 'First aid kit', 'Towel', 'Dry bag', 'Snacks / water', 'Phone charger']);
+  items.forEach(ensureItem);
+  return { categories: cats, items };
+}
+
+function ensureItem(item) {
+  if (!item) return item;
+  if (!item.qty || item.qty < 1) item.qty = 1;
+  if (item.packed == null) item.packed = item.checked ? item.qty : 0;
+  if (item.returnPacked == null) item.returnPacked = 0;
+  if (item.critical == null) item.critical = false;
+  if (item.bag == null) item.bag = '';
+  if (!Array.isArray(item.sections)) item.sections = [];
+  if (item.note == null) item.note = '';
+  item.packed = Math.max(0, Math.min(item.packed, item.qty));
+  item.returnPacked = Math.max(0, Math.min(item.returnPacked, item.qty));
+  item.checked = item.packed >= item.qty;
+  return item;
+}
+
+function itemPackedCount(item, trip) {
+  ensureItem(item);
+  if (trip && trip.returnMode) return item.returnPacked || 0;
+  return item.packed;
+}
+
+function isItemPacked(item, trip) {
+  ensureItem(item);
+  return itemPackedCount(item, trip) >= item.qty;
+}
+
+function bagLabel(id) {
+  const b = BAG_TAGS.find(x => x.id === id);
+  return b ? b.label : '';
+}
+
+function parseTagsInput(str) {
+  return String(str || '').split(/[\s,]+/).map(t => t.trim()).filter(Boolean)
+    .map(t => (t.startsWith('#') ? t : '#' + t).toLowerCase());
+}
+
+function formatTagsHtml(tags) {
+  if (!tags || !tags.length) return '';
+  return tags.map(t => `<span class="trip-tag">${esc(t)}</span>`).join('');
+}
+
+function tripCountdown(trip) {
+  const start = trip.dateStart || '';
+  if (!start) return '';
+  try {
+    const today = new Date(); today.setHours(12, 0, 0, 0);
+    const ds = new Date(start + 'T12:00:00');
+    const diff = Math.round((ds - today) / 86400000);
+    if (diff > 0) return diff + ' day' + (diff !== 1 ? 's' : '');
+    if (diff === 0) return 'Today';
+    const end = trip.dateEnd || start;
+    const de = new Date(end + 'T12:00:00');
+    if (today <= de) return 'In progress';
+    return '';
+  } catch (e) { return ''; }
+}
+
+function itemMatchesSection(item, sectionId) {
+  ensureItem(item);
+  if (!sectionId || sectionId === 'all') return true;
+  if (!item.sections.length) return true;
+  return item.sections.includes(sectionId);
+}
+
+function itemDisplayName(item) {
+  ensureItem(item);
+  return item.qty > 1 ? item.name + ' x ' + item.qty : item.name;
+}
+
+function copyItemFields(src) {
+  ensureItem(src);
+  return {
+    name: src.name, note: src.note || '', qty: src.qty, packed: 0, returnPacked: 0,
+    critical: !!src.critical, bag: src.bag || '', sections: [...(src.sections || [])],
+    checked: false, fromTemplate: !!src.fromTemplate
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      migrateState(data);
+      return data;
+    }
+  } catch (e) {}
+  const fresh = {
+    masterTemplate: defaultTemplate(),
+    trips: [],
+    savedTemplates: getDefaultSavedTemplates(),
+    settings: { theme: 'dark', homeSort: 'created', hideCompleted: false, showArchived: false, pinnedTripId: null }
+  };
+  return fresh;
+}
+
+function ensureTripShape(trip) {
+  if (!trip) return;
+  if (trip.date && !trip.dateStart) {
+    trip.dateStart = trip.date;
+    delete trip.date;
+  }
+  if (!trip.dateEnd) trip.dateEnd = trip.dateStart || '';
+  if (trip.location == null) trip.location = '';
+  if (!Array.isArray(trip.tags)) trip.tags = [];
+  if (trip.archived == null) trip.archived = false;
+  if (trip.unpackMode == null) trip.unpackMode = false;
+  if (trip.returnMode == null) trip.returnMode = false;
+  if (trip.returnCelebrated == null) trip.returnCelebrated = false;
+  if (trip.viewSection == null) trip.viewSection = 'all';
+  if (trip.celebrated == null) trip.celebrated = false;
+  if (!trip.categories && state && state.masterTemplate) {
+    trip.categories = state.masterTemplate.categories.map(c => ({
+      id: c.id, name: c.name, order: c.order
+    }));
+  }
+  if (trip.items) trip.items.forEach(ensureItem);
+}
+
+function migrateState(data) {
+  if (!data.masterTemplate) data.masterTemplate = defaultTemplate();
+  if (data.masterTemplate.items) data.masterTemplate.items.forEach(ensureItem);
+  if (!data.trips) data.trips = [];
+  ensureSettingsFromData(data);
+  ensureSavedTemplates(data);
+  data.trips.forEach(trip => {
+    if (trip.date && !trip.dateStart) {
+      trip.dateStart = trip.date;
+      delete trip.date;
+    }
+    if (!trip.dateEnd) trip.dateEnd = trip.dateStart || '';
+    if (trip.location == null) trip.location = '';
+    if (!Array.isArray(trip.tags)) trip.tags = [];
+    if (trip.archived == null) trip.archived = false;
+    if (trip.unpackMode == null) trip.unpackMode = false;
+    if (trip.returnMode == null) trip.returnMode = false;
+    if (trip.returnCelebrated == null) trip.returnCelebrated = false;
+    if (trip.viewSection == null) trip.viewSection = 'all';
+    if (trip.celebrated == null) trip.celebrated = false;
+    const tpl = data.masterTemplate;
+    if (!trip.categories && tpl.categories) {
+      trip.categories = tpl.categories.map(c => ({
+        id: c.id, name: c.name, order: c.order
+      }));
+    }
+    if (trip.items) trip.items.forEach(it => {
+      ensureItem(it);
+      if (it.checked && it.packed === 0) it.packed = it.qty;
+    });
+  });
+}
+
+function ensureSettingsFromData(data) {
+  if (!data.settings) data.settings = { theme: 'dark', homeSort: 'created', hideCompleted: false, showArchived: false, pinnedTripId: null };
+  if (!data.settings.homeSort) data.settings.homeSort = 'created';
+  if (data.settings.hideCompleted == null) data.settings.hideCompleted = false;
+  if (data.settings.showArchived == null) data.settings.showArchived = false;
+}
+
+function ensureSettings() { ensureSettingsFromData(state); }
+
+function getTripCategories(trip) {
+  ensureTripShape(trip);
+  return [...(trip.categories || [])].sort((a, b) => a.order - b.order);
+}
+
+function formatTripDateRange(trip) {
+  const start = trip.dateStart || trip.date || '';
+  const end = trip.dateEnd || start;
+  if (!start) return '';
+  try {
+    const ds = new Date(start + 'T12:00:00');
+    if (!end || end === start) {
+      return ds.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+    const de = new Date(end + 'T12:00:00');
+    const sameYear = ds.getFullYear() === de.getFullYear();
+    const startFmt = ds.toLocaleDateString('en-GB', {
+      day: '2-digit', month: 'short', year: sameYear ? undefined : 'numeric'
+    });
+    const endFmt = de.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    return startFmt + ' \u2013 ' + endFmt;
+  } catch (e) {
+    return start;
+  }
+}
+
+function parseTripDate(value) {
+  if (!value) return null;
+  const date = new Date(value + 'T12:00:00');
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function tripDurationDays(start, end) {
+  const ds = parseTripDate(start);
+  const de = parseTripDate(end || start);
+  if (!ds || !de) return null;
+  return Math.round((de - ds) / 86400000) + 1;
+}
+
+function persistLocalOnly() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  updateWidgetSnapshot();
+}
+
+function saveState() {
+  if (window.GIW_SYNC) GIW_SYNC.touchSyncMeta(state);
+  persistLocalOnly();
+  if (window.GIW_SYNC) GIW_SYNC.schedulePush();
+}
+
+function widgetModeLabel(trip) {
+  if (trip.returnMode) return 'return';
+  if (trip.unpackMode) return 'unpack';
+  return 'pack';
+}
+
+function buildWidgetPayload() {
+  const tripId = state.settings && state.settings.pinnedTripId;
+  if (!tripId) {
+    return JSON.stringify({ name: 'Get In Water', remaining: -1, total: 0, done: 0, mode: 'pack' });
+  }
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip || trip.archived) {
+    return JSON.stringify({ name: 'Get In Water', remaining: -1, total: 0, done: 0, mode: 'pack' });
+  }
+  ensureTripShape(trip);
+  const p = tripProgress(trip);
+  return JSON.stringify({
+    name: trip.name,
+    remaining: p.total - p.done,
+    total: p.total,
+    done: p.done,
+    mode: widgetModeLabel(trip),
+    updated: Date.now()
+  });
+}
+
+function pushWidgetToNative(payload) {
+  if (!window.Capacitor || !Capacitor.isNativePlatform || !Capacitor.isNativePlatform()) return;
+  const tryUpdate = () => {
+    const wb = Capacitor.Plugins && Capacitor.Plugins.WidgetBridge;
+    if (wb && wb.update) return wb.update({ json: payload });
+    return Promise.reject(new Error('WidgetBridge unavailable'));
+  };
+  tryUpdate().catch(() => {
+    setTimeout(() => { tryUpdate().catch(() => {}); }, 300);
+    setTimeout(() => { tryUpdate().catch(() => {}); }, 1200);
+  });
+}
+
+function updateWidgetSnapshot() {
+  const payload = buildWidgetPayload();
+  try {
+    localStorage.setItem('giw_widget', payload);
+    pushWidgetToNative(payload);
+  } catch (e) {}
+}
+
+function getCategories() {
+  return [...state.masterTemplate.categories].sort((a, b) => a.order - b.order);
+}
+
+function getCategoryName(id) {
+  const c = state.masterTemplate.categories.find(x => x.id === id);
+  return c ? c.name : 'Other';
+}
+
+function tripProgress(trip) {
+  ensureTripShape(trip);
+  let total = 0, done = 0;
+  trip.items.forEach(i => {
+    ensureItem(i);
+    total += i.qty;
+    done += trip.returnMode ? (i.returnPacked || 0) : i.packed;
+  });
+  return { done, total, pct: total ? Math.round((done / total) * 100) : 0 };
+}
+
+function tripIsComplete(trip) {
+  const p = tripProgress(trip);
+  return p.total > 0 && p.done >= p.total;
+}
+
+function criticalItemsRemaining(trip) {
+  ensureTripShape(trip);
+  return trip.items.filter(i => i.critical && !isItemPacked(i, trip));
+}
+
+function createTripFromTemplate(name, dateStart, dateEnd, location, tags, sourceId) {
+  sourceId = sourceId || '__master__';
+  let categories, items;
+  if (sourceId === '__master__') {
+    categories = state.masterTemplate.categories.map(c => ({
+      id: c.id, name: c.name, order: c.order
+    }));
+    items = state.masterTemplate.items.map(it => ({
+      id: uid(), categoryId: it.categoryId, ...copyItemFields(it)
+    }));
+  } else {
+    const tpl = getSavedTemplate(sourceId);
+    if (!tpl) return null;
+    const catIdMap = {};
+    categories = tpl.categories.map(c => {
+      const newId = uid();
+      catIdMap[c.id] = newId;
+      return { id: newId, name: c.name, order: c.order };
+    });
+    items = tpl.items
+      .filter(it => catIdMap[it.categoryId])
+      .map(it => ({
+        id: uid(), categoryId: catIdMap[it.categoryId], ...copyItemFields(it)
+      }));
+  }
+  const start = dateStart || '';
+  const end = dateEnd || start;
+  const trip = {
+    id: uid(), name, location: location || '', tags: tags || [],
+    dateStart: start, dateEnd: end, createdAt: Date.now(),
+    archived: false, unpackMode: false, returnMode: false, viewSection: 'all', celebrated: false, returnCelebrated: false,
+    categories, items
+  };
+  state.trips.unshift(trip);
+  saveState();
+  return trip.id;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function jsAttr(s) {
+  const t = String(s);
+  if (t === '') return '';
+  if (!/^[a-zA-Z0-9_-]+$/.test(t)) return '_invalid';
+  return t.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+const ICON_PATHS = {
+  copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  close: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  chevUp: '<polyline points="18 15 12 9 6 15"/>',
+  chevDown: '<polyline points="6 9 12 15 18 9"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>',
+  fileText: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>',
+  filePdf: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><rect x="8" y="12" width="8" height="7" rx="1"/>',
+  moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  sun: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
+  help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  menu: '<line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>',
+  edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+  reset: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  sync: '<path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>'
+};
+
+function iconMerge(size) {
+  const s = size || 18;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.25" stroke-linecap="round"><path d="M2 12h8.25"/></g><path fill="currentColor" d="M10.25 8.75 14.75 12 10.25 15.25z"/><g fill="currentColor"><circle cx="18.25" cy="6.5" r="1.55"/><circle cx="18.25" cy="10.5" r="1.55"/><circle cx="18.25" cy="14.5" r="1.55"/><circle cx="18.25" cy="18.5" r="1.55"/></g></svg>`;
+}
+
+function icon(name, size) {
+  if (name === 'merge') return iconMerge(size);
+  const path = ICON_PATHS[name];
+  if (!path) return '';
+  const s = size || 16;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+}
+
+function iconPdfBtn() {
+  return '<span class="btn-export-pdf-label">PDF</span>';
+}
+
+function toggleCard(el) {
+  const card = el.closest('.card.collapsible');
+  if (card) card.classList.toggle('card-open');
+}
+
+function initBubbles() {
+  const box = document.getElementById('bubbles');
+  for (let i = 0; i < 12; i++) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const sz = 8 + Math.random() * 24;
+    b.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:-${sz}px;animation-duration:${12+Math.random()*18}s;animation-delay:${Math.random()*10}s;`;
+    box.appendChild(b);
+  }
+}
+
+function appLogoSrc() {
+  // Navy-bg icon reads correctly in both themes; light-bg variant makes ear
+  // outlines blend into the pale background and look clipped.
+  return 'icon-192.png?v=' + APP_VERSION;
+}
+
+function updateAppLogo() {
+  const logoSrc = appLogoSrc();
+  const logo = document.getElementById('brandLogo');
+  if (logo) logo.src = logoSrc;
+  const footerLogo = document.getElementById('footerAppLogo');
+  if (footerLogo) footerLogo.src = logoSrc;
+  const fav = document.getElementById('favicon');
+  if (fav) fav.href = logoSrc;
+  const apple = document.getElementById('apple-touch-icon');
+  if (apple) apple.href = logoSrc;
+}
+
+function setThemeColor(theme) {
+  const meta = document.getElementById('theme-color-active');
+  if (meta) meta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.dark);
+}
+
+function updateNativeStatusBar(theme) {
+  if (!IS_NATIVE) return;
+  if (nativeStatusBarTheme === theme) return;
+  const statusBar = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar;
+  if (!statusBar) return;
+
+  nativeStatusBarTheme = theme;
+  const isLight = theme === 'light';
+  Promise.resolve(statusBar.setOverlaysWebView && statusBar.setOverlaysWebView({ overlay: false })).catch(() => {});
+  Promise.resolve(statusBar.setBackgroundColor && statusBar.setBackgroundColor({
+    color: isLight ? THEME_COLORS.light : THEME_COLORS.dark
+  })).catch(() => {});
+  Promise.resolve(statusBar.setStyle && statusBar.setStyle({
+    style: isLight ? 'LIGHT' : 'DARK'
+  })).catch(() => {});
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-theme');
+  document.getElementById('themeIcon').textContent = isLight ? '☀️' : '🌙';
+  state.settings.theme = isLight ? 'light' : 'dark';
+  saveState();
+  setThemeColor(state.settings.theme);
+  updateNativeStatusBar(state.settings.theme);
+  updateAppLogo();
+  render();
+}
+
+function applyTheme() {
+  if (state.settings.theme === 'light') {
+    document.body.classList.add('light-theme');
+    document.getElementById('themeIcon').textContent = '☀️';
+  } else {
+    document.body.classList.remove('light-theme');
+    document.getElementById('themeIcon').textContent = '🌙';
+  }
+  setThemeColor(state.settings.theme);
+  updateNativeStatusBar(state.settings.theme);
+  updateAppLogo();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+window.showExportToast = (msg) => showToast(msg || '📥 Saved!');
+
+function navigate(s, tripId, options) {
+  const opts = options || {};
+  const keepScroll = opts.preserveScroll;
+  const scrollY = opts.scrollY != null ? opts.scrollY : window.scrollY;
+  screen = s;
+  if (tripId !== undefined) activeTripId = tripId;
+  menuOpen = false;
+  exportMenuOpen = false;
+  render();
+  if (keepScroll) window.scrollTo(0, scrollY);
+  else window.scrollTo(0, 0);
+}
+
+function switchAboutTab(tab) {
+  aboutTab = tab;
+  if (tab !== 'starters') {
+    activeSavedTemplateId = null;
+    editingMasterGear = false;
+  }
+  render();
+}
+
+function stayInMasterGearEditor() {
+  editingMasterGear = true;
+  activeSavedTemplateId = null;
+  aboutTab = 'starters';
+}
+
+function openMasterGearEditor() {
+  stayInMasterGearEditor();
+  navigate('about');
+}
+
+function closeMasterGearEditor() {
+  editingMasterGear = false;
+  aboutTab = 'starters';
+  navigate('about');
+}
+
+function openModal(html, onMount) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+  if (onMount) onMount();
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function getSyncUiState() {
+  if (!window.GIW_SYNC) {
+    return { configured: false, signedIn: false, syncing: false, pendingPush: false, statusLabel: 'Sync unavailable', syncButtonTitle: 'Sync unavailable', lastSyncLabel: '', user: null };
+  }
+  return GIW_SYNC.getStatus();
+}
+
+function renderHomeSyncButton() {
+  const s = getSyncUiState();
+  if (!s.configured) return '';
+  const spin = s.syncing ? ' sync-spin' : '';
+  const pending = s.pendingPush && s.signedIn && !s.syncing ? ' sync-pending' : '';
+  const title = esc(s.syncButtonTitle);
+  return `<button class="btn-secondary btn-icon-only${spin}${pending}" onclick="handleSyncClick()" title="${title}" id="home-sync-btn">${icon('sync', 18)}</button>`;
+}
+
+function renderAccountSyncCard() {
+  const s = getSyncUiState();
+  if (!s.configured) {
+    return `<div class="card">
+      <div class="card-title">Account &amp; sync</div>
+      <p style="font-size:13px;color:var(--tip);line-height:1.55;margin:0">Cloud sync is not configured in this build.</p>
+    </div>`;
+  }
+  if (!s.signedIn) {
+    return `<div class="card">
+      <div class="card-title">Account &amp; sync</div>
+      <p style="font-size:13px;color:var(--tip);line-height:1.55;margin:0 0 12px">Optional — sync trips between phone and browser. Works offline without an account.</p>
+      <button class="btn-primary" onclick="giwSignIn()">Sign in with Google</button>
+    </div>`;
+  }
+  const user = s.user || {};
+  const name = esc(user.displayName || user.email || 'Signed in');
+  const email = user.email && user.displayName ? `<p style="font-size:12px;color:var(--muted);margin:4px 0 0">${esc(user.email)}</p>` : '';
+  const last = s.lastSyncLabel ? `<p style="font-size:12px;color:var(--muted);margin:8px 0 0">Last synced ${esc(s.lastSyncLabel)}</p>` : '';
+  return `<div class="card">
+      <div class="card-title">Account &amp; sync</div>
+      <p style="font-size:14px;margin:0 0 4px">${name}</p>
+      ${email}
+      <p style="font-size:13px;color:var(--tip);margin:10px 0 0">${esc(s.statusLabel)}</p>
+      ${last}
+      <div class="action-row" style="margin-top:12px;margin-bottom:0">
+        <button class="btn-secondary" onclick="giwSignOut()">Sign out</button>
+      </div>
+    </div>`;
+}
+
+async function handleSyncClick() {
+  if (!window.GIW_SYNC) { showToast('Sync unavailable'); return; }
+  try {
+    await GIW_SYNC.syncNow();
+  } catch (e) {}
+  render();
+}
+
+async function giwSignIn() {
+  if (!window.GIW_SYNC) return;
+  try {
+    await GIW_SYNC.signInWithGoogle();
+    showToast('Signed in');
+  } catch (e) {
+    showToast('Sign-in failed');
+  }
+  render();
+}
+
+async function giwSignOut() {
+  if (!window.GIW_SYNC) return;
+  await GIW_SYNC.signOut();
+  showToast('Signed out');
+  render();
+}
+
+function onSyncStatusChange() {
+  const btn = document.getElementById('home-sync-btn');
+  if (btn && screen === 'home') {
+    const row = btn.parentElement;
+    if (row) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = renderHomeSyncButton();
+      const fresh = tmp.firstElementChild;
+      if (fresh) btn.replaceWith(fresh);
+    }
+  }
+  if (screen === 'about' && aboutTab === 'about') render();
+}
+
+function nextTripCopyName(baseName) {
+  const root = baseName.replace(/\s*\(\d+\)\s*$/, '').trim();
+  const escaped = root.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('^' + escaped + '(?: \\((\\d+)\\))?$');
+  let max = 1;
+  state.trips.forEach(t => {
+    const m = t.name.match(re);
+    if (m) max = Math.max(max, m[1] ? parseInt(m[1], 10) : 1);
+  });
+  return max === 1 ? root + ' (2)' : root + ' (' + (max + 1) + ')';
+}
+
+function cloneTripFromSource(sourceTrip, name, dateStart, dateEnd, options) {
+  options = options || {};
+  ensureTripShape(sourceTrip);
+  const catFilter = options.categoryIds;
+  const catIdMap = {};
+  const categories = sourceTrip.categories
+    .filter(c => !catFilter || catFilter.includes(c.id))
+    .map(c => {
+      const newId = uid();
+      catIdMap[c.id] = newId;
+      return { id: newId, name: c.name, order: c.order };
+    });
+  const items = sourceTrip.items
+    .filter(it => catIdMap[it.categoryId])
+    .map(it => ({
+      id: uid(), categoryId: catIdMap[it.categoryId],
+      ...copyItemFields(it)
+    }));
+  const start = dateStart || '';
+  const end = dateEnd || start;
+  const trip = {
+    id: uid(), name,
+    location: options.location != null ? options.location : (sourceTrip.location || ''),
+    tags: options.tags ? [...options.tags] : [...(sourceTrip.tags || [])],
+    dateStart: start, dateEnd: end, createdAt: Date.now(),
+    archived: false, unpackMode: false, returnMode: false, viewSection: 'all', celebrated: false, returnCelebrated: false,
+    categories, items
+  };
+  state.trips.unshift(trip);
+  saveState();
+  return trip.id;
+}
+
+function getHomeTrips() {
+  ensureSettings();
+  let trips = state.trips.filter(t => {
+    ensureTripShape(t);
+    if (t.archived && !state.settings.showArchived) return false;
+    if (state.settings.hideCompleted && tripIsComplete(t) && !t.archived) return false;
+    return true;
+  });
+  const q = homeSearch.trim().toLowerCase();
+  if (q) {
+    trips = trips.filter(t => {
+      const hay = [t.name, t.location, ...(t.tags || []), ...t.items.map(i => i.name + ' ' + (i.note || ''))].join(' ').toLowerCase();
+      return hay.includes(q.replace(/^#/, '')) || (t.tags || []).some(tag => tag.toLowerCase().includes(q));
+    });
+  }
+  const sort = state.settings.homeSort;
+  trips.sort((a, b) => {
+    if (sort === 'name') return a.name.localeCompare(b.name);
+    if (sort === 'progress') return tripProgress(b).pct - tripProgress(a).pct;
+    if (sort === 'date') {
+      const da = a.dateStart || '', db = b.dateStart || '';
+      if (da && db) return da.localeCompare(db);
+      if (da) return -1;
+      if (db) return 1;
+    }
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  });
+  return trips;
+}
+
+function mountTripDateModal(startId, endId, oneDayId) {
+  const startEl = document.getElementById(startId);
+  const endEl = document.getElementById(endId);
+  const oneDayEl = document.getElementById(oneDayId);
+  const updateDurationLabel = () => {
+    if (!startEl.value) {
+      oneDayEl.textContent = 'Pick start date';
+      return;
+    }
+    const days = tripDurationDays(startEl.value, endEl.value || startEl.value);
+    if (days == null) {
+      oneDayEl.textContent = 'Pick dates';
+    } else if (days < 1) {
+      oneDayEl.textContent = 'Finish before start';
+    } else {
+      oneDayEl.textContent = days === 1 ? 'One day trip' : `${days} day trip`;
+    }
+  };
+  oneDayEl.onclick = () => {
+    if (startEl.value) {
+      endEl.value = startEl.value;
+      updateDurationLabel();
+      showToast('One day trip');
+    } else {
+      showToast('Pick a start date first');
+    }
+  };
+  startEl.addEventListener('change', () => {
+    if (!endEl.value || endEl.value < startEl.value) endEl.value = startEl.value;
+    updateDurationLabel();
+  });
+  endEl.addEventListener('change', updateDurationLabel);
+  startEl.addEventListener('input', updateDurationLabel);
+  endEl.addEventListener('input', updateDurationLabel);
+  updateDurationLabel();
+}
+
+function promptNewTrip() {
+  const masterCount = state.masterTemplate.items.length;
+  const templateOptions = (state.savedTemplates || []).map(t => {
+    const n = t.items.length;
+    return `<option value="${t.id}">${esc(t.name)} (${n} item${n !== 1 ? 's' : ''})</option>`;
+  }).join('');
+  const selectStyle = 'width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px';
+  openModal(`
+    <h3>New Trip</h3>
+    <div class="modal-field"><label>Trip name</label><input id="trip-name" placeholder="e.g. Osezaki" autofocus/></div>
+    <div class="modal-field"><label>Template</label>
+      <select id="trip-template" style="${selectStyle}">
+        <option value="__master__">Master gear list (${masterCount} item${masterCount !== 1 ? 's' : ''})</option>
+        ${templateOptions}
+      </select>
+    </div>
+    <div class="modal-field"><label>Location / site</label><input id="trip-location" placeholder="e.g. Red Sea — Brothers"/></div>
+    <div class="modal-field"><label>Tags</label><input id="trip-tags" placeholder="#daytrip #coldwater #maldives"/></div>
+    <div class="modal-field-row">
+      <div class="modal-field"><label>Start date</label><input id="trip-date-start" type="date"/></div>
+      <div class="modal-field"><label>Finish date</label><input id="trip-date-end" type="date"/></div>
+    </div>
+    <button class="btn-secondary" id="trip-one-day-btn" style="width:100%;margin-bottom:4px">One day trip</button>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="trip-create-btn">Create</button>
+    </div>
+  `, () => {
+    mountTripDateModal('trip-date-start', 'trip-date-end', 'trip-one-day-btn');
+    document.getElementById('trip-create-btn').onclick = () => {
+      const name = document.getElementById('trip-name').value.trim();
+      if (!name) { showToast('Enter a trip name'); return; }
+      const location = document.getElementById('trip-location').value.trim();
+      const tags = parseTagsInput(document.getElementById('trip-tags').value);
+      const dateStart = document.getElementById('trip-date-start').value;
+      const dateEnd = document.getElementById('trip-date-end').value || dateStart;
+      if (dateStart && dateEnd && dateEnd < dateStart) {
+        showToast('Finish date must be on or after start');
+        return;
+      }
+      const sourceId = document.getElementById('trip-template').value || '__master__';
+      const id = createTripFromTemplate(name, dateStart, dateEnd, location, tags, sourceId);
+      if (!id) { showToast('Template not found'); return; }
+      closeModal();
+      navigate('trip', id);
+    };
+  });
+}
+
+function promptDuplicateTrip(tripId) {
+  const source = state.trips.find(t => t.id === tripId);
+  if (!source) return;
+  const defaultName = nextTripCopyName(source.name);
+  openModal(`
+    <h3>Duplicate Trip</h3>
+    <p style="font-size:13px;color:var(--muted);margin:-6px 0 12px;line-height:1.45">Copies your cards and gear list. Checks start cleared.</p>
+    <div class="modal-field"><label>Trip name</label><input id="trip-dup-name" value="${esc(defaultName)}" autofocus/></div>
+    <div class="modal-field-row">
+      <div class="modal-field"><label>Start date</label><input id="trip-dup-start" type="date"/></div>
+      <div class="modal-field"><label>Finish date</label><input id="trip-dup-end" type="date"/></div>
+    </div>
+    <button class="btn-secondary" id="trip-dup-one-day-btn" style="width:100%;margin-bottom:4px">One day trip</button>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="trip-dup-create-btn">Create copy</button>
+    </div>
+  `, () => {
+    mountTripDateModal('trip-dup-start', 'trip-dup-end', 'trip-dup-one-day-btn');
+    document.getElementById('trip-dup-create-btn').onclick = () => {
+      const name = document.getElementById('trip-dup-name').value.trim();
+      if (!name) { showToast('Enter a trip name'); return; }
+      const dateStart = document.getElementById('trip-dup-start').value;
+      const dateEnd = document.getElementById('trip-dup-end').value || dateStart;
+      if (dateStart && dateEnd && dateEnd < dateStart) {
+        showToast('Finish date must be on or after start');
+        return;
+      }
+      const id = cloneTripFromSource(source, name, dateStart, dateEnd);
+      closeModal();
+      showToast('Trip duplicated');
+      navigate('trip', id);
+    };
+  });
+}
+
+function promptEditTripDetails(tripId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  ensureTripShape(trip);
+  openModal(`
+    <h3>Trip details</h3>
+    <div class="modal-field"><label>Trip name</label><input id="trip-edit-name" value="${esc(trip.name)}" autofocus/></div>
+    <div class="modal-field"><label>Location / site</label><input id="trip-edit-location" value="${esc(trip.location || '')}"/></div>
+    <div class="modal-field"><label>Tags</label><input id="trip-edit-tags" value="${esc((trip.tags || []).join(' '))}" placeholder="#daytrip #coldwater"/></div>
+    <div class="modal-field-row">
+      <div class="modal-field"><label>Start date</label><input id="trip-edit-start" type="date" value="${esc(trip.dateStart || '')}"/></div>
+      <div class="modal-field"><label>Finish date</label><input id="trip-edit-end" type="date" value="${esc(trip.dateEnd || '')}"/></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="trip-edit-save">Save</button>
+    </div>
+  `, () => {
+    document.getElementById('trip-edit-save').onclick = () => {
+      const name = document.getElementById('trip-edit-name').value.trim();
+      if (!name) { showToast('Enter a trip name'); return; }
+      trip.name = name;
+      trip.location = document.getElementById('trip-edit-location').value.trim();
+      trip.tags = parseTagsInput(document.getElementById('trip-edit-tags').value);
+      trip.dateStart = document.getElementById('trip-edit-start').value;
+      trip.dateEnd = document.getElementById('trip-edit-end').value || trip.dateStart;
+      saveState();
+      closeModal();
+      navigate('trip', tripId);
+    };
+  });
+}
+
+function promptBuddyCopy(tripId) {
+  const source = state.trips.find(t => t.id === tripId);
+  if (!source) return;
+  ensureTripShape(source);
+  const cats = getTripCategories(source);
+  const checks = cats.map(c =>
+    `<label class="modal-check-row"><input type="checkbox" class="buddy-cat" value="${c.id}" checked/> ${esc(c.name)}</label>`
+  ).join('');
+  openModal(`
+    <h3>Buddy copy</h3>
+    <p style="font-size:13px;color:var(--muted);margin:-6px 0 10px;line-height:1.45">Share a subset of your packing list. Checks start cleared.</p>
+    <div class="modal-field"><label>Trip name</label><input id="buddy-name" value="${esc(source.name + ' — Buddy')}" autofocus/></div>
+    <div class="modal-field"><label>Categories to include</label></div>
+    <div class="modal-checklist">${checks}</div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="buddy-create">Create buddy copy</button>
+    </div>
+  `, () => {
+    document.getElementById('buddy-create').onclick = () => {
+      const name = document.getElementById('buddy-name').value.trim();
+      if (!name) { showToast('Enter a name'); return; }
+      const ids = [...document.querySelectorAll('.buddy-cat:checked')].map(el => el.value);
+      if (!ids.length) { showToast('Select at least one category'); return; }
+      const id = cloneTripFromSource(source, name, source.dateStart, source.dateEnd, { categoryIds: ids, tags: [...(source.tags || []), '#buddy'] });
+      closeModal();
+      showToast('Buddy copy created');
+      navigate('trip', id);
+    };
+  });
+}
+
+function promptRenameTrip(tripId) {
+  promptEditTripDetails(tripId);
+}
+
+function renderHeader(title, subtitle, showBack, tags) {
+  let brandContent;
+  if (showBack) {
+    if (screen === 'about') {
+      brandContent = `
+        <button class="btn-back btn-close" onclick="navigate('home')" title="Close">${icon('close', 14)}</button>
+        <div class="brand-text trip-header-text">
+          <h1>Settings</h1>
+          <p>${esc(subtitle || 'Gear template & about')}</p>
+        </div>`;
+    } else {
+      const tagsHtml = tags && tags.length ? `<div class="trip-tags trip-header-tags">${formatTagsHtml(tags)}</div>` : '';
+      brandContent = `
+        <button class="btn-back" onclick="navigate('home')">← Back</button>
+        <div class="brand-text trip-header-text">
+          <h1>${esc(title || 'Trip')}</h1>
+          ${subtitle ? `<p>${esc(subtitle)}</p>` : ''}
+          ${tagsHtml}
+        </div>`;
+    }
+  } else {
+    brandContent = `<div class="brand-icon"><img id="brandLogo" src="${appLogoSrc()}" width="44" height="44" alt=""/></div>
+        <div class="brand-text"><h1>${esc(title || 'GET IN WATER')}</h1><p>${esc(subtitle || 'Trip Packing Checklist')}</p></div>`;
+  }
+  const hdrClass = showBack && screen === 'trip' ? 'hdr trip-hdr-wrap' : 'hdr';
+  return `
+    <header class="${hdrClass}">
+      <div class="brand${showBack && screen === 'trip' ? ' trip-hdr' : ''}">
+        ${brandContent}
+      </div>
+      <div class="hdr-actions">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"><span class="theme-icon" id="themeIcon">🌙</span></button>
+        ${screen === 'home' ? `<button class="btn-back btn-close" onclick="navigate('about')" title="About">?</button>` : ''}
+      </div>
+    </header>`;
+}
+
+function renderAppFooter() {
+  const thingiverseIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHIAAAByCAMAAAC4A3VPAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABpUExURStS/gAAADBY/yhY/zBQ/yhQ/yxT/yxT/ipT/ipR/ixT/itT/ixS/itS/v////H1//L0/8rU/8rT/73J/73J/rzJ/6++/6++/qKz/pWp/5Wo/oid/nuT/nuS/m2I/mB9/lNz/kZo/jld/g0+l6gAAAAOdFJOU/8AICAgIK+vr7C/v+/vniJZ+QAAAKhJREFUeNrt2ckNwjAARNFxFpbENmELO4T0XyQV2DJI9gH938DTnEem6a3KtaqMGquiuUoLFa5X8ZyIiIjo26ZHht6KtfMZ2kJCQkJCQkJCQkLmJZ9jpP3Ghxpj3fR755B4UK6uIfIECQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQn5d6QrT3ZK7xi+ftNbq02fOflgL6Vma5l2qaTmyxAmh/ucBna1+QBeIOmb8eOcqAAAAABJRU5ErkJggg==';
+  return `
+    <footer class="app-footer">
+      <div class="app-footer-icons">
+        <a class="app-footer-icon" href="https://www.instagram.com/threecats_lsp" target="_blank" rel="noopener noreferrer" title="Follow @threecats_lsp on Instagram">
+          <svg fill="none" height="36" viewBox="0 0 50 50" width="36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="giwInstaGradient" x1="0%" x2="100%" y1="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#feda75"/>
+                <stop offset="5%" style="stop-color:#fa7e1e"/>
+                <stop offset="45%" style="stop-color:#d92e7f"/>
+                <stop offset="60%" style="stop-color:#9b36b7"/>
+                <stop offset="90%" style="stop-color:#515bd4"/>
+              </linearGradient>
+            </defs>
+            <rect fill="none" height="40" rx="10" ry="10" stroke="url(#giwInstaGradient)" stroke-width="2" width="40" x="5" y="5"/>
+            <circle cx="25" cy="25" fill="none" r="7" stroke="url(#giwInstaGradient)" stroke-width="1.2"/>
+            <circle cx="25" cy="25" fill="url(#giwInstaGradient)" r="2.5"/>
+            <circle cx="36" cy="12" fill="url(#giwInstaGradient)" r="1.8"/>
+          </svg>
+        </a>
+        <a class="app-footer-icon" href="https://github.com/Three-Cats-LSP/Get-In-Water" target="_blank" rel="noopener noreferrer" title="View source on GitHub">
+          <svg fill="var(--muted)" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        </a>
+        <a class="app-footer-icon" href="https://www.thingiverse.com/Roman_Markovtsev/designs" target="_blank" rel="noopener noreferrer" title="My designs on Thingiverse">
+          <img alt="Thingiverse" src="${thingiverseIcon}"/>
+        </a>
+        <a class="app-footer-icon" href="https://threecats-lsp.com/d-planner-plus/" target="_blank" rel="noopener noreferrer" title="LSP D-Planner+">
+          <img alt="LSP D-Planner+" src="https://threecats-lsp.com/d-planner-plus/icon-192.png" style="border-radius:8px;border:1px solid var(--border-hi)"/>
+        </a>
+        <a class="app-footer-icon" href="https://threecats-lsp.com/t-viewer/" target="_blank" rel="noopener noreferrer" title="T-Viewer">
+          <img alt="T-Viewer" src="https://threecats-lsp.com/t-viewer/icon-192.png" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border-hi);object-fit:contain;display:block;"/>
+        </a>
+        <a class="app-footer-icon" href="https://threecats-lsp.com/seabirds/" target="_blank" rel="noopener noreferrer" title="SeaBirds">
+          <img alt="SeaBirds" src="https://threecats-lsp.com/seabirds/icon-192.png" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border-hi);object-fit:contain;display:block;"/>
+        </a>
+        ${IS_NATIVE ? '' : `<a class="app-footer-icon" href="https://threecats-lsp.com/get-in-water/download.html" target="_blank" rel="noopener noreferrer" title="Download Get In Water APK">
+          <img id="footerAppLogo" alt="Get In Water APK" src="${appLogoSrc()}" style="border-radius:8px;border:1px solid var(--border-hi)"/>
+        </a>`}
+      </div>
+      <div class="app-footer-donate-wrap">
+        <a class="app-footer-donate" href="https://paypal.me/ThreeCatsLSP" target="_blank" rel="noopener noreferrer">
+          <svg fill="none" height="13" viewBox="0 0 24 24" width="13" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828L8.293 21H12.5c.524 0 .968-.381 1.05-.9l.437-2.786h1.8c3.476 0 5.893-1.408 6.656-5.49.343-1.818.044-3.145-.22-4.907z" fill="currentColor" opacity="0.7"/></svg>
+          If you find this useful, consider a donation to support development
+        </a>
+      </div>
+      <p class="app-footer-version">Version ${APP_VERSION}</p>
+    </footer>`;
+}
+
+function renderHomeTripsHtml() {
+  ensureSettings();
+  const trips = getHomeTrips();
+  if (!trips.length) {
+    return `<div class="empty-state"><div style="font-size:36px">🧳</div><p>${homeSearch ? 'No trips match your search.' : 'No trips yet.<br>Create one from your master gear template.'}</p></div>`;
+  }
+  return trips.map(t => {
+    const p = tripProgress(t);
+    const dateStr = formatTripDateRange(t);
+    const countdown = tripCountdown(t);
+    const pinned = state.settings.pinnedTripId === t.id;
+    return `
+      <div class="trip-card ${t.archived ? 'archived' : ''}">
+        <div class="trip-card-head">
+          <div class="trip-card-main" onclick="navigate('trip','${jsAttr(t.id)}')">
+            <h3>${esc(t.name)}${pinned ? ' 📌' : ''}${t.archived ? ' <span style="font-size:11px;color:var(--muted)">(archived)</span>' : ''}</h3>
+            ${t.location ? `<div class="trip-location">${esc(t.location)}</div>` : ''}
+            <div class="trip-meta">${dateStr ? esc(dateStr) : ''}${dateStr && countdown ? ' · ' : ''}${countdown ? `<span class="trip-countdown">${esc(countdown)}</span> · ` : ''}${p.done}/${p.total} packed</div>
+            ${(t.tags && t.tags.length) ? `<div class="trip-tags">${formatTagsHtml(t.tags)}</div>` : ''}
+          </div>
+          <div class="trip-card-actions">
+            <button class="icon-btn icon-btn-sm" onclick="promptDuplicateTrip('${jsAttr(t.id)}')" title="Duplicate trip">${icon('copy', 14)}</button>
+            <button class="icon-btn icon-btn-sm danger" onclick="deleteTrip('${jsAttr(t.id)}')" title="Remove trip">${icon('close', 14)}</button>
+          </div>
+        </div>
+        <div class="progress-bar" onclick="navigate('trip','${jsAttr(t.id)}')"><div class="progress-fill" style="width:${p.pct}%"></div></div>
+      </div>`;
+  }).join('');
+}
+
+function renderHome() {
+  return `
+    ${renderHeader('GET IN WATER', 'Trip Packing Checklist', false)}
+    <div class="action-row">
+      <button class="btn-primary btn-icon-only" onclick="promptNewTrip()" title="New trip">${icon('plus', 18)}</button>
+      ${renderHomeSyncButton()}
+    </div>
+    <div class="home-toolbar">
+      <input type="search" id="home-search" placeholder="Search trips, tags, gear…" value="${esc(homeSearch)}" oninput="setHomeSearch(this.value)"/>
+      <select onchange="setHomeSort(this.value)">
+        <option value="created" ${state.settings.homeSort === 'created' ? 'selected' : ''}>Newest</option>
+        <option value="date" ${state.settings.homeSort === 'date' ? 'selected' : ''}>By date</option>
+        <option value="progress" ${state.settings.homeSort === 'progress' ? 'selected' : ''}>By progress</option>
+        <option value="name" ${state.settings.homeSort === 'name' ? 'selected' : ''}>By name</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="card-title">Your Trips</div>
+      <div id="home-trips">${renderHomeTripsHtml()}</div>
+      <div class="home-list-filters">
+        <label><input type="checkbox" ${state.settings.hideCompleted ? 'checked' : ''} onchange="setHideCompleted(this.checked)"/> Hide completed</label>
+        <label><input type="checkbox" ${state.settings.showArchived ? 'checked' : ''} onchange="setShowArchived(this.checked)"/> Show archived</label>
+      </div>
+    </div>
+    ${renderAppFooter()}`;
+}
+
+function refreshHomeTrips() {
+  const box = document.getElementById('home-trips');
+  if (box) box.innerHTML = renderHomeTripsHtml();
+}
+
+function setHomeSearch(v) {
+  homeSearch = v;
+  if (screen === 'home') refreshHomeTrips();
+  else render();
+}
+function setHomeSort(v) { state.settings.homeSort = v; saveState(); render(); }
+function setHideCompleted(v) {
+  state.settings.hideCompleted = v;
+  saveState();
+  if (screen === 'home') refreshHomeTrips();
+  else render();
+}
+function setShowArchived(v) {
+  state.settings.showArchived = v;
+  saveState();
+  if (screen === 'home') refreshHomeTrips();
+  else render();
+}
+
+function renderTemplateContent() {
+  const cats = getCategories();
+  const itemCount = state.masterTemplate.items.length;
+  let html = `
+    <p style="font-size:13px;color:var(--tip);line-height:1.55;margin-bottom:12px">Your <strong>master gear list</strong> — ${itemCount} item${itemCount !== 1 ? 's' : ''} in ${cats.length} card${cats.length !== 1 ? 's' : ''}. New trips start from this list.</p>
+    <div class="export-row">
+      <div class="menu-dropdown">
+        <button class="btn-export btn-icon-only" onclick="toggleExportMenu(event)" title="Export">${icon('fileText', 16)}</button>
+        <div class="menu-panel ${exportMenuOpen ? 'open' : ''}" id="master-export-menu">
+          <button onclick="doTemplateExport('txt')">Master gear (TXT)</button>
+          <button onclick="doTemplateExport('pdf')">Master gear (PDF)</button>
+        </div>
+      </div>
+      <button class="btn-secondary btn-icon-only" onclick="addCategory()" title="Add card">${icon('plus', 18)}</button>
+    </div>`;
+  cats.forEach((cat) => {
+    const items = state.masterTemplate.items.filter(i => i.categoryId === cat.id);
+    html += `
+      <div class="card collapsible card-open" id="cat-${cat.id}">
+        <div class="card-title" onclick="toggleCard(this)">
+          <div class="card-title-left" onclick="event.stopPropagation()">
+            <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameCategory('${jsAttr(cat.id)}',this.value)" title="Rename card"/>
+            <div class="card-title-actions">
+              <div class="card-move-stack">
+                <button class="icon-btn icon-btn-sm" onclick="moveCategory('${jsAttr(cat.id)}',-1)" title="Move card up">${icon('chevUp', 11)}</button>
+                <button class="icon-btn icon-btn-sm" onclick="moveCategory('${jsAttr(cat.id)}',1)" title="Move card down">${icon('chevDown', 11)}</button>
+              </div>
+              <button class="icon-btn icon-btn-sm danger" onclick="deleteCategory('${jsAttr(cat.id)}')" title="Remove card">${icon('close', 13)}</button>
+            </div>
+          </div>
+          <div class="card-title-right">
+            <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addTemplateItem('${jsAttr(cat.id)}')" title="Add item">${icon('plus', 13)}</button>
+            <span class="card-caret">${icon('chevDown', 11)}</span>
+          </div>
+        </div>
+        <div class="card-collapsible-body">
+          ${items.length ? items.map(it => renderItemRow({ type: 'template', tripId: '' }, it)).join('') : `<div class="empty-state" style="padding:12px 4px"><p style="margin:0;font-size:12px">No items — tap + to add</p></div>`}
+        </div>
+      </div>`;
+  });
+  return html;
+}
+
+function renderMasterGearEditor() {
+  return `
+    <div class="action-row">
+      <button class="btn-secondary" onclick="closeMasterGearEditor()">← All templates</button>
+    </div>
+    ${renderTemplateContent()}`;
+}
+
+function renderStartersTab() {
+  if (editingMasterGear) return renderMasterGearEditor();
+  if (activeSavedTemplateId) return renderSavedTemplateEditor();
+  return renderTemplatesGallery();
+}
+
+function renderMasterGearCard() {
+  const catCount = state.masterTemplate.categories.length;
+  const itemCount = state.masterTemplate.items.length;
+  return `
+    <div class="template-card template-card-master">
+      <h4>Master gear list</h4>
+      <p>Your default packing list — categories and items copied when you start a new trip.</p>
+      <div class="template-card-meta">${catCount} card${catCount !== 1 ? 's' : ''} · ${itemCount} item${itemCount !== 1 ? 's' : ''}</div>
+      <div class="template-card-actions">
+        <button class="btn-primary btn-icon-only" onclick="openMasterGearEditor()" title="Edit master gear list">${icon('edit', 18)}</button>
+      </div>
+    </div>`;
+}
+
+function renderTemplatesGallery() {
+  const templates = state.savedTemplates || [];
+  const cards = templates.map(tpl => {
+    const itemCount = tpl.items.length;
+    const catCount = tpl.categories.length;
+    return `
+    <div class="template-card">
+      <h4>${esc(tpl.name)}${tpl.builtIn ? ' <span style="font-size:10px;color:var(--muted)">· built-in</span>' : ''}</h4>
+      <p>${esc(tpl.desc || 'No description')}</p>
+      <div class="template-card-meta">${catCount} card${catCount !== 1 ? 's' : ''} · ${itemCount} item${itemCount !== 1 ? 's' : ''}</div>
+      <div class="template-card-actions">
+        <button class="btn-secondary btn-icon-only" onclick="openSavedTemplateEditor('${jsAttr(tpl.id)}')" title="Edit">${icon('edit', 18)}</button>
+        <button class="btn-secondary btn-icon-only" onclick="mergeSavedTemplate('${jsAttr(tpl.id)}')" title="Add to master gear list">${icon('merge', 18)}</button>
+      </div>
+    </div>`;
+  }).join('');
+  return `
+    <p style="font-size:13px;color:var(--tip);line-height:1.55;margin-bottom:12px">Reusable packing lists. Copy and edit a template, then add its items to your master gear list.</p>
+    <div class="action-row">
+      <button class="btn-primary btn-icon-only" onclick="promptNewSavedTemplate()" title="New template">${icon('plus', 18)}</button>
+    </div>
+    <div class="template-gallery">${renderMasterGearCard()}${cards || '<div class="empty-state" style="grid-column:1/-1"><p>No starter templates yet.</p></div>'}</div>`;
+}
+
+function renderSavedTemplateEditor() {
+  const tpl = getSavedTemplate(activeSavedTemplateId);
+  if (!tpl) { activeSavedTemplateId = null; return renderTemplatesGallery(); }
+  const cats = [...tpl.categories].sort((a, b) => a.order - b.order);
+  let catsHtml = cats.map(cat => {
+    const items = tpl.items.filter(i => i.categoryId === cat.id);
+    return `
+      <div class="card collapsible card-open">
+        <div class="card-title" onclick="toggleCard(this)">
+          <div class="card-title-left" onclick="event.stopPropagation()">
+            <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}',this.value)" title="Rename card"/>
+            <div class="card-title-actions">
+              <div class="card-move-stack">
+                <button class="icon-btn icon-btn-sm" onclick="moveSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}',-1)" title="Move card up">${icon('chevUp', 11)}</button>
+                <button class="icon-btn icon-btn-sm" onclick="moveSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}',1)" title="Move card down">${icon('chevDown', 11)}</button>
+              </div>
+              <button class="icon-btn icon-btn-sm danger" onclick="deleteSavedCategory('${jsAttr(tpl.id)}','${jsAttr(cat.id)}')" title="Remove card">${icon('close', 13)}</button>
+            </div>
+          </div>
+          <div class="card-title-right">
+            <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addSavedTemplateItem('${jsAttr(tpl.id)}','${jsAttr(cat.id)}')" title="Add item">${icon('plus', 13)}</button>
+            <span class="card-caret">${icon('chevDown', 11)}</span>
+          </div>
+        </div>
+        <div class="card-collapsible-body">
+          ${items.length ? items.map(it => renderItemRow({ type: 'saved', tripId: tpl.id }, it)).join('') : `<div class="empty-state" style="padding:12px 4px"><p style="margin:0;font-size:12px">No items — tap + to add</p></div>`}
+        </div>
+      </div>`;
+  }).join('');
+  return `
+    <div class="action-row">
+      <button class="btn-secondary" onclick="closeSavedTemplateEditor()">← All templates</button>
+    </div>
+    <div class="card">
+      <div class="modal-field"><label style="display:block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Template name</label>
+        <input style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px" value="${esc(tpl.name)}" onchange="updateSavedTemplateMeta('${jsAttr(tpl.id)}',this.value,null)"/></div>
+      <div class="modal-field" style="margin-top:10px"><label style="display:block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Description</label>
+        <input style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px" value="${esc(tpl.desc || '')}" placeholder="What is this template for?" onchange="updateSavedTemplateMeta('${jsAttr(tpl.id)}',null,this.value)"/></div>
+    </div>
+    <div class="action-row">
+      <button class="btn-secondary btn-icon-only" onclick="addSavedCategory('${jsAttr(tpl.id)}')" title="Add card">${icon('plus', 18)}</button>
+    </div>
+    ${catsHtml}
+    <div class="action-row" style="margin-top:8px">
+      <button class="btn-primary btn-icon-only" onclick="mergeSavedTemplate('${jsAttr(tpl.id)}')" title="Add to master gear list">${icon('merge', 18)}</button>
+      ${tpl.builtIn
+        ? `<button class="btn-export btn-reset-red btn-icon-only" onclick="resetSavedTemplate('${jsAttr(tpl.id)}')" title="Reset to default">${icon('reset', 18)}</button>`
+        : `<button class="btn-secondary btn-danger" onclick="deleteSavedTemplate('${jsAttr(tpl.id)}')">Delete template</button>`}
+    </div>`;
+}
+
+function renderAboutTab() {
+  return `
+    ${renderAccountSyncCard()}
+    <div class="card">
+      <div class="card-title">Companion to LSP D-Planner+</div>
+      <p style="font-size:14px;line-height:1.6;color:var(--tip)">
+        Get In Water helps you pack for dive trips. Edit your <strong>master gear list</strong> under Templates, start a trip checklist, and tick items off as you pack. Export TXT or PDF for printing.
+      </p>
+    </div>
+    <div class="card">
+      <div class="card-title">Backup & restore</div>
+      <p style="font-size:13px;color:var(--tip);line-height:1.55;margin-bottom:12px">Export all trips and your master gear as JSON. Restore on a new device by importing the file.</p>
+      <div class="action-row">
+        <button class="btn-secondary" onclick="exportBackupJSON()">Export backup (JSON)</button>
+        <button class="btn-secondary" onclick="document.getElementById('import-json-input').click()">Import backup</button>
+        <input type="file" id="import-json-input" accept="application/json,.json" style="display:none" onchange="importBackupJSON(this)"/>
+      </div>
+    </div>
+    <a class="link-card" href="https://threecats-lsp.com" target="_blank" rel="noopener">🏠 Three Cats LSP · Diver's Toolkit</a>
+    <a class="link-card" href="https://github.com/Three-Cats-LSP/Get-In-Water" target="_blank" rel="noopener">GitHub · Get In Water</a>
+    ${IS_NATIVE ? '' : '<a class="link-card" href="https://threecats-lsp.com/get-in-water/download.html" target="_blank" rel="noopener">⬇ Get In Water · Download APK</a>'}
+    <a class="link-card" href="https://threecats-lsp.com/seabirds/" target="_blank" rel="noopener">SeaBirds</a>
+    <a class="link-card" href="https://www.thingiverse.com/Roman_Markovtsev/designs" target="_blank" rel="noopener">My Designs · Thingiverse</a>
+    <a class="link-card" href="https://www.instagram.com/threecats_lsp" target="_blank" rel="noopener">Follow @threecats_lsp on Instagram</a>
+    <a class="link-card" href="https://paypal.me/ThreeCatsLSP" target="_blank" rel="noopener">💙 Support Development · PayPal</a>
+    <p style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:16px;opacity:0.7">v${APP_VERSION} · Three Cats LSP</p>`;
+}
+
+function renderAbout() {
+  return `
+    ${renderHeader('GET IN WATER', 'Settings & About', true)}
+    <div class="about-tabs">
+      <button class="about-tab-btn ${aboutTab === 'starters' ? 'active' : ''}" onclick="switchAboutTab('starters')">Templates</button>
+      <button class="about-tab-btn ${aboutTab === 'about' ? 'active' : ''}" onclick="switchAboutTab('about')">About</button>
+    </div>
+    ${aboutTab === 'starters' ? renderStartersTab() : renderAboutTab()}`;
+}
+
+function renderItemRow(ctx, it) {
+  const { type, tripId } = ctx;
+  ensureItem(it);
+  if (type === 'template' || type === 'saved') {
+    const badges = [];
+    if (it.critical) badges.push(`<span class="item-badge">★ critical</span>`);
+    if (it.bag) badges.push(`<span class="item-badge">${esc(bagLabel(it.bag))}</span>`);
+    const delFn = type === 'saved'
+      ? `deleteSavedTemplateItem('${jsAttr(tripId)}','${jsAttr(it.id)}')`
+      : `deleteTemplateItem('${jsAttr(it.id)}')`;
+    return `
+      <div class="edit-row">
+        <div style="flex:1;min-width:0">
+          <div class="item-name">${esc(itemDisplayName(it))}</div>
+          ${it.note ? `<div class="item-note">${esc(it.note)}</div>` : ''}
+          ${badges.length ? `<div class="item-meta">${badges.join('')}</div>` : ''}
+        </div>
+        <button class="icon-btn" onclick="openItemEditor('${type}','${jsAttr(tripId)}','${jsAttr(it.id)}')" title="Edit">${icon('edit', 14)}</button>
+        <button class="icon-btn danger" onclick="${delFn}" title="Delete">${icon('close', 14)}</button>
+      </div>`;
+  }
+  const trip = tripId ? state.trips.find(t => t.id === tripId) : null;
+  if (trip && trip.unpackMode && it.packed < it.qty) return '';
+  const packed = isItemPacked(it, trip);
+  if (trip && !itemMatchesSection(it, trip.viewSection)) return '';
+  const packedCount = itemPackedCount(it, trip);
+  const cls = ['check-item', packed ? 'checked' : '', it.critical ? 'critical-item' : ''].filter(Boolean).join(' ');
+  const onToggle = type === 'trip'
+    ? `onclick="toggleTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}')"`
+    : '';
+  const qtyHtml = it.qty > 1 ? `
+    <div class="qty-controls" onclick="event.stopPropagation()">
+      <button class="qty-btn" onclick="adjustItemQty('${type}','${jsAttr(tripId)}','${jsAttr(it.id)}',-1)">−</button>
+      <span class="qty-label">${packedCount}/${it.qty}</span>
+      <button class="qty-btn" onclick="adjustItemQty('${type}','${jsAttr(tripId)}','${jsAttr(it.id)}',1)">+</button>
+    </div>` : '';
+  const badges = [];
+  if (it.bag) badges.push(`<span class="item-badge">${esc(bagLabel(it.bag))}</span>`);
+  if (it.sections && it.sections.length) {
+    it.sections.forEach(sid => {
+      const sec = TRIP_SECTIONS.find(s => s.id === sid);
+      if (sec) badges.push(`<span class="item-badge">${esc(sec.label)}</span>`);
+    });
+  }
+  const editBtn = `<button class="icon-btn" onclick="event.stopPropagation(); openItemEditor('${type}','${jsAttr(tripId)}','${jsAttr(it.id)}')" title="Edit item">${icon('edit', 14)}</button>`;
+  const moveBtns = type === 'trip'
+    ? `<div class="item-move-stack" onclick="event.stopPropagation()">
+         <button class="icon-btn" onclick="moveTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}',-1)" title="Move item up">${icon('chevUp', 11)}</button>
+         <button class="icon-btn" onclick="moveTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}',1)" title="Move item down">${icon('chevDown', 11)}</button>
+       </div>`
+    : '';
+  const delBtn = type === 'trip'
+    ? `<button class="icon-btn danger" onclick="event.stopPropagation(); deleteTripItem('${jsAttr(tripId)}','${jsAttr(it.id)}')" title="Remove item">${icon('close', 14)}</button>`
+    : `<button class="icon-btn danger" onclick="deleteTemplateItem('${jsAttr(it.id)}')" title="Delete item">${icon('close', 14)}</button>`;
+  return `
+    <div class="${cls}">
+      <div class="check-main" ${onToggle}>
+        <div class="check-box">${packed ? icon('check', 14) : ''}</div>
+        <div style="flex:1;min-width:0">
+          <div class="item-name">${esc(itemDisplayName(it))}</div>
+          ${it.note ? `<div class="item-note">${esc(it.note)}</div>` : ''}
+          ${badges.length ? `<div class="item-meta">${badges.join('')}</div>` : ''}
+        </div>
+      </div>
+      ${qtyHtml}
+      <div class="item-actions">${moveBtns}${editBtn}${delBtn}</div>
+    </div>`;
+}
+
+function renderTrip() {
+  const trip = state.trips.find(t => t.id === activeTripId);
+  if (!trip) return renderHome();
+  ensureTripShape(trip);
+  const p = tripProgress(trip);
+  const cats = getTripCategories(trip);
+  const knownIds = new Set(cats.map(c => c.id));
+  const criticalLeft = criticalItemsRemaining(trip);
+  const complete = tripIsComplete(trip);
+
+  if (complete && !trip.unpackMode) {
+    if (trip.returnMode && !trip.returnCelebrated) {
+      trip.returnCelebrated = true;
+      saveState();
+      setTimeout(() => openCelebrateOverlay('return'), 300);
+    } else if (!trip.returnMode && !trip.celebrated) {
+      trip.celebrated = true;
+      saveState();
+      setTimeout(() => openCelebrateOverlay('pack'), 300);
+    }
+  }
+
+  const sectionTabs = `<div class="trip-subbar">
+    <div class="section-tabs">
+      <button class="section-tab ${trip.viewSection === 'all' ? 'active' : ''}" onclick="setTripSection('${jsAttr(trip.id)}','all')">All</button>
+      ${TRIP_SECTIONS.map(s => `<button class="section-tab ${trip.viewSection === s.id ? 'active' : ''}" onclick="setTripSection('${jsAttr(trip.id)}','${s.id}')">${esc(s.label)}</button>`).join('')}
+    </div>
+    <div class="trip-mode-actions">
+      <button class="trip-mode-btn ${trip.unpackMode ? 'active' : ''}" onclick="toggleUnpackMode('${jsAttr(trip.id)}')" title="${trip.unpackMode ? 'Exit unpack mode' : 'Unpack mode — tap items as you repack'}">${trip.unpackMode ? 'Unpacking' : 'Unpack'}</button>
+      <button class="trip-mode-btn ${trip.returnMode ? 'return-active' : ''}" onclick="toggleReturnMode('${jsAttr(trip.id)}')" title="${trip.returnMode ? 'Exit return mode' : 'Return mode — pack gear for the trip home'}">${trip.returnMode ? 'Returning' : 'Return'}</button>
+    </div>
+  </div>`;
+
+  let banner = '';
+  if (trip.returnMode) {
+    if (criticalLeft.length) {
+      banner = `<div class="critical-banner">⚠ ${criticalLeft.length} critical item${criticalLeft.length !== 1 ? 's' : ''} not packed for home: ${criticalLeft.slice(0, 3).map(i => esc(i.name)).join(', ')}${criticalLeft.length > 3 ? '…' : ''}</div>`;
+    } else if (complete) {
+      banner = `<div class="ready-banner">✓ All gear collected — ready to head home!</div>`;
+    } else {
+      const left = trip.items.filter(i => !isItemPacked(i, trip)).length;
+      banner = `<div class="critical-banner" style="border-color:var(--yellow);color:var(--yellow);background:rgba(255,183,3,0.1)">Return mode — ${left} item${left !== 1 ? 's' : ''} still to collect for the trip home</div>`;
+    }
+  } else if (criticalLeft.length && !trip.unpackMode) {
+    banner = `<div class="critical-banner">⚠ ${criticalLeft.length} critical item${criticalLeft.length !== 1 ? 's' : ''} not packed: ${criticalLeft.slice(0, 3).map(i => esc(i.name)).join(', ')}${criticalLeft.length > 3 ? '…' : ''}</div>`;
+  } else if (complete && !trip.unpackMode) {
+    banner = `<div class="ready-banner">✓ All packed — ready to dive!</div>`;
+  } else if (trip.unpackMode) {
+    banner = `<div class="critical-banner" style="border-color:var(--accent);color:var(--accent);background:rgba(0,200,255,0.1)">Unpack mode — tap items as you repack</div>`;
+  }
+
+  let catsHtml = cats.map(cat => {
+    const items = trip.items.filter(i => i.categoryId === cat.id);
+    const rows = items.map(it => renderItemRow({ type: 'trip', tripId: trip.id }, it)).filter(Boolean).join('');
+    if (!rows && trip.viewSection !== 'all') return '';
+    return `
+      <div class="card collapsible card-open">
+        <div class="card-title" onclick="toggleCard(this)">
+          <div class="card-title-left" onclick="event.stopPropagation()">
+            <input value="${esc(cat.name)}" size="${Math.max(4, cat.name.length)}" onchange="renameTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}',this.value)" title="Rename card"/>
+            <div class="card-title-actions">
+              <div class="card-move-stack">
+                <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}',-1)" title="Move card up">${icon('chevUp', 11)}</button>
+                <button class="icon-btn icon-btn-sm" onclick="moveTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}',1)" title="Move card down">${icon('chevDown', 11)}</button>
+              </div>
+              <button class="icon-btn icon-btn-sm" onclick="duplicateTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}')" title="Duplicate card">${icon('copy', 13)}</button>
+              <button class="icon-btn icon-btn-sm danger" onclick="removeTripCategory('${jsAttr(trip.id)}','${jsAttr(cat.id)}')" title="Remove card">${icon('close', 13)}</button>
+            </div>
+          </div>
+          <div class="card-title-right">
+            <button class="icon-btn icon-btn-sm card-add-btn" onclick="event.stopPropagation(); addTripItem('${jsAttr(trip.id)}','${jsAttr(cat.id)}')" title="Add item">${icon('plus', 13)}</button>
+            <span class="card-caret">${icon('chevDown', 11)}</span>
+          </div>
+        </div>
+        <div class="card-collapsible-body">
+          ${rows || `<div class="empty-state" style="padding:12px 4px"><p style="margin:0;font-size:12px">No items in this section — tap + to add</p></div>`}
+        </div>
+      </div>`;
+  }).join('');
+
+  const otherItems = trip.items.filter(it => !knownIds.has(it.categoryId));
+  const otherRows = otherItems.map(it => renderItemRow({ type: 'trip', tripId: trip.id }, it)).filter(Boolean).join('');
+  if (otherRows) {
+    catsHtml += `
+      <div class="card collapsible card-open">
+        <div class="card-title" onclick="toggleCard(this)">
+          <div class="card-title-left">Other</div>
+          <div class="card-title-right"><span class="card-caret">${icon('chevDown', 11)}</span></div>
+        </div>
+        <div class="card-collapsible-body">${otherRows}</div>
+      </div>`;
+  }
+
+  const subtitle = [formatTripDateRange(trip), trip.location].filter(Boolean).join(' · ') || 'Packing checklist';
+  const pinned = state.settings.pinnedTripId === trip.id;
+
+  return `
+    ${renderHeader(trip.name, subtitle, true, trip.tags)}
+    <div class="progress-sticky">
+      <div class="trip-meta">${p.done} / ${p.total} ${trip.returnMode ? 'collected' : 'packed'} (${p.pct}%)${trip.returnMode ? ' · Return mode' : trip.unpackMode ? ' · Unpacking' : ''}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${p.pct}%"></div></div>
+    </div>
+    ${banner}
+    ${sectionTabs}
+    <div class="action-row">
+      <button class="btn-secondary btn-icon-only" onclick="addTripCategory('${jsAttr(trip.id)}')" title="Add card">${icon('plus', 18)}</button>
+      <div class="menu-dropdown">
+        <button class="btn-export btn-icon-only" onclick="toggleExportMenu(event)" title="Export">${icon('fileText', 16)}</button>
+        <div class="menu-panel ${exportMenuOpen ? 'open' : ''}" id="trip-export-menu">
+          <button onclick="doTripExport('full','txt')">Full checklist (TXT)</button>
+          <button onclick="doTripExport('full','pdf')">Full checklist (PDF)</button>
+          <button onclick="doTripExport('remaining','txt')">Remaining items (TXT)</button>
+          <button onclick="doTripExport('remaining','pdf')">Remaining items (PDF)</button>
+          <button onclick="doTripExport('bag','txt')">By bag (TXT)</button>
+          <button onclick="doTripExport('bag','pdf')">By bag (PDF)</button>
+        </div>
+      </div>
+      <div class="menu-dropdown">
+        <button class="btn-secondary btn-icon-only" onclick="toggleMenu(event)" title="More">${icon('menu', 18)}</button>
+        <div class="menu-panel ${menuOpen ? 'open' : ''}" id="trip-menu">
+          <button onclick="promptEditTripDetails('${jsAttr(trip.id)}')">Trip details</button>
+          <button onclick="togglePinTrip('${jsAttr(trip.id)}')">${pinned ? 'Unpin from widget' : 'Pin for home widget'}</button>
+          <button onclick="promptBuddyCopy('${jsAttr(trip.id)}')">Buddy copy</button>
+          <button onclick="shareRemaining('${jsAttr(trip.id)}')">Share remaining list</button>
+          <button onclick="resetTrip('${jsAttr(trip.id)}')">Reset all checks</button>
+          <button onclick="toggleArchiveTrip('${jsAttr(trip.id)}')">${trip.archived ? 'Restore from archive' : 'Archive trip'}</button>
+          <button class="danger" onclick="deleteTrip('${jsAttr(trip.id)}')">Delete trip</button>
+        </div>
+      </div>
+    </div>
+    ${catsHtml}`;
+}
+
+function closeCelebrate() {
+  document.getElementById('celebrate-overlay').classList.remove('open');
+}
+
+function openCelebrateOverlay(kind) {
+  const overlay = document.getElementById('celebrate-overlay');
+  const emoji = overlay.querySelector('.emoji');
+  const title = overlay.querySelector('h3');
+  const text = overlay.querySelector('p');
+  const btn = overlay.querySelector('button');
+  if (kind === 'return') {
+    emoji.textContent = '🧳';
+    title.textContent = 'Ready to head home!';
+    text.textContent = 'All gear collected. Safe travels!';
+    btn.textContent = 'Done';
+  } else {
+    emoji.textContent = '🤿';
+    title.textContent = 'Ready to dive!';
+    text.textContent = 'Everything is packed. Have a safe and fun trip!';
+    btn.textContent = "Let's go";
+  }
+  overlay.classList.add('open');
+}
+
+function setTripSection(tripId, sectionId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (trip) { trip.viewSection = sectionId; saveState(); navigate('trip', tripId); }
+}
+
+function toggleUnpackMode(tripId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  trip.unpackMode = !trip.unpackMode;
+  if (trip.unpackMode) trip.returnMode = false;
+  saveState();
+  showToast(trip.unpackMode ? 'Unpack mode on' : 'Pack mode');
+  navigate('trip', tripId);
+}
+
+function toggleReturnMode(tripId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  if (!trip.returnMode) {
+    trip.returnMode = true;
+    trip.unpackMode = false;
+    trip.returnCelebrated = false;
+    trip.items.forEach(i => { ensureItem(i); i.returnPacked = 0; });
+    showToast('Return mode — check items as you pack for home');
+  } else {
+    trip.returnMode = false;
+    showToast('Exit return mode');
+  }
+  saveState();
+  navigate('trip', tripId);
+}
+
+function togglePinTrip(tripId) {
+  ensureSettings();
+  state.settings.pinnedTripId = state.settings.pinnedTripId === tripId ? null : tripId;
+  saveState();
+  showToast(state.settings.pinnedTripId ? 'Pinned for widget' : 'Unpinned');
+  navigate('trip', tripId);
+}
+
+function toggleArchiveTrip(tripId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  trip.archived = !trip.archived;
+  saveState();
+  showToast(trip.archived ? 'Trip archived' : 'Trip restored');
+  if (trip.archived) navigate('home');
+  else navigate('trip', tripId);
+}
+
+async function shareRemaining(tripId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  const text = buildTripText(trip, 'remaining');
+  if (navigator.share) {
+    try { await navigator.share({ title: trip.name + ' — remaining', text }); return; } catch (e) {}
+  }
+  downloadBlob(text, `GIW_${dateStr()}_${safeFilename(trip.name)}_Remaining.txt`, 'text/plain');
+}
+
+function render() {
+  const root = document.getElementById('app-root');
+  if (screen === 'home') root.innerHTML = renderHome();
+  else if (screen === 'trip') root.innerHTML = renderTrip();
+  else if (screen === 'about') root.innerHTML = renderAbout();
+  applyTheme();
+}
+
+function toggleExportMenu(e) {
+  e.stopPropagation();
+  exportMenuOpen = !exportMenuOpen;
+  menuOpen = false;
+  render();
+}
+
+function toggleMenu(e) {
+  e.stopPropagation();
+  menuOpen = !menuOpen;
+  exportMenuOpen = false;
+  render();
+}
+
+function doTripExport(mode, fmt) {
+  exportMenuOpen = false;
+  if (fmt === 'pdf') exportTripPDF(mode);
+  else exportTripTXT(mode);
+  render();
+}
+
+function doTemplateExport(fmt) {
+  exportMenuOpen = false;
+  if (fmt === 'pdf') exportTemplatePDF();
+  else exportTemplateTXT();
+  render();
+}
+
+document.addEventListener('click', () => {
+  if (menuOpen || exportMenuOpen) {
+    menuOpen = false;
+    exportMenuOpen = false;
+    render();
+  }
+});
+
+// ── Template editing ──
+function addCategory() {
+  const order = state.masterTemplate.categories.length;
+  state.masterTemplate.categories.push({ id: uid(), name: 'New Category', order });
+  saveState(); stayInMasterGearEditor(); navigate('about');
+}
+function renameCategory(id, name) {
+  const c = state.masterTemplate.categories.find(x => x.id === id);
+  if (c) { c.name = name.trim() || c.name; saveState(); }
+}
+function deleteCategory(id) {
+  if (!confirm('Delete this category and all its items?')) return;
+  state.masterTemplate.categories = state.masterTemplate.categories.filter(c => c.id !== id);
+  state.masterTemplate.items = state.masterTemplate.items.filter(i => i.categoryId !== id);
+  saveState(); stayInMasterGearEditor(); navigate('about');
+}
+function moveCategory(id, dir) {
+  const cats = getCategories();
+  const idx = cats.findIndex(c => c.id === id);
+  const swap = idx + dir;
+  if (swap < 0 || swap >= cats.length) return;
+  const tmp = cats[idx].order; cats[idx].order = cats[swap].order; cats[swap].order = tmp;
+  saveState(); stayInMasterGearEditor(); navigate('about');
+}
+function addTemplateItem(catId) {
+  const item = { id: uid(), categoryId: catId, name: 'New item', note: '', qty: 1, packed: 0, critical: false, bag: '', sections: [] };
+  state.masterTemplate.items.push(item);
+  stayInMasterGearEditor();
+  openItemEditor('template', '', item.id, { removeOnCancel: true });
+}
+function renameTemplateItem(id, name) {
+  const it = state.masterTemplate.items.find(x => x.id === id);
+  if (it) { it.name = name.trim() || it.name; saveState(); }
+}
+function deleteTemplateItem(id) {
+  state.masterTemplate.items = state.masterTemplate.items.filter(i => i.id !== id);
+  saveState(); stayInMasterGearEditor(); navigate('about');
+}
+
+// ── Trip actions ──
+function getItemRef(type, tripId, itemId) {
+  if (type === 'template') return state.masterTemplate.items.find(i => i.id === itemId);
+  if (type === 'saved') {
+    const tpl = getSavedTemplate(tripId);
+    return tpl && tpl.items.find(i => i.id === itemId);
+  }
+  const trip = state.trips.find(t => t.id === tripId);
+  return trip && trip.items.find(i => i.id === itemId);
+}
+
+function removeItemRef(type, tripId, itemId) {
+  if (type === 'template') {
+    state.masterTemplate.items = state.masterTemplate.items.filter(i => i.id !== itemId);
+    return;
+  }
+  if (type === 'saved') {
+    const tpl = getSavedTemplate(tripId);
+    if (tpl) tpl.items = tpl.items.filter(i => i.id !== itemId);
+    return;
+  }
+  const trip = state.trips.find(t => t.id === tripId);
+  if (trip) trip.items = trip.items.filter(i => i.id !== itemId);
+}
+
+function openItemEditor(type, tripId, itemId, options) {
+  const opts = options || {};
+  const it = getItemRef(type, tripId, itemId);
+  if (!it) return;
+  ensureItem(it);
+  const returnScrollY = window.scrollY;
+  let saved = false;
+  const sectionChecks = TRIP_SECTIONS.map(s =>
+    `<label class="modal-check-row"><input type="checkbox" class="item-sec" value="${s.id}" ${it.sections.includes(s.id) ? 'checked' : ''}/> ${esc(s.label)}</label>`
+  ).join('');
+  const bagOptions = BAG_TAGS.map(b =>
+    `<option value="${b.id}" ${it.bag === b.id ? 'selected' : ''}>${esc(b.label)}</option>`
+  ).join('');
+  openModal(`
+    <h3>Edit item</h3>
+    <div class="modal-field"><label>Name</label><input id="item-edit-name" value="${esc(it.name)}" autofocus/></div>
+    <div class="modal-field"><label>Note</label><input id="item-edit-note" value="${esc(it.note || '')}" placeholder="e.g. 32% nitrox, dry bag #2"/></div>
+    <div class="modal-field-row">
+      <div class="modal-field"><label>Quantity</label><input id="item-edit-qty" type="number" min="1" max="99" value="${it.qty}"/></div>
+      <div class="modal-field"><label>Bag / location</label>
+        <select id="item-edit-bag" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px">
+          <option value="">— None —</option>${bagOptions}
+        </select>
+      </div>
+    </div>
+    <div class="modal-field"><label class="modal-check-row" style="cursor:pointer"><input type="checkbox" id="item-edit-critical" ${it.critical ? 'checked' : ''}/> Critical — must not forget</label></div>
+    <div class="modal-field"><label>When to pack (leave empty = all phases)</label></div>
+    <div class="modal-checklist">${sectionChecks}</div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="item-edit-cancel">Cancel</button>
+      <button class="btn-primary" id="item-edit-save">Save</button>
+    </div>
+  `, () => {
+    document.getElementById('item-edit-cancel').onclick = () => {
+      if (opts.removeOnCancel && !saved) removeItemRef(type, tripId, itemId);
+      closeModal();
+    };
+    document.getElementById('item-edit-save').onclick = () => {
+      const target = getItemRef(type, tripId, itemId);
+      if (!target) {
+        showToast('Item no longer exists');
+        closeModal();
+        return;
+      }
+      ensureItem(target);
+      const name = document.getElementById('item-edit-name').value.trim();
+      if (!name) { showToast('Enter a name'); return; }
+      target.name = name;
+      target.note = document.getElementById('item-edit-note').value.trim();
+      target.qty = Math.max(1, parseInt(document.getElementById('item-edit-qty').value, 10) || 1);
+      target.bag = document.getElementById('item-edit-bag').value;
+      target.critical = document.getElementById('item-edit-critical').checked;
+      target.sections = [...document.querySelectorAll('.item-sec:checked')].map(el => el.value);
+      if (target.packed > target.qty) target.packed = target.qty;
+      if (target.returnPacked > target.qty) target.returnPacked = target.qty;
+      target.checked = target.packed >= target.qty;
+      saved = true;
+      saveState();
+      closeModal();
+      if (type === 'template') { stayInMasterGearEditor(); navigate('about'); }
+      else if (type === 'saved') { aboutTab = 'starters'; openSavedTemplateEditor(tripId); }
+      else navigate('trip', tripId, { preserveScroll: true, scrollY: returnScrollY });
+    };
+  });
+}
+
+function adjustItemQty(type, tripId, itemId, delta) {
+  const it = getItemRef(type, tripId, itemId);
+  if (!it) return;
+  ensureItem(it);
+  const trip = type === 'trip' ? state.trips.find(t => t.id === tripId) : null;
+  if (trip && trip.returnMode) {
+    it.returnPacked = Math.max(0, Math.min(it.qty, (it.returnPacked || 0) + delta));
+  } else {
+    it.packed = Math.max(0, Math.min(it.qty, it.packed + delta));
+    it.checked = it.packed >= it.qty;
+  }
+  saveState();
+  render();
+}
+
+function toggleTripItem(tripId, itemId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  const it = trip && trip.items.find(i => i.id === itemId);
+  if (!it) return;
+  ensureItem(it);
+  if (trip.returnMode) {
+    if (it.qty > 1) {
+      it.returnPacked = (it.returnPacked || 0) >= it.qty ? 0 : Math.min(it.qty, (it.returnPacked || 0) + 1);
+    } else {
+      it.returnPacked = (it.returnPacked || 0) >= it.qty ? 0 : it.qty;
+    }
+  } else if (trip.unpackMode) {
+    if (it.packed > 0) it.packed--;
+    it.checked = it.packed >= it.qty;
+  } else if (it.qty > 1) {
+    it.packed = it.packed >= it.qty ? 0 : Math.min(it.qty, it.packed + 1);
+    it.checked = it.packed >= it.qty;
+  } else {
+    it.packed = it.packed >= it.qty ? 0 : it.qty;
+    it.checked = it.packed >= it.qty;
+  }
+  saveState();
+  render();
+}
+function resetTrip(tripId) {
+  if (!confirm('Uncheck all items on this trip?')) return;
+  const trip = state.trips.find(t => t.id === tripId);
+  if (trip) {
+    trip.items.forEach(i => { ensureItem(i); i.packed = 0; i.returnPacked = 0; i.checked = false; });
+    trip.celebrated = false;
+    trip.returnCelebrated = false;
+    trip.unpackMode = false;
+    trip.returnMode = false;
+    saveState();
+    navigate('trip', tripId);
+  }
+}
+function deleteTrip(tripId) {
+  if (!confirm('Delete this trip?')) return;
+  state.trips = state.trips.filter(t => t.id !== tripId);
+  saveState();
+  if (screen === 'trip' && activeTripId === tripId) navigate('home');
+  else render();
+}
+function deleteTripItem(tripId, itemId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  trip.items = trip.items.filter(i => i.id !== itemId);
+  saveState();
+  navigate('trip', tripId, { preserveScroll: true });
+}
+function addTripItem(tripId, catId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (trip) {
+    const item = { id: uid(), categoryId: catId, name: 'New item', note: '', qty: 1, packed: 0, critical: false, bag: '', sections: [], checked: false, fromTemplate: false };
+    trip.items.push(item);
+    openItemEditor('trip', tripId, item.id, { removeOnCancel: true });
+  }
+}
+
+function moveTripItem(tripId, itemId, dir) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  const item = trip.items.find(i => i.id === itemId);
+  if (!item) return;
+  const categoryIndexes = trip.items
+    .map((it, index) => ({ it, index }))
+    .filter(entry => entry.it.categoryId === item.categoryId)
+    .map(entry => entry.index);
+  const idx = categoryIndexes.findIndex(index => trip.items[index].id === itemId);
+  const swapIdx = idx + dir;
+  if (swapIdx < 0 || swapIdx >= categoryIndexes.length) return;
+  const from = categoryIndexes[idx];
+  const to = categoryIndexes[swapIdx];
+  [trip.items[from], trip.items[to]] = [trip.items[to], trip.items[from]];
+  saveState();
+  navigate('trip', tripId, { preserveScroll: true });
+}
+
+function renameTripCategory(tripId, catId, name) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  ensureTripShape(trip);
+  const cat = trip.categories.find(c => c.id === catId);
+  if (cat) { cat.name = name.trim() || cat.name; saveState(); }
+}
+
+function addTripCategory(tripId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  ensureTripShape(trip);
+  const name = prompt('Card name:', 'New Category');
+  if (!name || !name.trim()) return;
+  const order = trip.categories.length ? Math.max(...trip.categories.map(c => c.order)) + 1 : 0;
+  trip.categories.push({ id: uid(), name: name.trim(), order });
+  saveState();
+  navigate('trip', tripId);
+}
+
+function removeTripCategory(tripId, catId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  ensureTripShape(trip);
+  if (!confirm('Remove this card and all its items from this trip?')) return;
+  trip.categories = trip.categories.filter(c => c.id !== catId);
+  trip.items = trip.items.filter(i => i.categoryId !== catId);
+  saveState();
+  navigate('trip', tripId);
+}
+
+function nextCategoryCopyName(categories, sourceName) {
+  const baseName = sourceName.replace(/\s*\(\d+\)\s*$/, '').trim();
+  const escaped = baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('^' + escaped + '(?: \\((\\d+)\\))?$');
+  let max = 1;
+  categories.forEach(c => {
+    const m = c.name.match(re);
+    if (m) max = Math.max(max, m[1] ? parseInt(m[1], 10) : 1);
+  });
+  return max === 1 ? baseName + ' (2)' : baseName + ' (' + (max + 1) + ')';
+}
+
+function duplicateTripCategory(tripId, catId) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  ensureTripShape(trip);
+  const src = trip.categories.find(c => c.id === catId);
+  if (!src) return;
+  const order = Math.max(...trip.categories.map(c => c.order)) + 1;
+  const newCatId = uid();
+  const newName = nextCategoryCopyName(trip.categories, src.name);
+  trip.categories.push({ id: newCatId, name: newName, order });
+  trip.items.filter(i => i.categoryId === catId).forEach(it => {
+    trip.items.push({
+      id: uid(), categoryId: newCatId, ...copyItemFields(it)
+    });
+  });
+  saveState();
+  navigate('trip', tripId);
+}
+
+function moveTripCategory(tripId, catId, dir) {
+  const trip = state.trips.find(t => t.id === tripId);
+  if (!trip) return;
+  const cats = getTripCategories(trip);
+  const idx = cats.findIndex(c => c.id === catId);
+  const swap = idx + dir;
+  if (swap < 0 || swap >= cats.length) return;
+  const tmp = cats[idx].order;
+  cats[idx].order = cats[swap].order;
+  cats[swap].order = tmp;
+  saveState();
+  navigate('trip', tripId, { preserveScroll: true });
+}
+
+// ── Export helpers ──
+function safeFilename(s) {
+  return String(s).replace(/[^a-zA-Z0-9_-]+/g, '_').replace(/^_|_$/g, '') || 'Trip';
+}
+function dateStr() { return new Date().toISOString().split('T')[0]; }
+
+function buildTemplateText() {
+  const lines = [
+    '═══════════════════════════════════════',
+    '  GET IN WATER — Master Gear Template',
+    '  Three Cats LSP · threecats-lsp.com',
+    '═══════════════════════════════════════', ''
+  ];
+  getCategories().forEach(cat => {
+    lines.push(`▸ ${cat.name.toUpperCase()}`);
+    state.masterTemplate.items.filter(i => i.categoryId === cat.id).forEach(it => {
+      ensureItem(it);
+      let line = '  • ' + itemDisplayName(it);
+      if (it.note) line += ' — ' + it.note;
+      if (it.bag) line += ' [' + bagLabel(it.bag) + ']';
+      if (it.critical) line += ' ★';
+      lines.push(line);
+    });
+    lines.push('');
+  });
+  lines.push('— Generated by Get In Water v' + APP_VERSION);
+  return lines.join('\n');
+}
+
+function formatItemExportLine(it, mode, trip) {
+  ensureItem(it);
+  if (mode === 'remaining' && isItemPacked(it, trip)) return null;
+  const mark = isItemPacked(it, trip) ? '[x]' : '[ ]';
+  const count = trip && trip.returnMode ? (it.returnPacked || 0) : it.packed;
+  let line = `  ${mark} ${itemDisplayName(it)}`;
+  if (it.qty > 1 && count > 0 && count < it.qty) line += ` (${count}/${it.qty} ${trip && trip.returnMode ? 'collected' : 'packed'})`;
+  if (it.note) line += ' — ' + it.note;
+  if (it.critical) line += ' ★';
+  return line;
+}
+
+function buildTripText(trip, mode) {
+  const p = tripProgress(trip);
+  ensureTripShape(trip);
+  const lines = [
+    '═══════════════════════════════════════',
+    '  GET IN WATER — Trip Packing List',
+    '  Three Cats LSP · threecats-lsp.com',
+    '═══════════════════════════════════════',
+    `Trip: ${trip.name}`,
+    trip.location ? `Location: ${trip.location}` : '',
+    formatTripDateRange(trip) ? `Dates: ${formatTripDateRange(trip)}` : '',
+    (trip.tags && trip.tags.length) ? `Tags: ${trip.tags.join(' ')}` : '',
+    `Progress: ${p.done}/${p.total} ${trip.returnMode ? 'collected' : 'packed'}`,
+    trip.returnMode ? '(Return mode — trip home checklist)' : '',
+    mode === 'remaining' ? '(Remaining items only)' : '',
+    mode === 'bag' ? '(Grouped by bag / location)' : '',
+    ''
+  ].filter(Boolean);
+
+  if (mode === 'bag') {
+    const groups = {};
+    const items = trip.items;
+    items.forEach(it => {
+      ensureItem(it);
+      const key = it.bag || '_none';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(it);
+    });
+    const order = ['carry-on', 'checked', 'camera', 'boat', '_none'];
+    order.forEach(key => {
+      if (!groups[key] || !groups[key].length) return;
+      const title = key === '_none' ? 'UNASSIGNED' : bagLabel(key).toUpperCase();
+      lines.push(`▸ ${title}`);
+      groups[key].forEach(it => {
+        const row = formatItemExportLine(it, 'full', trip);
+        if (row) lines.push(row);
+      });
+      lines.push('');
+    });
+    Object.keys(groups).filter(k => !order.includes(k)).forEach(key => {
+      lines.push(`▸ ${key.toUpperCase()}`);
+      groups[key].forEach(it => {
+        const row = formatItemExportLine(it, 'full', trip);
+        if (row) lines.push(row);
+      });
+      lines.push('');
+    });
+  } else {
+    const cats = getTripCategories(trip);
+    let items = trip.items;
+    if (mode === 'remaining') items = items.filter(i => !isItemPacked(i, trip));
+    const knownIds = new Set(cats.map(c => c.id));
+    cats.forEach(cat => {
+      const catItems = items.filter(i => i.categoryId === cat.id);
+      if (!catItems.length) return;
+      lines.push(`▸ ${cat.name.toUpperCase()}`);
+      catItems.forEach(it => {
+        const row = formatItemExportLine(it, mode, trip);
+        if (row) lines.push(row);
+      });
+      lines.push('');
+    });
+    const otherItems = items.filter(i => !knownIds.has(i.categoryId));
+    if (otherItems.length) {
+      lines.push('▸ OTHER');
+      otherItems.forEach(it => {
+        const row = formatItemExportLine(it, mode, trip);
+        if (row) lines.push(row);
+      });
+      lines.push('');
+    }
+  }
+  lines.push('— Generated by Get In Water v' + APP_VERSION);
+  return lines.join('\n');
+}
+
+function downloadBlob(text, filename, mime) {
+  const blob = new Blob([text], { type: mime });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+  showExportToast();
+}
+
+function exportTemplateTXT() {
+  downloadBlob(buildTemplateText(), `GIW_${dateStr()}_MasterTemplate.txt`, 'text/plain');
+}
+function exportTripTXT(mode) {
+  const trip = state.trips.find(t => t.id === activeTripId);
+  if (!trip) return;
+  const tag = mode === 'remaining' ? 'Remaining' : mode === 'bag' ? 'ByBag' : 'Full';
+  downloadBlob(buildTripText(trip, mode), `GIW_${dateStr()}_${safeFilename(trip.name)}_${tag}.txt`, 'text/plain');
+}
+
+function mergeSavedTemplate(id) {
+  const tpl = getSavedTemplate(id);
+  if (!tpl) return;
+  tpl.categories.forEach(cat => {
+    let masterCat = state.masterTemplate.categories.find(c => c.name === cat.name);
+    if (!masterCat) {
+      masterCat = { id: uid(), name: cat.name, order: state.masterTemplate.categories.length };
+      state.masterTemplate.categories.push(masterCat);
+    }
+    tpl.items.filter(i => i.categoryId === cat.id).forEach(it => {
+      ensureItem(it);
+      if (!state.masterTemplate.items.some(i => i.categoryId === masterCat.id && i.name === it.name)) {
+        state.masterTemplate.items.push({
+          id: uid(), categoryId: masterCat.id, name: it.name,
+          note: it.note || '', qty: it.qty || 1, packed: 0,
+          critical: !!it.critical, bag: it.bag || '', sections: [...(it.sections || [])]
+        });
+      }
+    });
+  });
+  saveState();
+  showToast('Template added to master gear list');
+  openMasterGearEditor();
+}
+
+function openSavedTemplateEditor(id) {
+  editingMasterGear = false;
+  activeSavedTemplateId = id;
+  aboutTab = 'starters';
+  navigate('about');
+}
+
+function closeSavedTemplateEditor() {
+  activeSavedTemplateId = null;
+  editingMasterGear = false;
+  aboutTab = 'starters';
+  navigate('about');
+}
+
+function createNewSavedTemplate() {
+  const tpl = {
+    id: uid(),
+    name: 'New template',
+    desc: '',
+    builtIn: false,
+    categories: [{ id: uid(), name: 'Gear', order: 0 }],
+    items: []
+  };
+  state.savedTemplates.push(tpl);
+  saveState();
+  openSavedTemplateEditor(tpl.id);
+}
+
+function cloneSavedTemplate(sourceId, name, desc) {
+  const src = getSavedTemplate(sourceId);
+  if (!src) return null;
+  const catIdMap = {};
+  const categories = src.categories.map(c => {
+    const newId = uid();
+    catIdMap[c.id] = newId;
+    return { id: newId, name: c.name, order: c.order };
+  });
+  const items = src.items.map(it => {
+    ensureItem(it);
+    return {
+      id: uid(), categoryId: catIdMap[it.categoryId], name: it.name,
+      note: it.note || '', qty: it.qty || 1, packed: 0,
+      critical: !!it.critical, bag: it.bag || '', sections: [...(it.sections || [])]
+    };
+  });
+  return { id: uid(), name, desc: desc || '', builtIn: false, categories, items };
+}
+
+function promptNewSavedTemplate() {
+  const templates = state.savedTemplates || [];
+  const copyOptions = templates.map(t =>
+    `<option value="${t.id}">${esc(t.name)}</option>`
+  ).join('');
+  openModal(`
+    <h3>New template</h3>
+    <p style="font-size:13px;color:var(--muted);margin:-6px 0 14px;line-height:1.45">New template or copy and edit an existing one.</p>
+    <div class="modal-field"><label>Template name</label><input id="new-tpl-name" placeholder="e.g. Cold water kit" autofocus/></div>
+    <div class="modal-field"><label>Description</label><input id="new-tpl-desc" placeholder="Optional"/></div>
+    <div class="modal-field"><label>Start from</label>
+      <select id="new-tpl-copy" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:14px">
+        <option value="">— Blank template —</option>
+        <option value="__master__">— Current master gear —</option>
+        ${copyOptions}
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="new-tpl-create">Create</button>
+    </div>
+  `, () => {
+    const copyEl = document.getElementById('new-tpl-copy');
+    copyEl.addEventListener('change', () => {
+      const nameEl = document.getElementById('new-tpl-name');
+      if (nameEl.value.trim()) return;
+      if (copyEl.value === '__master__') {
+        nameEl.value = 'Master gear';
+      } else if (copyEl.value) {
+        const src = getSavedTemplate(copyEl.value);
+        if (src) nameEl.value = src.name + ' (copy)';
+      }
+    });
+    document.getElementById('new-tpl-create').onclick = () => {
+      const name = document.getElementById('new-tpl-name').value.trim();
+      if (!name) { showToast('Enter a template name'); return; }
+      const desc = document.getElementById('new-tpl-desc').value.trim();
+      const copyFrom = document.getElementById('new-tpl-copy').value;
+      let tpl;
+      if (copyFrom === '__master__') {
+        tpl = cloneMasterAsSavedTemplate(name, desc);
+      } else if (copyFrom) {
+        tpl = cloneSavedTemplate(copyFrom, name, desc);
+        if (!tpl) { showToast('Could not copy template'); return; }
+      } else {
+        tpl = {
+          id: uid(), name, desc, builtIn: false,
+          categories: [{ id: uid(), name: 'Gear', order: 0 }],
+          items: []
+        };
+      }
+      state.savedTemplates.push(tpl);
+      saveState();
+      closeModal();
+      const msg = copyFrom === '__master__' ? 'Saved from master gear' : copyFrom ? 'Template copied' : 'Template created';
+      showToast(msg);
+      openSavedTemplateEditor(tpl.id);
+    };
+  });
+}
+
+function cloneMasterAsSavedTemplate(name, desc) {
+  const catIdMap = {};
+  const categories = state.masterTemplate.categories.map(c => {
+    const newId = uid();
+    catIdMap[c.id] = newId;
+    return { id: newId, name: c.name, order: c.order };
+  });
+  const items = state.masterTemplate.items.map(it => {
+    ensureItem(it);
+    return {
+      id: uid(), categoryId: catIdMap[it.categoryId], name: it.name,
+      note: it.note || '', qty: it.qty || 1, packed: 0,
+      critical: !!it.critical, bag: it.bag || '', sections: [...(it.sections || [])]
+    };
+  });
+  return { id: uid(), name, desc, builtIn: false, categories, items };
+}
+
+function updateSavedTemplateMeta(id, name, desc) {
+  const tpl = getSavedTemplate(id);
+  if (!tpl) return;
+  if (name != null && name.trim()) tpl.name = name.trim();
+  if (desc != null) tpl.desc = desc.trim();
+  saveState();
+}
+
+function resetSavedTemplate(id) {
+  const key = id.replace('starter_', '');
+  if (!STARTER_TEMPLATES[key]) return;
+  if (!confirm('Reset this template to the original built-in version? Your edits will be lost.')) return;
+  const fresh = starterToSaved(key, STARTER_TEMPLATES[key]);
+  const idx = state.savedTemplates.findIndex(t => t.id === id);
+  if (idx >= 0) state.savedTemplates[idx] = fresh;
+  saveState();
+  showToast('Template reset');
+  openSavedTemplateEditor(id);
+}
+
+function deleteSavedTemplate(id) {
+  const tpl = getSavedTemplate(id);
+  if (!tpl) return;
+  if (tpl.builtIn) { showToast('Built-in templates can be reset, not deleted'); return; }
+  if (!confirm('Delete this template permanently?')) return;
+  state.savedTemplates = state.savedTemplates.filter(t => t.id !== id);
+  if (activeSavedTemplateId === id) activeSavedTemplateId = null;
+  saveState();
+  showToast('Template deleted');
+  navigate('about');
+}
+
+function addSavedCategory(tplId) {
+  const tpl = getSavedTemplate(tplId);
+  if (!tpl) return;
+  tpl.categories.push({ id: uid(), name: 'New Category', order: tpl.categories.length });
+  saveState();
+  openSavedTemplateEditor(tplId);
+}
+
+function renameSavedCategory(tplId, catId, name) {
+  const tpl = getSavedTemplate(tplId);
+  const cat = tpl && tpl.categories.find(c => c.id === catId);
+  if (cat) { cat.name = name.trim() || cat.name; saveState(); }
+}
+
+function deleteSavedCategory(tplId, catId) {
+  const tpl = getSavedTemplate(tplId);
+  if (!tpl || !confirm('Delete this card and all its items?')) return;
+  tpl.categories = tpl.categories.filter(c => c.id !== catId);
+  tpl.items = tpl.items.filter(i => i.categoryId !== catId);
+  saveState();
+  openSavedTemplateEditor(tplId);
+}
+
+function moveSavedCategory(tplId, catId, dir) {
+  const tpl = getSavedTemplate(tplId);
+  if (!tpl) return;
+  const cats = [...tpl.categories].sort((a, b) => a.order - b.order);
+  const idx = cats.findIndex(c => c.id === catId);
+  const swap = idx + dir;
+  if (swap < 0 || swap >= cats.length) return;
+  const tmp = cats[idx].order;
+  cats[idx].order = cats[swap].order;
+  cats[swap].order = tmp;
+  saveState();
+  openSavedTemplateEditor(tplId);
+}
+
+function addSavedTemplateItem(tplId, catId) {
+  const tpl = getSavedTemplate(tplId);
+  if (!tpl) return;
+  const item = { id: uid(), categoryId: catId, name: 'New item', note: '', qty: 1, packed: 0, critical: false, bag: '', sections: [] };
+  tpl.items.push(item);
+  openItemEditor('saved', tplId, item.id, { removeOnCancel: true });
+}
+
+function deleteSavedTemplateItem(tplId, itemId) {
+  const tpl = getSavedTemplate(tplId);
+  if (!tpl) return;
+  tpl.items = tpl.items.filter(i => i.id !== itemId);
+  saveState();
+  openSavedTemplateEditor(tplId);
+}
+
+function exportBackupJSON() {
+  const payload = {
+    app: 'Get In Water',
+    version: APP_VERSION,
+    exportedAt: new Date().toISOString(),
+    data: state
+  };
+  downloadBlob(JSON.stringify(payload, null, 2), `GIW_Backup_${dateStr()}.json`, 'application/json');
+}
+
+function importBackupJSON(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      if (!confirm('Replace all current data with this backup?')) { input.value = ''; return; }
+      const data = sanitizeImportedBackup(parsed, uid);
+      migrateState(data);
+      state = data;
+      ensureSettings();
+      saveState();
+      homeSearch = '';
+      screen = 'home';
+      showToast('Backup restored');
+      render();
+    } catch (e) {
+      showToast('Import failed — invalid file');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ── PDF export (DejaVu Sans — full Unicode / Cyrillic) ──
+let _pdfFontCache = null;
+async function loadPDFFonts(doc) {
+  if (_pdfFontCache) {
+    doc.addFileToVFS('DejaVuSans.ttf', _pdfFontCache.regular);
+    doc.addFileToVFS('DejaVuSans-Bold.ttf', _pdfFontCache.bold);
+    doc.addFont('DejaVuSans.ttf', 'DejaVuSans', 'normal');
+    doc.addFont('DejaVuSans-Bold.ttf', 'DejaVuSans', 'bold');
+    doc.setFont('DejaVuSans', 'normal');
+    return true;
+  }
+  try {
+    const [rResp, bResp] = await Promise.all([
+      fetch('vendor/fonts/DejaVuSans.ttf'),
+      fetch('vendor/fonts/DejaVuSans-Bold.ttf')
+    ]);
+    if (!rResp.ok || !bResp.ok) throw new Error('Font fetch failed');
+    const [rBuf, bBuf] = await Promise.all([rResp.arrayBuffer(), bResp.arrayBuffer()]);
+    function toBase64(buf) {
+      const bytes = new Uint8Array(buf);
+      const CHUNK = 8192;
+      let bin = '';
+      for (let i = 0; i < bytes.length; i += CHUNK) {
+        bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+      }
+      return btoa(bin);
+    }
+    _pdfFontCache = { regular: toBase64(rBuf), bold: toBase64(bBuf) };
+    doc.addFileToVFS('DejaVuSans.ttf', _pdfFontCache.regular);
+    doc.addFileToVFS('DejaVuSans-Bold.ttf', _pdfFontCache.bold);
+    doc.addFont('DejaVuSans.ttf', 'DejaVuSans', 'normal');
+    doc.addFont('DejaVuSans-Bold.ttf', 'DejaVuSans', 'bold');
+    doc.setFont('DejaVuSans', 'normal');
+    return true;
+  } catch (e) {
+    console.error('[GIW] DejaVu font load failed:', e);
+    alert('Could not load PDF fonts. Reinstall the app or refresh while online, then try again.');
+    return false;
+  }
+}
+
+const PDF_PW = 210;
+const PDF_PH = 297;
+const PDF_ML = 16;
+const PDF_MR = 16;
+const PDF_HEADER_H = 12;
+const PDF_FOOTER_H = 8;
+const PDF_CONTENT_TOP = PDF_HEADER_H + 3;
+const PDF_CONTENT_BOT = PDF_PH - PDF_FOOTER_H - 3;
+const PDF_CW = PDF_PW - PDF_ML - PDF_MR;
+const PDF_SECTION_BAR_H = 6;
+const PDF_SECTION_GAP = 4;
+const PDF_ITEM_ROW_H = 5.5;
+
+function formatPdfDate(dateStr) {
+  if (!dateStr) {
+    return new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+  try {
+    return new Date(dateStr + 'T12:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  } catch (e) {
+    return dateStr;
+  }
+}
+
+async function buildPdfDoc(meta, sections) {
+  const { jsPDF } = window.jspdf;
+  if (!jsPDF) { alert('PDF library not loaded.'); return null; }
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+  if (!(await loadPDFFonts(doc))) return null;
+
+  let y = PDF_CONTENT_TOP;
+  const nowStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const tripDate = meta.date || formatPdfDate(meta.dateStart);
+
+  function drawHeader() {
+    doc.setFillColor(3, 12, 24);
+    doc.rect(0, 0, PDF_PW, PDF_HEADER_H, 'F');
+    doc.setFillColor(0, 180, 220);
+    doc.roundedRect(PDF_ML, 2, 8, 8, 1.5, 1.5, 'F');
+    doc.setFont('DejaVuSans', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(255, 255, 255);
+    doc.text('GIW', PDF_ML + 4, 7.2, { align: 'center' });
+    doc.setFontSize(9);
+    doc.text('GET IN WATER', PDF_ML + 11, 5.8);
+    doc.setFont('DejaVuSans', 'normal');
+    doc.setFontSize(7.5);
+    doc.text(meta.tripLabel || 'Packing Checklist', PDF_ML + 11, 9.5);
+    doc.text(tripDate, PDF_PW - PDF_MR, 5.8, { align: 'right' });
+    if (meta.subtitle) {
+      doc.setFontSize(6.5);
+      doc.text(meta.subtitle, PDF_PW - PDF_MR, 9.2, { align: 'right' });
+    }
+    doc.setTextColor(0, 0, 0);
+    y = PDF_CONTENT_TOP;
+  }
+
+  function drawFooter() {
+    doc.setFillColor(235, 245, 252);
+    doc.rect(0, PDF_PH - PDF_FOOTER_H, PDF_PW, PDF_FOOTER_H, 'F');
+    doc.setFont('DejaVuSans', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(70, 90, 110);
+    doc.text('\u00a9 Three Cats LSP  \u00b7  @threecats_lsp  \u00b7  Have a safe and fun trip!', PDF_ML, PDF_PH - 3.2);
+    doc.text('Exported ' + nowStr + '  \u00b7  v' + APP_VERSION, PDF_PW - PDF_MR, PDF_PH - 3.2, { align: 'right' });
+    doc.setTextColor(0, 0, 0);
+  }
+
+  function checkY(need) {
+    if (y + need > PDF_CONTENT_BOT) {
+      drawFooter();
+      doc.addPage();
+      drawHeader();
+    }
+  }
+
+  let sectionIndex = 0;
+
+  function drawSectionTitle(title) {
+    const gap = sectionIndex === 0 ? 0 : PDF_SECTION_GAP;
+    sectionIndex += 1;
+    checkY(gap + PDF_SECTION_BAR_H + 3);
+    y += gap;
+    doc.setFillColor(0, 130, 180);
+    doc.rect(PDF_ML, y, PDF_CW, PDF_SECTION_BAR_H, 'F');
+    doc.setFont('DejaVuSans', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(255, 255, 255);
+    doc.text(title, PDF_ML + 2, y + 4.2);
+    doc.setTextColor(0, 0, 0);
+    y += PDF_SECTION_BAR_H + 3;
+  }
+
+  function drawItemLine(line) {
+    doc.setFont('DejaVuSans', 'normal');
+    doc.setFontSize(9);
+    const wrapped = doc.splitTextToSize(line, PDF_CW - 6);
+    const blockH = PDF_ITEM_ROW_H * wrapped.length;
+    checkY(blockH + 1.5);
+    wrapped.forEach((row, i) => {
+      doc.text(row, PDF_ML + 3, y + 3.8 + i * PDF_ITEM_ROW_H);
+    });
+    y += blockH + 1.5;
+  }
+
+  drawHeader();
+
+  if (meta.modeLabel) {
+    checkY(6);
+    doc.setFont('DejaVuSans', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(90, 110, 130);
+    doc.text(meta.modeLabel, PDF_ML, y + 3.2);
+    doc.setTextColor(0, 0, 0);
+    y += 6;
+  }
+
+  sections.forEach(sec => {
+    drawSectionTitle(sec.title);
+    sec.items.forEach(item => {
+      const line = typeof item === 'string' ? item : item.line;
+      drawItemLine(line);
+    });
+  });
+
+  drawFooter();
+  return doc;
+}
+
+async function exportTemplatePDF() {
+  const sections = getCategories().map(cat => ({
+    title: cat.name,
+    items: state.masterTemplate.items
+      .filter(i => i.categoryId === cat.id)
+      .map(it => '\u2022  ' + it.name)
+  }));
+  const doc = await buildPdfDoc({
+    tripLabel: 'Master Gear Template',
+    date: '',
+    subtitle: 'Three Cats LSP'
+  }, sections);
+  if (!doc) { showToast('PDF export failed'); return; }
+  try {
+    doc.save('GIW_' + dateStr() + '_MasterTemplate.pdf');
+    showExportToast();
+  } catch (e) {
+    showToast('PDF export failed');
+  }
+}
+
+async function exportTripPDF(mode) {
+  const trip = state.trips.find(t => t.id === activeTripId);
+  if (!trip) return;
+  ensureTripShape(trip);
+  const p = tripProgress(trip);
+  let items = trip.items;
+  if (mode === 'remaining') items = items.filter(i => !isItemPacked(i, trip));
+
+  let sections;
+  if (mode === 'bag') {
+    const groups = {};
+    items.forEach(it => {
+      ensureItem(it);
+      const key = it.bag || '_none';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(it);
+    });
+    const bagOrder = ['carry-on', 'checked', 'camera', 'boat', '_none'];
+    const itemLine = it => (isItemPacked(it, trip) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it) + (it.note ? ' — ' + it.note : '');
+    sections = [];
+    bagOrder.forEach(key => {
+      if (!groups[key] || !groups[key].length) return;
+      sections.push({ title: key === '_none' ? 'Unassigned' : bagLabel(key), items: groups[key].map(itemLine) });
+    });
+    Object.keys(groups).filter(k => !bagOrder.includes(k)).sort().forEach(key => {
+      sections.push({ title: bagLabel(key) || key, items: groups[key].map(itemLine) });
+    });
+  } else {
+    sections = getTripCategories(trip).map(cat => ({
+      title: cat.name,
+      items: items.filter(i => i.categoryId === cat.id).map(it => (isItemPacked(it, trip) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it) + (it.note ? ' — ' + it.note : ''))
+    })).filter(sec => sec.items.length);
+    const knownIds = new Set(getTripCategories(trip).map(c => c.id));
+    const orphanItems = items.filter(i => !knownIds.has(i.categoryId));
+    if (orphanItems.length) {
+      sections.push({
+        title: 'Other',
+        items: orphanItems.map(it => (isItemPacked(it, trip) ? '\u2611  ' : '\u2610  ') + itemDisplayName(it))
+      });
+    }
+  }
+
+  const subtitleParts = [p.done + '/' + p.total + ' packed'];
+  if (trip.location) subtitleParts.unshift(trip.location);
+  const doc = await buildPdfDoc({
+    tripLabel: trip.name,
+    date: formatTripDateRange(trip),
+    subtitle: subtitleParts.join(' · '),
+    modeLabel: mode === 'remaining' ? 'Remaining items only' : mode === 'bag' ? 'Grouped by bag' : ''
+  }, sections);
+
+  const tag = mode === 'remaining' ? 'Remaining' : mode === 'bag' ? 'ByBag' : 'Full';
+  if (!doc) { showToast('PDF export failed'); return; }
+  try {
+    doc.save('GIW_' + dateStr() + '_' + safeFilename(trip.name) + '_' + tag + '.pdf');
+    showExportToast();
+  } catch (e) {
+    showToast('PDF export failed');
+  }
+}
+
+// ── Init ──
+state = loadState();
+ensureSettingsFromData(state);
+initBubbles();
+updateWidgetSnapshot();
+
+function startApp() {
+  render();
+}
+
+if (window.GIW_SYNC) {
+  GIW_SYNC.init({
+    getState: () => state,
+    setState: (s) => { state = s; },
+    persistLocal: persistLocalOnly,
+    saveState,
+    render,
+    migrateState,
+    showToast,
+    openModal,
+    closeModal,
+    uid,
+    isNative: IS_NATIVE,
+    onStatusChange: onSyncStatusChange
+  }).then(startApp).catch(startApp);
+} else {
+  startApp();
+}
+
+if (window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) {
+  const appPlugin = Capacitor.Plugins && Capacitor.Plugins.App;
+  if (appPlugin && appPlugin.addListener) {
+    appPlugin.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) {
+        updateWidgetSnapshot();
+        if (window.GIW_SYNC && GIW_SYNC.isSignedIn()) {
+          GIW_SYNC.pullIfNewer().catch(() => {});
+        }
+      }
+    });
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) updateWidgetSnapshot();
+  });
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  const registerServiceWorker = () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(r => {
+        console.log('[SW] registered, scope:', r.scope);
+        r.update();
+      })
+      .catch(e => console.warn('[SW] registration failed:', e));
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', registerServiceWorker, { once: true });
+  } else {
+    registerServiceWorker();
+  }
+}
+
+let _pwaPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _pwaPrompt = e;
+  const banner = document.createElement('div');
+  banner.id = 'pwaBanner';
+  banner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border-hi);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.4);font-family:Outfit,sans-serif;max-width:340px;width:90%;';
+  banner.innerHTML = '<span style="font-size:28px;">\uD83E\uDD3F</span>'
+    + '<div style="flex:1;"><div style="color:var(--text);font-weight:600;font-size:14px;">Install Get In Water</div>'
+    + '<div style="color:var(--muted);font-size:12px;margin-top:2px;">Add to home screen for offline packing lists</div></div>'
+    + '<button onclick="_pwaPrompt.prompt();_pwaPrompt.userChoice.then(()=>{_pwaPrompt=null;document.getElementById(\'pwaBanner\').remove();})" style="background:linear-gradient(135deg,#00d9ff,#00b8a0);border:none;border-radius:8px;padding:8px 14px;color:#030c18;font-weight:700;font-size:12px;cursor:pointer;">INSTALL</button>'
+    + '<button onclick="this.parentNode.remove()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0;line-height:1;">&times;</button>';
+  document.body.appendChild(banner);
+});
+
+if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !navigator.standalone) {
+  setTimeout(() => {
+    if (document.getElementById('pwaBanner')) return;
+    const b = document.createElement('div');
+    b.id = 'pwaBanner';
+    b.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border-hi);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:12px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.6);font-family:Outfit,sans-serif;max-width:340px;width:90%;';
+    b.innerHTML = '<span style="font-size:24px;">\uD83E\uDD3F</span>'
+      + '<div style="flex:1;"><div style="color:var(--text);font-weight:600;font-size:13px;">Install on iPhone / iPad</div>'
+      + '<div style="color:var(--muted);font-size:11px;margin-top:3px;">Tap <strong style="color:var(--accent);">Share \u2191</strong> then <strong style="color:var(--accent);">Add to Home Screen</strong></div></div>'
+      + '<button onclick="this.parentNode.remove()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0;line-height:1;">&times;</button>';
+    document.body.appendChild(b);
+  }, 2500);
+}
+</script>
+</body>
+</html>

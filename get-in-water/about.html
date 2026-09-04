@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>About - Get In Water - Three Cats LSP</title>
+  <meta name="description" content="About Get In Water - part of the Three Cats LSP Diver's Toolkit."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/about.css"/>
+</head>
+<body>
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="page-dots" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="logo-link" href="/">
+      <span class="logo-mark"><img src="/get-in-water/icon-192.png" alt="Get In Water" width="40" height="40"/></span>
+      <span>Diver's Toolkit</span>
+    </a>
+    <div class="header-actions">
+      <a class="btn btn-ghost" href="/">All apps</a>
+      <a class="btn btn-primary" href="/get-in-water/">Open App</a>
+    </div>
+  </header>
+  <main class="about-main">
+    <div class="about-card">
+      <p class="about-eyebrow">About Get In Water</p>
+      <article class="prose">
+<h1>Get In Water</h1>
+<p>Dive trip packing checklist app — part of the <a href="https://threecats-lsp.com">Three Cats LSP</a> <strong>Diver&#x27;s Toolkit</strong>.</p>
+<p>Maintain a <strong>master gear list</strong>, create <strong>per-trip checklists</strong>, tick items off as you pack, and export TXT or PDF for printing or sharing. Use it alongside <a href="https://threecats-lsp.com/d-planner-plus/">LSP D-Planner+</a> — plan the dive, then pack for it.</p>
+<p>🌐 <strong>Live app:</strong> https://threecats-lsp.com/get-in-water/</p>
+<p>📲 <strong>Android APK:</strong> https://threecats-lsp.com/get-in-water/download.html</p>
+<p><strong>Current version: 1.4.2</strong></p>
+<hr>
+<h2>Diver&#x27;s Toolkit</h2>
+<p>All apps at the <a href="https://threecats-lsp.com">Diver&#x27;s Toolkit hub</a>.</p>
+<hr>
+<h2>Features</h2>
+<h3>Master List &amp; Templates</h3>
+<ul>
+<li><strong>Master gear list</strong> — your default packing list; new trips start from it or any saved template</li>
+<li><strong>Starter templates</strong> — Recreational, Underwater Photographer, Technical Diver (built-in, resettable)</li>
+<li>Edit under <strong>Settings → Templates</strong></li>
+</ul>
+<h3>Per-Trip Checklists</h3>
+<ul>
+<li>Create named trips from master list or a template</li>
+<li>Tick items off as you pack — progress bar tracks completion</li>
+<li>Items carry notes and quantity</li>
+</ul>
+<h3>Export</h3>
+<ul>
+<li><strong>TXT</strong> — plain text gear list to clipboard or Downloads</li>
+<li><strong>PDF</strong> — formatted packing list with trip name, date, and item notes</li>
+<li>Share via any Android share target (WhatsApp, email, etc.)</li>
+</ul>
+<h3>Cloud sync (optional)</h3>
+<ul>
+<li><strong>Sign in with Google</strong> to sync checklists between the web app and Android</li>
+<li><strong>Offline-first</strong> — works fully without an account; sync when signed in</li>
+<li><strong>Home screen Sync button</strong> — manual sync without reloading the app</li>
+<li>Start packing on your phone, finish on desktop (or vice versa)</li>
+<li>Configure Firebase once — see <a href="#cloud-sync-setup">Cloud sync setup</a> for contributors</li>
+</ul>
+<h3>Android Native Features</h3>
+<ul>
+<li>Full offline support — no internet needed after install</li>
+<li>Home-screen launcher name <strong>GiW</strong> (short label under the icon)</li>
+<li>Edge-to-edge layout, light/dark theme</li>
+<li>Export TXT/PDF to app storage, then share via the system sheet (Downloads when the device allows)</li>
+</ul>
+<hr>
+<h2>Web App</h2>
+<p>Open https://threecats-lsp.com/get-in-water/ in any modern browser.</p>
+<p><strong>Install as PWA:</strong></p>
+<ol>
+<li><strong>Safari (iPhone/iPad):</strong> Share → Add to Home Screen → Add</li>
+<li><strong>Chrome (Android):</strong> ⋮ → Install app / Add to Home Screen → confirm</li>
+<li><strong>Chrome (desktop):</strong> Click install icon in address bar</li>
+</ol>
+<hr>
+<h2>Android App</h2>
+<p>Built with <a href="https://capacitorjs.com">Capacitor</a>. Direct APK — no Play Store required.</p>
+<p><strong>Requirements:</strong> Android 5.0+ (API 21)</p>
+<p><strong>Install:</strong></p>
+<ol>
+<li>Download APK from https://threecats-lsp.com/get-in-water/download.html</li>
+<li>Allow &quot;Install from unknown sources&quot; in Android settings</li>
+<li>Open the downloaded APK and install</li>
+</ol>
+<hr>
+<h2>Cloud sync setup</h2>
+<p>Optional Google sign-in uses <a href="https://firebase.google.com">Firebase</a> (Auth + Firestore). See <a href=".env.example"><code>.env.example</code></a> for one-time console steps:</p>
+<ol>
+<li>Create a Firebase project and enable <strong>Google</strong> sign-in</li>
+<li>Create Firestore and deploy <a href="firestore.rules"><code>firestore.rules</code></a></li>
+<li>Copy web config into local <code>firebase-config.js</code> (from <a href="firebase-config.example.js"><code>firebase-config.example.js</code></a>; file is gitignored)</li>
+<li>Add Android app → <code>google-services.json</code> in <code>android/app/</code> (not committed)</li>
+<li>Ensure <code>android/variables.gradle</code> has <code>rgcfaIncludeGoogle = true</code> (required for Google Sign-In in APK)</li>
+<li>Register SHA-1 fingerprints for debug/release keystores</li>
+<li>GitHub secrets: <code>GOOGLE_SERVICES_JSON</code> (base64 of <code>google-services.json</code>), <code>FIREBASE_WEB_CONFIG</code> (base64 of <code>firebase-config.js</code>)</li>
+</ol>
+<p><strong>Manual test checklist</strong></p>
+<hr>
+<h2>License</h2>
+<p>MIT — free to use, modify, and distribute. Optional Google account for cloud sync; no ads, no subscription.</p>
+<hr>
+<p><em>Three Cats LSP · <a href="https://threecats-lsp.com">threecats-lsp.com</a></em></p>
+      </article>
+    </div>
+  </main>
+  <footer class="site-footer">Three Cats LSP - Diver's Toolkit</footer>
+</body>
+</html>

@@ -1,0 +1,318 @@
+// LSP D-Planner — Service Worker
+// Network-first for HTML (always fresh), cache-first for static assets.
+// CACHE_VERSION is derived from APP_VERSION + generated APP_BUILD_ID.
+
+importScripts('app-version.js');
+importScripts('app-build.js');
+const CACHE_VERSION = 'lsp-dplanner-plus-v' + APP_VERSION + '-' + APP_BUILD_ID;
+
+// These URL patterns are never cached — always fetched live or passed through
+function shouldNeverCache(url) {
+  const path = url.pathname || '';
+  const host = url.hostname || '';
+  if (path.endsWith('.apk') || path.endsWith('.aab')) return true;
+  if (path.endsWith('version.json') || path.includes('/version.json')) return true;
+  if (host.includes('raw.githubusercontent.com')) return true;
+  return false;
+}
+
+function isHTMLRequest(request) {
+  const accept = request.headers.get('Accept') || '';
+  return accept.includes('text/html');
+}
+
+/** Safety-critical engine sources — network-first so physics fixes reach users before offline cache. */
+function isSafetyCriticalEngineAsset(pathname) {
+  const leaf = (pathname || '').split('/').pop() || '';
+  return /-engine-bundle\.js$/.test(leaf)
+    || leaf === 'zhl-schedule-worker.js'
+    || leaf === 'zhl-worker-bridge.js'
+    || leaf === 'zhl-physics-core.js'
+    || leaf === 'zhl-gas-core.js'
+    || leaf === 'zhl-ccr-core.js'
+    || leaf === 'zhl-schedule-core.js'
+    || leaf === 'vpm-engine-core.js';
+}
+
+/** Fast-changing UI runtime assets should refresh before falling back to cache. */
+function isFreshRuntimeAsset(pathname) {
+  const leaf = (pathname || '').split('/').pop() || '';
+  return leaf === 'plot-core.js'
+    || leaf === 'results-render-core.js'
+    || leaf === 'export-core.js'
+    || leaf === 'schedule-runner-core.js';
+}
+
+async function networkFirstWithCacheFallback(event, request, url) {
+  const cacheKey = new Request(url.origin + url.pathname);
+  try {
+    const response = await fetch(request);
+    if (response.ok && url.pathname.startsWith(APP_BASE)) {
+      const clone = response.clone();
+      event.waitUntil(caches.open(CACHE_VERSION).then(cache => cache.put(cacheKey, clone)));
+    }
+    return response;
+  } catch (_) {
+    const cached = await caches.match(request, { ignoreSearch: true });
+    if (cached) return cached;
+    return new Response('Offline — asset unavailable', {
+      status: 503,
+      statusText: 'Offline',
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
+}
+
+function getAppBasePath() {
+  const p = self.location.pathname || '/';
+  if (p.includes('/LSP_D-planner-plus/')) return '/LSP_D-planner-plus/';
+  if (p.includes('/LSP_D-planner/')) return '/LSP_D-planner/';
+  if (p.includes('/d-planner-plus/')) return '/d-planner-plus/';
+  if (p.includes('/d-planner-ccr/')) return '/d-planner-ccr/';
+  if (p.includes('/d-planner/')) return '/d-planner/';
+  const swDir = p.replace(/[^/]*$/, '');
+  return swDir || '/LSP_D-planner-plus/';
+}
+
+const APP_BASE = getAppBasePath();
+const OFFLINE_INDEX = APP_BASE + 'index.html';
+
+const REQUIRED_PRECACHE = [
+  OFFLINE_INDEX,
+  APP_BASE + 'app-version.js',
+  APP_BASE + 'app-build.js',
+  APP_BASE + 'lsp-dplanner-foundation.css',
+  APP_BASE + 'lsp-dplanner-modes.css',
+  APP_BASE + 'lsp-dplanner-controls.css',
+  APP_BASE + 'lsp-dplanner-results.css',
+  APP_BASE + 'lsp-dplanner-mobile-shell.css',
+  APP_BASE + 'zhl-engine-bundle.js',
+  APP_BASE + 'padi-engine.js',
+  APP_BASE + 'vpm-engine-bundle.js',
+  APP_BASE + 'zhl-worker-bridge.js',
+  APP_BASE + 'zhl-schedule-worker.js',
+  APP_BASE + 'planner-inputs-core.js',
+  APP_BASE + 'rec-planner.js',
+  APP_BASE + 'settings-core.js',
+  APP_BASE + 'surf-interval-core.js',
+  APP_BASE + 'gas-table-core.js',
+  APP_BASE + 'gas-plan-core.js',
+  APP_BASE + 'gas-cards-core.js',
+  APP_BASE + 'export-core.js',
+  APP_BASE + 'dive-graph-engine.js',
+  APP_BASE + 'plot-core.js',
+  APP_BASE + 'gf-curve-core.js',
+  APP_BASE + 'contingency-core.js',
+  APP_BASE + 'results-panel.js',
+  APP_BASE + 'results-render-core.js',
+  APP_BASE + 'schedule-runner-core.js',
+  APP_BASE + 'zhl-headless-adapter.js',
+  APP_BASE + 'planner-shell.js',
+];
+
+// Required for offline/PWA startup (Tier-3 ZHL + self-hosted fonts/icons)
+const OPTIONAL_PRECACHE = [
+  APP_BASE + 'capacitor-bridge.js',
+  APP_BASE + 'android-select-picker.js',
+  APP_BASE + 'vendor/jspdf.umd.min.js',
+  APP_BASE + 'vendor/fonts/fonts.css',
+  APP_BASE + 'vendor/fonts/DejaVuSans.ttf',
+  APP_BASE + 'vendor/fonts/DejaVuSans-Bold.ttf',
+  APP_BASE + 'vendor/pdf-fonts.js',
+  APP_BASE + 'vendor/fonts/JTUSjIg69CK48gW7PXoo9Wdhyzbi.woff2',
+  APP_BASE + 'vendor/fonts/JTUSjIg69CK48gW7PXoo9Wlhyw.woff2',
+  APP_BASE + 'vendor/fonts/QGYvz_MVcBeNP4NJtEtq.woff2',
+  APP_BASE + 'vendor/fonts/QGYvz_MVcBeNP4NJuktqQ4E.woff2',
+  APP_BASE + 'vendor/fonts/tDbV2o-flEEny0FZhsfKu5WU4xD0OwG_TA.woff2',
+  APP_BASE + 'vendor/fonts/tDbV2o-flEEny0FZhsfKu5WU4xD1OwG_TA.woff2',
+  APP_BASE + 'vendor/fonts/tDbV2o-flEEny0FZhsfKu5WU4xD2OwG_TA.woff2',
+  APP_BASE + 'vendor/fonts/tDbV2o-flEEny0FZhsfKu5WU4xD4OwG_TA.woff2',
+  APP_BASE + 'vendor/fonts/tDbV2o-flEEny0FZhsfKu5WU4xD7OwE.woff2',
+  APP_BASE + 'vendor/fonts/tDbV2o-flEEny0FZhsfKu5WU4xD_OwG_TA.woff2',
+  APP_BASE + 'vendor/icons/giw-icon-192.png',
+  APP_BASE + 'vendor/icons/regulator-1835546.png',
+  APP_BASE + 'vendor/icons/computer-14545985.png',
+  APP_BASE + 'vendor/icons/tools-1424252.png',
+  APP_BASE + 'vendor/icons/settings-2099058.png',
+  APP_BASE + 'manifest.json',
+  APP_BASE + 'icon-192.png',
+  APP_BASE + 'icon-512.png',
+];
+
+const PRECACHE_ASSETS = REQUIRED_PRECACHE.concat(OPTIONAL_PRECACHE);
+
+async function verifyShellPrecache(cacheName) {
+  const cache = await caches.open(cacheName);
+  const checks = await Promise.all(REQUIRED_PRECACHE.map(async (url) => {
+    const hit = await cache.match(url, { ignoreSearch: true });
+    return !!hit;
+  }));
+  return checks.every(Boolean);
+}
+
+// Install — skip waiting only when required shell assets are cached
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_VERSION)
+      .then(cache => Promise.allSettled(PRECACHE_ASSETS.map(url =>
+        cache.add(url)
+          .then(() => ({ url, ok: true }))
+          .catch(err => {
+            console.warn('[SW] precache skip:', url, err);
+            return { url, ok: false };
+          })
+      )))
+      .then(async (results) => {
+        const succeeded = new Set();
+        for (const r of results) {
+          if (r.status === 'fulfilled' && r.value && r.value.ok) succeeded.add(r.value.url);
+        }
+        const shellReady = REQUIRED_PRECACHE.every(u => succeeded.has(u));
+        if (shellReady) {
+          const optionalMiss = OPTIONAL_PRECACHE.filter(u => !succeeded.has(u));
+          if (optionalMiss.length > 0) {
+            // Optional miss banner is delivered from activate after clients.claim().
+          }
+          self.skipWaiting();
+          return;
+        }
+        console.error('[SW] required shell precache incomplete — aborting install');
+        await caches.delete(CACHE_VERSION);
+        throw new Error('Required shell precache incomplete');
+      })
+      .catch(err => {
+        console.error('[SW] install failed:', err);
+        throw err;
+      })
+  );
+});
+
+// Activate — delete old caches only when this version's shell is complete
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    verifyShellPrecache(CACHE_VERSION).then(async (shellReady) => {
+      if (!shellReady) {
+        console.error('[SW] activate blocked — incomplete shell cache; preserving prior caches');
+        await caches.delete(CACHE_VERSION);
+        return;
+      }
+      const keys = await caches.keys();
+      await Promise.all(
+        keys
+          .filter(key => key !== CACHE_VERSION)
+          .map(key => {
+            console.log('[SW] Deleting old cache:', key);
+            return caches.delete(key);
+          })
+      );
+      await self.clients.claim();
+      const cache = await caches.open(CACHE_VERSION);
+      const optionalMiss = [];
+      for (const url of OPTIONAL_PRECACHE) {
+        const hit = await cache.match(url, { ignoreSearch: true });
+        if (!hit) optionalMiss.push(url);
+      }
+      const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      clients.forEach((client) => {
+        client.postMessage({ type: 'SW_SHELL_READY', version: CACHE_VERSION });
+        if (optionalMiss.length > 0) {
+          client.postMessage({ type: 'SW_OPTIONAL_PRECACHE_MISS', urls: optionalMiss });
+        }
+      });
+    })
+  );
+});
+
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    event.waitUntil(
+      verifyShellPrecache(CACHE_VERSION).then((shellReady) => {
+        if (shellReady) self.skipWaiting();
+        else console.warn('[SW] SKIP_WAITING ignored — required shell precache incomplete');
+      })
+    );
+  }
+});
+
+// Fetch strategy:
+//   - APK / external URLs: pass through, never intercept
+//   - HTML (index.html, navigation): network-first, cache fallback
+//   - Engine bundles + schedule cores: network-first (safety-critical updates)
+//   - Fast-changing UI runtime files: network-first (fresh graph/tooltips)
+//   - Everything else (JS, CSS, fonts, etc.): cache-first, network fallback
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+
+  // Never intercept cross-origin or APK requests
+  if (url.origin !== self.location.origin) return;
+  if (shouldNeverCache(url)) return;
+
+  // Network-first for HTML — ensures index.html is always up to date
+  if (isHTMLRequest(event.request) || url.pathname.endsWith('.html') || url.pathname.endsWith('/')) {
+    event.respondWith(
+      (async () => {
+        try {
+          const response = await fetch(event.request);
+          if (response.ok) {
+            const clone = response.clone();
+            const cachePromise = caches.open(CACHE_VERSION).then(cache => {
+              const key = new Request(url.origin + url.pathname);
+              return cache.put(key, clone);
+            });
+            event.waitUntil(cachePromise);
+          }
+          return response;
+        } catch (_) {
+          const cached = await caches.match(event.request, { ignoreSearch: true });
+          if (cached) return cached;
+          if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+            const offline = await caches.match(OFFLINE_INDEX, { ignoreSearch: true });
+            if (offline) return offline;
+          }
+          return new Response('Offline — asset unavailable', {
+            status: 503,
+            statusText: 'Offline',
+            headers: { 'Content-Type': 'text/plain' },
+          });
+        }
+      })()
+    );
+    return;
+  }
+
+  // Network-first for decompression engine assets — avoid serving stale physics after updates
+  if (isSafetyCriticalEngineAsset(url.pathname) || isFreshRuntimeAsset(url.pathname)) {
+    event.respondWith(networkFirstWithCacheFallback(event, event.request, url));
+    return;
+  }
+
+  // Cache-first for all other static assets
+  event.respondWith(
+    (async () => {
+      const cached = await caches.match(event.request, { ignoreSearch: true });
+      if (cached) return cached;
+      try {
+        const response = await fetch(event.request);
+        if (response.ok && url.pathname.startsWith(APP_BASE)) {
+          const clone = response.clone();
+          const cacheKey = new Request(url.origin + url.pathname);
+          const cachePromise = caches.open(CACHE_VERSION).then(cache => cache.put(cacheKey, clone));
+          event.waitUntil(cachePromise);
+        }
+        return response;
+      } catch (_) {
+        if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+          const offline = await caches.match(OFFLINE_INDEX, { ignoreSearch: true });
+          if (offline) return offline;
+        }
+        return new Response('Offline — asset unavailable', {
+          status: 503,
+          statusText: 'Offline',
+          headers: { 'Content-Type': 'text/plain' },
+        });
+      }
+    })()
+  );
+});

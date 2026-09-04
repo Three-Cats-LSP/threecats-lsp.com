@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>About - LSP D-Planner+ - Three Cats LSP</title>
+  <meta name="description" content="About LSP D-Planner+ - part of the Three Cats LSP Diver's Toolkit."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/about.css"/>
+</head>
+<body>
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="page-dots" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="logo-link" href="/">
+      <span class="logo-mark"><img src="/d-planner-plus/icon-192.png" alt="LSP D-Planner+" width="40" height="40"/></span>
+      <span>Diver's Toolkit</span>
+    </a>
+    <div class="header-actions">
+      <a class="btn btn-ghost" href="/">All apps</a>
+      <a class="btn btn-primary" href="/d-planner-plus/">Open App</a>
+    </div>
+  </header>
+  <main class="about-main">
+    <div class="about-card">
+      <p class="about-eyebrow">About LSP D-Planner+</p>
+      <article class="prose">
+<h1>LSP D-Planner+</h1>
+<p>LSP D-Planner+ is a free, open-source decompression planning app for recreational and technical divers.</p>
+<p>It runs in the browser, installs as a PWA, works offline after first load, and is also available as a direct Android APK. There is no account, no ads, no Play Store requirement, and no server-side decompression calculation.</p>
+<ul>
+<li>Live app: https://threecats-lsp.com/d-planner-plus/</li>
+<li>Android APK: https://threecats-lsp.com/d-planner-plus/download.html</li>
+<li>Official release: https://github.com/Three-Cats-LSP/LSP_D-planner-plus/releases/latest</li>
+<li>Toolkit hub: https://threecats-lsp.com</li>
+<li>Current version: 3.2.0</li>
+<li>License: MIT</li>
+</ul>
+<h2>Safety Notice</h2>
+<p>This software is a planning aid, not life-support equipment and not a replacement for training, certification, tables, dive computers, instructor guidance, team procedures, or conservative judgment.</p>
+<p>Always verify plans independently, analyze gases, confirm MOD and ppO2 limits, carry adequate bailout/reserve gas, and follow your training agency and team protocols. The authors accept no responsibility for dive outcomes.</p>
+<h2>Three Cats LSP Toolkit</h2>
+<table><thead><tr>
+<th>App</th>
+<th>Purpose</th>
+<th>Live app</th>
+<th>Repository</th>
+<th>Android APK</th>
+</tr></thead><tbody>
+<tr>
+<td>LSP D-Planner+</td>
+<td>OC, CCR, pSCR, rec and tech decompression planning</td>
+<td>https://threecats-lsp.com/d-planner-plus/</td>
+<td>https://github.com/Three-Cats-LSP/LSP_D-planner-plus</td>
+<td>https://threecats-lsp.com/d-planner-plus/download.html</td>
+</tr>
+<tr>
+<td>T-Viewer</td>
+<td>View, edit, style, and share exported TXT/PDF dive plans</td>
+<td>https://threecats-lsp.com/t-viewer/</td>
+<td>https://github.com/Three-Cats-LSP/T-Viewer</td>
+<td>https://threecats-lsp.com/t-viewer/download.html</td>
+</tr>
+<tr>
+<td>Get In Water</td>
+<td>Dive trip packing lists and exportable checklists</td>
+<td>https://threecats-lsp.com/get-in-water/</td>
+<td>https://github.com/Three-Cats-LSP/Get-In-Water</td>
+<td>https://threecats-lsp.com/get-in-water/download.html</td>
+</tr>
+</tbody></table>
+<h2>What Changed Since 2.5</h2>
+<p>Version 3.1.3 is the current post-2.5 milestone release after a major UI, engine, audit, export, and release-hardening overhaul.</p>
+<p>Highlights:</p>
+<ul>
+<li>New risk-first audit epoch covering the app from engines and safety paths outward.</li>
+<li>Cleaner extracted runtime modules instead of large inline logic in <code>index.html</code>.</li>
+<li>ZHL headless adapter extracted into its own runtime file.</li>
+<li>VPM and ZHL render paths aligned around shared schedule rendering contracts.</li>
+<li>New deco schedule layout: Phase, Depth, Stop, Run, Mix, ppO2, CNS, EAD.</li>
+<li>Canonical gas labels across the app: <code>Air</code>, <code>100%</code>, and <code>OO/HH</code> such as <code>50/00</code> or <code>18/45</code>.</li>
+<li>Redesigned gas consumption cards with per-cylinder remaining gas bars, inline no-gas warnings, and main/contingency parity.</li>
+<li>Main dive graph moved into the Dive Profile flow; Graphs tab removed; Tissues tab simplified.</li>
+<li>Better mobile navigation and compact planner cards.</li>
+<li>Stronger MOD, gas-label, schedule-table, graph, contingency, export, and browser visual contracts.</li>
+<li>Release gates, Android APK build, offline ZIP build, and GitHub Pages deploy are green for 3.1.3.</li>
+</ul>
+<h2>Algorithms And Modes</h2>
+<table><thead><tr>
+<th>Algorithm</th>
+<th>Supported modes</th>
+<th>Notes</th>
+</tr></thead><tbody>
+<tr>
+<td>Buhlmann ZHL-16C + Gradient Factors</td>
+<td>OC, CCR, pSCR</td>
+<td>16 tissue compartments, GF presets/custom GF, shallow-gradient controls, altitude/acclimatization support</td>
+</tr>
+<tr>
+<td>VPM-B</td>
+<td>OC, CCR</td>
+<td>Bubble-model planning with conservatism +0 to +5</td>
+</tr>
+<tr>
+<td>VPM-B/GFS</td>
+<td>OC, CCR</td>
+<td>VPM-B deep stop profile with GF High shallow-stop control</td>
+</tr>
+<tr>
+<td>PADI RDP</td>
+<td>Recreational OC</td>
+<td>Narrow recreational table mode for Air, EAN32, and EAN36</td>
+</tr>
+</tbody></table>
+<h2>Core Planner Features</h2>
+<h3>Recreational Planning</h3>
+<ul>
+<li>PADI RDP and Buhlmann NDL workflows.</li>
+<li>Multi-dive day planning with residual nitrogen / tissue carryover.</li>
+<li>Surface interval support.</li>
+<li>Average-depth and unit helper tools.</li>
+<li>Rec mode deliberately keeps gas choices narrow for safety-contract clarity.</li>
+</ul>
+<h3>Technical Planning</h3>
+<ul>
+<li>OC, CCR, and pSCR circuit modes.</li>
+<li>Trimix bottom, travel, and deco gases.</li>
+<li>Travel gas with switch depth and MinOD/MOD display.</li>
+<li>Deco gas switching with explicit ppO2, MOD, and gas-label contracts.</li>
+<li>Altitude and acclimatization controls.</li>
+<li>Repetitive Buhlmann and VPM state carry.</li>
+<li>Contingency plans for gas loss, extra bottom time, and deeper-than-planned scenarios.</li>
+<li>Bailout and emergency gas consumption views.</li>
+</ul>
+<h3>Safety And Warnings</h3>
+<ul>
+<li>MOD blocking for unsafe bottom-gas depth.</li>
+<li>Narcotic depth warning tied to the affected gas.</li>
+<li>High CNS warning placement below the deco card.</li>
+<li>No-gas and critical-gas warnings inside the affected gas card.</li>
+<li>Low, critical, and no-gas states use distinct visual severity.</li>
+<li>Gas supply is shown per cylinder, not only as a total.</li>
+</ul>
+<h3>Results Views</h3>
+<ul>
+<li>Deco plan card with gas chips and plan metadata.</li>
+<li>Full dive graph in the Dive Profile tab.</li>
+<li>Main schedule table with consistent columns across Buhlmann, VPM, and contingency plans.</li>
+<li>Gas consumption cards with remaining gas bars.</li>
+<li>Tissue saturation and GF/tissue tools under the Tissues view.</li>
+<li>Light and dark themes.</li>
+<li>Desktop two-column layout and mobile compact layout.</li>
+</ul>
+<h3>Tools</h3>
+<ul>
+<li>MOD calculator.</li>
+<li>Best Mix.</li>
+<li>END calculator.</li>
+<li>EAD table.</li>
+<li>Gas table.</li>
+<li>NDL table.</li>
+<li>Unit converter.</li>
+<li>CNS / OTU calculator.</li>
+</ul>
+<h3>Export</h3>
+<table><thead><tr>
+<th>Export</th>
+<th>Description</th>
+</tr></thead><tbody>
+<tr>
+<td>Copy</td>
+<td>Plain text plan copied to clipboard</td>
+</tr>
+<tr>
+<td>Deco Slate</td>
+<td>Compact monospaced slate format</td>
+</tr>
+<tr>
+<td>TXT</td>
+<td>Full text plan download/share</td>
+</tr>
+<tr>
+<td>PDF</td>
+<td>Dive plan PDF with schedule, gas, graph, tissue, and summary sections</td>
+</tr>
+<tr>
+<td>Emergency Plan</td>
+<td>Contingency plan export for gas-loss and emergency scenarios</td>
+</tr>
+</tbody></table>
+<p>T-Viewer can open and style exported TXT/PDF dive plans:</p>
+<ul>
+<li>https://threecats-lsp.com/t-viewer/</li>
+</ul>
+<h2>Install</h2>
+<h3>Web / PWA</h3>
+<p>Open:</p>
+<pre><code>https://threecats-lsp.com/d-planner-plus/</code></pre>
+<p>Then install from your browser:</p>
+<table><thead><tr>
+<th>Platform</th>
+<th>Install path</th>
+</tr></thead><tbody>
+<tr>
+<td>iPhone / iPad Safari</td>
+<td>Share -&gt; Add to Home Screen</td>
+</tr>
+<tr>
+<td>Android Chrome</td>
+<td>Menu -&gt; Install app or Add to Home Screen</td>
+</tr>
+<tr>
+<td>Desktop Chrome / Edge / Vivaldi</td>
+<td>Install icon in address bar</td>
+</tr>
+</tbody></table>
+<h3>Android APK</h3>
+<p>Download:</p>
+<pre><code>https://threecats-lsp.com/d-planner-plus/download.html</code></pre>
+<p>Requirements:</p>
+<ul>
+<li>Android 5.0+ / API 21+</li>
+<li>Allow &quot;Install unknown apps&quot; for your browser or file manager</li>
+</ul>
+<p>The update manifest is:</p>
+<pre><code>https://threecats-lsp.com/d-planner-plus/version.json</code></pre>
+<h2>Runtime Architecture</h2>
+<p>The app is a static web app with extracted runtime modules and generated engine bundles.</p>
+<p>High-level runtime:</p>
+<pre><code>index.html
+|-- app-version.js
+|-- settings-core.js
+|-- planner-shell.js
+|-- results-render-core.js
+|-- results-panel.js
+|-- plot-core.js
+|-- zhl-engine-bundle.js
+|-- zhl-headless-adapter.js
+|-- zhl-worker-bridge.js
+|-- zhl-schedule-worker.js
+|-- vpm-engine-bundle.js
+|-- schedule-runner-core.js
+|-- vpm-runner-core.js
+|-- export-core.js
+`-- native bridge / PWA / UI support modules</code></pre>
+<p>Engine sources:</p>
+<pre><code>zhl-physics-core.js
+zhl-gas-core.js
+zhl-schedule-core.js
+zhl-ccr-core.js
+vpm-engine-core.js
+vpmb.py</code></pre>
+<p>Generated bundles:</p>
+<pre><code>zhl-engine-bundle.js
+vpm-engine-bundle.js</code></pre>
+<p>The engine bundles are rebuilt with:</p>
+<pre><code>npm run build:bundles</code></pre>
+<p>Engine parity is checked with:</p>
+<pre><code>npm run check:engine-parity</code></pre>
+<h2>Local Development</h2>
+<p>Install dependencies:</p>
+<pre><code>npm ci
+python -m pip install playwright
+python -m playwright install chromium</code></pre>
+<p>Useful commands:</p>
+<pre><code>npm run build
+npm run sync:www
+python tools/assemble_ui_html.py --verify
+python tools/seven_lens_protocol.py check-all --require-artifacts
+python -m tools.audit check --profile static
+python -m tools.audit run --profile ci
+python -m tools.audit run --profile release</code></pre>
+<p>Android sync:</p>
+<pre><code>npm run cap:sync</code></pre>
+<p>Open Android project:</p>
+<pre><code>npm run cap:open</code></pre>
+<h2>Test And Audit Gates</h2>
+<p>The 3.1.3 release uses a simplified risk-first audit workflow. Older Seven-Lens cycle records are preserved as historical evidence, but active development uses the newer V4 risk-first records and focused regression contracts.</p>
+<p>Primary local gates:</p>
+<table><thead><tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr></thead><tbody>
+<tr>
+<td><code>python dev/engine_regression.py</code></td>
+<td>Engine and schedule regression cases</td>
+</tr>
+<tr>
+<td><code>node dev/vpm_direct_regression.js</code></td>
+<td>Direct VPM smoke and reference checks</td>
+</tr>
+<tr>
+<td><code>python dev/ui_visual_contract_regression.py</code></td>
+<td>UI visual contracts for schedule, gas cards, graph, labels, and mobile layout</td>
+</tr>
+<tr>
+<td><code>python dev/ui_shell_results_regression.py</code></td>
+<td>Shell/results navigation and state contracts</td>
+</tr>
+<tr>
+<td><code>python dev/ui_results_css_regression.py</code></td>
+<td>Results CSS contracts</td>
+</tr>
+<tr>
+<td><code>python dev/ui_css_regression.py</code></td>
+<td>Controls/CSS contracts</td>
+</tr>
+<tr>
+<td><code>python tools/assemble_ui_html.py --verify</code></td>
+<td>Generated <code>index.html</code> parity with UI partials</td>
+</tr>
+<tr>
+<td><code>python tools/seven_lens_protocol.py check-all --require-artifacts</code></td>
+<td>Reviewed-boundary and audit protocol sanity</td>
+</tr>
+<tr>
+<td><code>python -m tools.audit check --profile static</code></td>
+<td>Static audit profile</td>
+</tr>
+<tr>
+<td><code>python -m tools.audit run --profile ci</code></td>
+<td>CI audit profile</td>
+</tr>
+<tr>
+<td><code>python -m tools.audit run --profile release</code></td>
+<td>Full release profile</td>
+</tr>
+</tbody></table>
+<p>Live browser suites:</p>
+<table><thead><tr>
+<th>Suite</th>
+<th>Link</th>
+</tr></thead><tbody>
+<tr>
+<td>Core tests</td>
+<td>https://threecats-lsp.com/d-planner-plus/tests.html</td>
+</tr>
+<tr>
+<td>Verify tests</td>
+<td>https://threecats-lsp.com/d-planner-plus/tests-verify.html</td>
+</tr>
+<tr>
+<td>Extended tests</td>
+<td>https://threecats-lsp.com/d-planner-plus/tests-extended.html</td>
+</tr>
+<tr>
+<td>Massive suite</td>
+<td>https://threecats-lsp.com/d-planner-plus/tests-massive.html</td>
+</tr>
+<tr>
+<td>Mobile massive suite</td>
+<td>https://threecats-lsp.com/d-planner-plus/tests-massive-main.html</td>
+</tr>
+<tr>
+<td>pSCR OTU/CNS suite</td>
+<td>https://threecats-lsp.com/d-planner-plus/tests-pscr-otu-cns.html</td>
+</tr>
+<tr>
+<td>CCR differential suite</td>
+<td>https://threecats-lsp.com/d-planner-plus/tests-ccr-differential.html</td>
+</tr>
+</tbody></table>
+<p>GitHub workflows:</p>
+<table><thead><tr>
+<th>Workflow</th>
+<th>Purpose</th>
+</tr></thead><tbody>
+<tr>
+<td>CI</td>
+<td>Core checks and regression gates</td>
+</tr>
+<tr>
+<td>Release gates</td>
+<td>Full release audit profile</td>
+</tr>
+<tr>
+<td>Deploy to GitHub Pages</td>
+<td>Publishes the web/PWA app</td>
+</tr>
+<tr>
+<td>Build Android APK</td>
+<td>Builds and publishes the Android APK</td>
+</tr>
+<tr>
+<td>Build Offline ZIP</td>
+<td>Publishes an offline web package</td>
+</tr>
+</tbody></table>
+<h2>Repository Layout</h2>
+<pre><code>.
+|-- index.html
+|-- ui/
+|   |-- markup-header.html
+|   |-- markup-modals.html
+|   `-- ...
+|-- *.js
+|-- *.css
+|-- dev/
+|   `-- regression and audit helper scripts
+|-- tools/
+|   `-- build, audit, bundle, sync, and validation tools
+|-- docs/
+|   `-- audit, review, architecture, and release documentation
+|-- android/
+|   `-- Capacitor Android project
+|-- www/
+|   `-- synced web assets for Android/packaging
+`-- tests/
+    `-- browser and differential fixtures</code></pre>
+<h2>Legacy Editions</h2>
+<p>Development continues in LSP D-Planner+ only. Older editions are archived:</p>
+<table><thead><tr>
+<th>App</th>
+<th>URL</th>
+<th>Status</th>
+</tr></thead><tbody>
+<tr>
+<td>LSP D-Planner</td>
+<td>https://threecats-lsp.com/d-planner/</td>
+<td>Archived OC-only version</td>
+</tr>
+<tr>
+<td>LSP D-Planner + CCR</td>
+<td>https://threecats-lsp.com/d-planner-ccr/</td>
+<td>Archived predecessor</td>
+</tr>
+</tbody></table>
+<h2>License</h2>
+<p>MIT. You may use, modify, and distribute this project under the terms of the MIT license.</p>
+<h2>Third-Party Assets</h2>
+<ul>
+<li>Oxygen icon by Flaticon: https://www.flaticon.com/free-icon/oxygen_6770314</li>
+<li>Dive Mode icon by Flaticon: https://www.flaticon.com/free-icon/dive_6648136</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Three Cats LSP: https://threecats-lsp.com</li>
+<li>GitHub organization: https://github.com/Three-Cats-LSP</li>
+<li>Instagram: https://www.instagram.com/threecats_lsp</li>
+</ul>
+      </article>
+    </div>
+  </main>
+  <footer class="site-footer">Three Cats LSP - Diver's Toolkit</footer>
+</body>
+</html>

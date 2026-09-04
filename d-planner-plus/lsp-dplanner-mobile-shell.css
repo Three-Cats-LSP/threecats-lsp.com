@@ -1,0 +1,709 @@
+/* AUDIT-UNIT:UI-CSS-MOBILE-SHELL */
+/* Mobile native shell — top route row + bottom result tabs (≤767px) */
+
+/* ── Desktop: shell elements inert ── */
+.app-bottom-nav,
+.mobile-algo-chips {
+  display: none;
+}
+
+.mobile-tools-list,
+.mobile-tool-detail-bar {
+  display: none;
+}
+
+/* ── Mobile browser + native shell ── */
+@media (max-width: 767px) {
+  .app-bottom-nav {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200;
+    align-items: stretch;
+    justify-content: center;
+    gap: 4px;
+    min-height: 56px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--surface);
+    border-top: 1px solid var(--border-hi);
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  .app-bottom-nav .nav-item {
+    flex: 0 1 108px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    min-height: 48px;
+    min-width: 48px;
+    max-width: 118px;
+    padding: 6px 4px;
+    border: none;
+    border-radius: 10px;
+    margin: 4px 2px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: system-ui, -apple-system, Roboto, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color var(--transition), background var(--transition);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .app-bottom-nav .nav-item[hidden] {
+    display: none !important;
+  }
+
+  .app-bottom-nav .nav-item > span {
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .app-bottom-nav .nav-item .nav-icon {
+    display: none;
+  }
+
+  .app-bottom-nav .nav-item:hover:not(:disabled) {
+    color: var(--text);
+    background: var(--accent-dim);
+  }
+
+  .app-bottom-nav .nav-item.active {
+    color: var(--accent);
+    background: color-mix(in oklab, var(--accent) 12%, transparent);
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+
+  .app-bottom-nav .nav-item:disabled,
+  .app-bottom-nav .nav-item[aria-disabled="true"] {
+    opacity: 0.38;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    inset: 0;
+    max-width: none;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) 0 env(safe-area-inset-left, 0px);
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .app-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: var(--space-2) var(--space-3) calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  body.mobile-tab-tools .app-bottom-nav,
+  body.mobile-tab-settings .app-bottom-nav {
+    display: none !important;
+  }
+
+  body.mobile-tab-tools .app-content,
+  body.mobile-tab-settings .app-content {
+    padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Hide desktop top nav on mobile — algo chips replace REC/Bühlmann/VPM */
+  #mainNavBar {
+    display: none !important;
+  }
+
+  /* Slim header */
+  #headerTopRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+  }
+
+  #headerTopRow .brand-lockup {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-left: 0;
+  }
+
+  #headerTopRow .brand-text p {
+    display: none;
+  }
+
+  #headerBanner {
+    display: none !important;
+  }
+
+  #headerTopRow .header-actions {
+    display: inline-flex;
+    order: 2;
+    width: auto;
+    margin-left: 0;
+    padding: 0;
+    gap: 8px;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+  }
+
+  #headerTopRow .brand-logo {
+    height: 36px;
+  }
+
+  #headerTopRow .brand-text h1 {
+    font-size: 15px;
+    letter-spacing: 1px;
+  }
+
+  header {
+    flex-shrink: 0;
+    padding: 0;
+  }
+
+  /* Route chips: REC / Bühlmann / VPM / Tools / Settings */
+  .mobile-algo-chips {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: var(--space-2) var(--space-3) var(--space-2);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    flex-shrink: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    margin-top: 6px;
+    z-index: 30;
+  }
+
+  .mobile-algo-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-algo-chip {
+    flex-shrink: 0;
+    min-height: 40px;
+    min-width: 48px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-med);
+    background: var(--surface-2);
+    color: var(--text-muted);
+    font-family: system-ui, -apple-system, Roboto, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-algo-chip:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  .mobile-algo-chip.active {
+    color: var(--accent);
+    background: color-mix(in oklab, var(--accent) 14%, transparent);
+    border-color: color-mix(in oklab, var(--accent) 35%, transparent);
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+
+  .planner-main.visible {
+    display: block;
+  }
+
+  /* Allowed !important: mobile tab state is the shell owner for planner/results/tools/settings visibility. */
+  body.mobile-tab-plan #plannerView {
+    display: block !important;
+  }
+
+  body.mobile-tab-plan #recPlannerView.planner-mode-view.visible,
+  body.mobile-tab-plan #tecPlannerView.planner-mode-view.visible {
+    display: flex !important;
+  }
+
+  body.mobile-tab-plan #resultsPanel {
+    display: none !important;
+  }
+
+  body.mobile-view-stack.mobile-tab-plan #resultsPanel.has-results {
+    display: flex !important;
+  }
+
+  body.mobile-view-stack.mobile-tab-plan #recPlannerView.planner-mode-view.visible,
+  body.mobile-view-stack.mobile-tab-plan #tecPlannerView.planner-mode-view.visible {
+    display: flex !important;
+  }
+
+  body.mobile-tab-plan #settingsPageWrap,
+  body.mobile-tab-plan #toolsPageWrap {
+    display: none !important;
+  }
+
+  body.mobile-tab-plan .mobile-algo-chips {
+    display: flex;
+  }
+
+  body.mobile-tab-plan #toolsBar {
+    display: none !important;
+  }
+
+  body.mobile-tab-results #plannerView {
+    display: block !important;
+  }
+
+  body.mobile-tab-results #recPlannerView,
+  body.mobile-tab-results #tecPlannerView {
+    display: none !important;
+  }
+
+  body.mobile-tab-results #resultsPanel.has-results {
+    display: flex !important;
+  }
+
+  body.mobile-tab-results #resultsPanel:not(.has-results) {
+    display: none !important;
+  }
+
+  body.mobile-tab-results #settingsPageWrap,
+  body.mobile-tab-results #toolsPageWrap {
+    display: none !important;
+  }
+
+  body.mobile-tab-results .mobile-algo-chips {
+    display: flex;
+  }
+
+  body.mobile-tab-results #toolsBar {
+    display: none !important;
+  }
+
+  body.mobile-tab-tools #plannerView,
+  body.mobile-tab-tools #settingsPageWrap {
+    display: none !important;
+  }
+
+  body.mobile-tab-tools #toolsPageWrap.visible,
+  body.mobile-tab-tools #toolsPageWrap {
+    display: flex !important;
+  }
+
+  body.mobile-tab-tools #toolsBar.visible,
+  body.mobile-tab-tools #toolsBar {
+    display: none !important;
+  }
+
+  body.mobile-tab-tools .mobile-algo-chips {
+    display: flex !important;
+  }
+
+  body.mobile-tab-tools #toolsPageWrap {
+    gap: 0;
+  }
+
+  body.mobile-tab-tools #toolsPageWrap.mobile-tool-list #toolsPanelMount {
+    display: none !important;
+  }
+
+  body.mobile-tab-tools #toolsPageWrap.mobile-tool-list .mobile-tools-list {
+    display: block;
+  }
+
+  body.mobile-tab-tools #toolsPageWrap.mobile-tool-list .mobile-tool-detail-bar {
+    display: none;
+  }
+
+  body.mobile-tab-tools #toolsPageWrap.mobile-tool-detail .mobile-tools-list {
+    display: none;
+  }
+
+  body.mobile-tab-tools #toolsPageWrap.mobile-tool-detail .mobile-tool-detail-bar {
+    display: flex;
+  }
+
+  body.mobile-tab-tools #toolsPageWrap.mobile-tool-detail #toolsPanelMount {
+    display: block;
+  }
+
+  .mobile-tools-list {
+    display: none;
+    width: 100%;
+  }
+
+  .mobile-tools-list-title {
+    margin: 2px 0 10px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .mobile-tool-row {
+    width: 100%;
+    min-height: 55px;
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 18px;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 13px;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    text-align: left;
+    font-family: system-ui, -apple-system, Roboto, sans-serif;
+    cursor: pointer;
+  }
+
+  .mobile-tool-row:first-of-type {
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+  }
+
+  .mobile-tool-row:last-of-type {
+    border-bottom: 0;
+    border-bottom-left-radius: 14px;
+    border-bottom-right-radius: 14px;
+  }
+
+  .mobile-tool-row.active,
+  .mobile-tool-row:active {
+    background: color-mix(in oklab, var(--accent) 12%, var(--surface-2));
+  }
+
+  .mobile-tool-icon {
+    color: var(--accent);
+    font-size: 15px;
+    text-align: center;
+  }
+
+  .mobile-tool-row strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .mobile-tool-row small {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.15;
+  }
+
+  .mobile-tool-chevron {
+    color: var(--muted);
+    font-size: 18px;
+    text-align: right;
+  }
+
+  .mobile-tool-detail-bar {
+    display: none;
+    width: 100%;
+    align-items: center;
+    grid-template-columns: minmax(64px, 1fr) auto minmax(64px, 1fr);
+    gap: 10px;
+    margin: 0 0 12px;
+    color: var(--text);
+    font-weight: 800;
+  }
+  body.mobile-tab-tools #toolsPageWrap.mobile-tool-detail .mobile-tool-detail-bar {
+    display: grid;
+  }
+
+  #mobileToolTitle {
+    grid-column: 2;
+    justify-self: center;
+    text-align: center;
+    font-size: 17px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .mobile-tool-back {
+    grid-column: 1;
+    justify-self: start;
+    min-height: 36px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  body.mobile-tab-settings #plannerView,
+  body.mobile-tab-settings #toolsPageWrap {
+    display: none !important;
+  }
+
+  body.mobile-tab-settings #settingsPageWrap.visible,
+  body.mobile-tab-settings #settingsPageWrap {
+    display: flex !important;
+  }
+
+  body.mobile-tab-settings #toolsBar {
+    display: none !important;
+  }
+
+  body.mobile-tab-settings .mobile-algo-chips {
+    display: flex !important;
+  }
+
+  #recResultTabs,
+  #tecResultTabs {
+    display: none !important;
+  }
+
+  .deco-gas-card .gas-card-grid {
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .deco-gas-card .gas-card-grid .gas-f-mix {
+    flex: 1 0 100%;
+  }
+
+  .deco-gas-card .gas-card-grid .gas-f-switch {
+    flex: 1 1 128px;
+    min-width: 112px;
+  }
+
+  .deco-gas-card .gas-card-grid .gas-f-num {
+    flex: 0 0 58px;
+    width: 58px;
+    max-width: 58px;
+  }
+
+  .deco-gas-card .gas-card-grid .gas-f-num input,
+  .deco-gas-card .gas-card-grid .gas-f-num select {
+    min-width: 44px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .deco-gas-card .gas-card-grid .switch-depth-display {
+    font-size: 10px;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  #ccrFieldsRow .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #ccrFieldsRow .circuit-mode-field,
+  #ccrFieldsRow #ccrBailoutRow {
+    grid-column: 1 / -1;
+  }
+
+  #ccrFieldsRow .circ-btns {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  #ccrFieldsRow #ccrBailoutRow select {
+    width: 100%;
+  }
+
+  #diluentGasCard .gas-card-grid {
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  #diluentGasCard .gas-card-grid .gas-f-mix {
+    flex: 1 0 100%;
+  }
+
+  #diluentGasCard .gas-card-grid .gas-f-num {
+    flex: 0 0 74px;
+    width: 74px;
+    max-width: 74px;
+  }
+
+  #diluentGasCard .gas-card-grid .gas-f-num input,
+  #diluentGasCard .gas-card-grid .gas-f-num select {
+    min-width: 44px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  /* Material touch targets */
+  .stepper-btn,
+  .gen-btn,
+  .circ-btn,
+  .gf-preset-btn,
+  .cons-btn,
+  .tools-bar-btn,
+  .result-tab-btn,
+  .option-pill-toggle,
+  .theme-pill-toggle {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .header-ref-btn {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+
+  .settings-version-label {
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    opacity: 0.72;
+  }
+
+  .settings-app-links {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .settings-app-links-title {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .settings-app-link-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .settings-app-link-list a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .settings-app-link-list .settings-donate-link {
+    border-color: rgba(0, 112, 186, 0.45);
+    color: #0070ba;
+  }
+
+  #mainVersionLabel {
+    display: none !important;
+  }
+
+  .gen-btn {
+    border-radius: 12px;
+    min-height: 48px;
+    font-family: system-ui, -apple-system, Roboto, sans-serif;
+  }
+
+  .input-card {
+    border-radius: 12px;
+  }
+
+  /* Hide old web footer promo block in mobile shell; Settings owns app links. */
+  .app-footer-promo,
+  .app-shell-footer-links {
+    display: none;
+  }
+
+  /* Theme variant B — Material elevated bottom bar */
+  body.mobile-theme-material .app-bottom-nav {
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.28);
+  }
+
+  body.mobile-theme-material .app-bottom-nav .nav-item.active {
+    box-shadow: none;
+    background: color-mix(in oklab, var(--accent) 18%, transparent);
+    border-radius: 12px;
+  }
+}
+
+/* ── Android native-only stricter app behavior ── */
+html.capacitor-native *,
+html.android-webview * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html.capacitor-native input,
+html.capacitor-native textarea,
+html.android-webview input,
+html.android-webview textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+@media (max-width: 767px) {
+  html.capacitor-native,
+  html.capacitor-native body,
+  html.android-webview,
+  html.android-webview body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  html.capacitor-native .app-bottom-nav,
+  html.android-webview .app-bottom-nav {
+    box-shadow: 0 -6px 28px rgba(0, 0, 0, 0.32);
+  }
+
+  html.capacitor-native .app-content,
+  html.android-webview .app-content {
+    overscroll-behavior-y: contain;
+  }
+
+  html.capacitor-native .app-footer-promo,
+  html.android-webview .app-footer-promo {
+    display: none !important;
+  }
+}
